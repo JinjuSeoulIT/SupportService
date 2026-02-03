@@ -1,5 +1,4 @@
 # SupportService
-# hospital-support (Hospital Support Service)
 
 병원 **진료지원 영역**을 담당하는 Spring Boot 기반 REST API 서비스입니다.  
 간호 문진(Nursing Assessment) 관리 기능을 중심으로,  
