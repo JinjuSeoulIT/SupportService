@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.medical_support.nursingtreatment.mapper.RecordMapper">
+
+    <select id="search" resultType="com.app.medical_support.nursingtreatment.dto.RecordResponseDTO">
+        SELECT
+        nr.record_id,
+        nr.visit_id,
+        nr.recorded_at,
+        nr.status,
+        nr.respiration,
+        nr.observation,
+        nr.systolic_bp,
+        nr.diastolic_bp,
+        nr.pulse,
+        nr.temperature,
+        nr.CONSCIOUSNESS_LEVEL,
+        nr.spo2,
+        nr.INITIAL_ASSESSMENT,
+        e.name AS nurseName,
+        d.dept_name,
+        en.shift_type,
+        rc.PATIENT_Id,
+        nr.height_cm,
+        nr.weight_kg
+
+        FROM CHJ.NURSING_RECORD nr
+
+        JOIN JCH.EMPLOYEE_NURSE en
+        ON nr.nursing_id = en.staff_id
+        JOIN JCH.EMPLOYEE e
+        ON en.staff_id = e.staff_id
+        JOIN JCH.DEPARTMENT d
+        ON e.dept_id = d.dept_id
+        JOIN HOSPITAL.CLINICAL_VISIT cv
+        ON TO_CHAR(cv.VISIT_ID) = nr.VISIT_ID
+        JOIN HOSPITAL.RECEPTION rc
+        ON cv.RECEPTION_ID = rc.RECEPTION_ID
+
+        <where>
+            <choose>
+                <when test="searchType != null and searchType.equals('recordId')">
+                    nr.record_id = #{searchValue}
+                </when>
+
+                <when test="searchType != null and searchType.equals('nurseName') and searchValue != null and searchValue !=''">
+                    e.name LIKE '%' || #{searchValue} || '%'
+                </when>
+
+                <when test="searchType != null and searchType.equals('recordedAt') and startDate != null and endDate != null">
+                    nr.recorded_at
+                    BETWEEN
+                    TO_TIMESTAMP(#{startDate} || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS')
+                    AND
+                    TO_TIMESTAMP(#{endDate} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
+                </when>
+                <otherwise>
+                    1=0 -- 위에 조건 두 개가 거짓이면, 값을 반환하지 않는다. 1=0 은 거짓이기 때문에, 빈 결과를 반환한다.
+                        -- 이 조건문이 없으면 전체 목록을 가져오는 쿼리문이 완성된다.
+                </otherwise>
+
+            </choose>
+        </where>
+        ORDER BY nr.record_id DESC
+    </select>
+
+
+
+    <select id="findRecordList" resultType="com.app.medical_support.nursingtreatment.dto.RecordResponseDTO">
+
+        SELECT
+            nr.record_id,
+            nr.visit_id,
+            nr.recorded_at,
+            nr.respiration,
+            nr.status,
+            nr.observation,
+            nr.systolic_bp,
+            nr.diastolic_bp,
+            nr.pulse,
+            nr.temperature,
+            nr.CONSCIOUSNESS_LEVEL,
+            nr.spo2,
+            nr.INITIAL_ASSESSMENT,
+            e.name AS nurseName,
+            d.dept_name,
+            en.shift_type,
+            rc.PATIENT_Id,
+            nr.height_cm,
+            nr.weight_kg
+
+        FROM CHJ.NURSING_RECORD nr
+
+                 JOIN JCH.EMPLOYEE_NURSE en
+                      ON nr.nursing_id = en.staff_id
+                 JOIN JCH.EMPLOYEE e
+                      ON en.staff_id = e.staff_id
+                 JOIN JCH.DEPARTMENT d
+                      ON e.dept_id = d.dept_id
+                 JOIN HOSPITAL.CLINICAL_VISIT cv
+                      ON TO_CHAR(cv.VISIT_ID) = nr.VISIT_ID
+                 JOIN HOSPITAL.RECEPTION rc
+                      ON cv.RECEPTION_ID = rc.RECEPTION_ID
+
+
+        ORDER BY nr.recorded_at DESC NULLS LAST, nr.record_id DESC
+    </select>
+
+    <select id="findRecordDetail" resultType="com.app.medical_support.nursingtreatment.dto.RecordResponseDTO">
+        SELECT
+            nr.record_id,
+            nr.visit_id,
+            nr.recorded_at,
+            nr.status,
+            nr.respiration,
+            nr.observation,
+            nr.systolic_bp,
+            nr.diastolic_bp,
+            nr.pulse,
+            nr.temperature,
+            nr.spo2,
+            nr.nursing_id,
+            nr.consciousness_level,
+            nr.initial_assessment,
+            TO_CHAR(nr.updated_at, 'YYYY-MM-DD HH24:MI:SS') AS updated_at,
+            nr.height_cm,
+            nr.weight_kg,
+            e.name AS nurse_name,
+            en.shift_type,
+            cv.reception_id,
+            rc.PATIENT_Id,
+            nr.pain_score
+        FROM CHJ.NURSING_RECORD nr
+                 JOIN JCH.EMPLOYEE_NURSE en
+                      ON nr.nursing_id = en.staff_id
+                 JOIN JCH.EMPLOYEE e
+                      ON en.staff_id = e.staff_id
+                 JOIN HOSPITAL.CLINICAL_VISIT cv
+                      ON TO_CHAR(cv.VISIT_ID) = nr.VISIT_ID
+                 JOIN HOSPITAL.RECEPTION rc
+                      ON cv.RECEPTION_ID = rc.RECEPTION_ID
+        WHERE nr.record_id = #{recordId}
+    </select>
+
+
+
+
+ </mapper>
