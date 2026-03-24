@@ -27,4 +27,11 @@ public class TestExecutionReqDTO {
 
     @Schema(description = "수행자ID")
     private Long performerId;
+
+    @Schema(description = "오더항목ID")
+    private Long orderItemId;
+
+    @Schema(description = "검사수행유형")
+    private String executionType;
+
 }
