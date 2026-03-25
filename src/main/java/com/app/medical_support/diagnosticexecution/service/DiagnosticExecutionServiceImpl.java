@@ -331,8 +331,13 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     }
 
     @Override
-    public List<TestExecutionDTO> findTestExecutionList() {
-        return testExecutionResMapStruct.toDTOList(testExecutionRepository.findAll());
+    public List<TestExecutionDTO> findTestExecutionList(String executionType) {
+        if (!hasText(executionType)) {
+            return testExecutionResMapStruct.toDTOList(testExecutionRepository.findAll());
+        }
+
+        String normalized = executionType.trim().toUpperCase();
+        return testExecutionResMapStruct.toDTOList(testExecutionRepository.findByExecutionType(normalized));
     }
 
     @Override

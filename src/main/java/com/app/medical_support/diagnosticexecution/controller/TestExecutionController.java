@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -29,8 +30,11 @@ public class TestExecutionController {
 
     @Operation(summary = "검사 수행 목록 조회")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<TestExecutionDTO>>> findList() {
-        return ResponseEntity.ok(new ApiResponse<>(true, "Test execution list loaded.", testExecutionService.findTestExecutionList()));
+    public ResponseEntity<ApiResponse<List<TestExecutionDTO>>> findList(
+            @Parameter(description = "Execution type filter (e.g. IMAGING, SPECIMEN)")
+            @RequestParam(required = false) String executionType
+    ) {
+        return ResponseEntity.ok(new ApiResponse<>(true, "Test execution list loaded.", testExecutionService.findTestExecutionList(executionType)));
     }
 
     @Operation(summary = "검사 수행 단건 조회")

@@ -43,7 +43,7 @@ public interface DiagnosticExecutionService {
     SpecimenDTO modifySpecimen(String id, SpecimenDTO specimenDTO);
     void deleteSpecimen(String id);
 
-    List<TestExecutionDTO> findTestExecutionList();
+    List<TestExecutionDTO> findTestExecutionList(String executionType);
     TestExecutionDTO findTestExecutionDetail(String id);
     TestExecutionDTO registerTestExecution(TestExecutionDTO testExecutionDTO);
     TestExecutionDTO modifyTestExecution(String id, TestExecutionReqDTO testExecutionReqDTO);
