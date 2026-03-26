@@ -6,6 +6,7 @@ import com.app.medical_support.diagnosticexecution.dto.TestExecutionReqDTO;
 import com.app.medical_support.diagnosticexecution.service.DiagnosticExecutionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,10 @@ public class TestExecutionController {
     @Operation(summary = "검사 수행 목록 조회")
     @GetMapping
     public ResponseEntity<ApiResponse<List<TestExecutionDTO>>> findList(
-            @Parameter(description = "Execution type filter (e.g. IMAGING, SPECIMEN)")
+            @Parameter(
+                    description = "Execution type filter",
+                    schema = @Schema(allowableValues = {"IMAGING", "ENDOSCOPY", "PATHOLOGY", "PHYSIOLOGICAL", "SPECIMEN"})
+            )
             @RequestParam(required = false) String executionType
     ) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Test execution list loaded.", testExecutionService.findTestExecutionList(executionType)));
