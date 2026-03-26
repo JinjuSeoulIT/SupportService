@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface TestExecutionRepository extends JpaRepository<TestExecutionEntity, String> {
     List<TestExecutionEntity> findByExecutionType(String executionType);
+    List<TestExecutionEntity> findByExecutionTypeAndProgressStatus(String executionType, String progressStatus);
+
 }

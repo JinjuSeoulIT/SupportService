@@ -337,7 +337,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         }
 
         String normalized = executionType.trim().toUpperCase();
-        return testExecutionResMapStruct.toDTOList(testExecutionRepository.findByExecutionType(normalized));
+        return testExecutionResMapStruct.toDTOList(testExecutionRepository.findByExecutionTypeAndProgressStatus(normalized, "IN_PROGRESS"));
     }
 
     @Override
