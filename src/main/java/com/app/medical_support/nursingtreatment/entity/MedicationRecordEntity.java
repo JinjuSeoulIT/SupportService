@@ -10,7 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(schema = "CHJ", name = "MEDICATION")
+@Table(schema = "CHJ", name = "MEDICATION_RECORD")
 @Getter
 @Setter
 @NoArgsConstructor

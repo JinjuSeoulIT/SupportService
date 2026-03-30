@@ -66,7 +66,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     public ImagingDTO registerImaging(ImagingDTO imagingDTO) {
         ImagingEntity entity = new ImagingEntity();
         entity.setImagingExamId(hasText(imagingDTO.getImagingExamId()) ? imagingDTO.getImagingExamId() : createImagingId());
-        entity.setVisitId(imagingDTO.getVisitId());
+        entity.setTestExecutionId(imagingDTO.getTestExecutionId());
         entity.setImagingType(imagingDTO.getImagingType());
         entity.setExamStatusYn(normalizeYnStatus(imagingDTO.getExamStatusYn()));
         entity.setExamAt(imagingDTO.getExamAt());
@@ -79,7 +79,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     public ImagingDTO modifyImaging(String id, ImagingDTO imagingDTO) {
         ImagingEntity entity = imagingRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticExecutionNotFoundException("Imaging exam not found. id=" + id));
-        entity.setVisitId(imagingDTO.getVisitId());
+        entity.setTestExecutionId(imagingDTO.getTestExecutionId());
         entity.setImagingType(imagingDTO.getImagingType());
         entity.setExamStatusYn(normalizeYnStatus(imagingDTO.getExamStatusYn()));
         entity.setExamAt(imagingDTO.getExamAt());
@@ -368,19 +368,26 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     public TestExecutionDTO modifyTestExecution(String id, TestExecutionReqDTO testExecutionReqDTO) {
         TestExecutionEntity entity = testExecutionRepository.findById(id)
                 .orElseThrow(() -> new TestExecutionNotFoundExecution("Test execution not found. id=" + id));
+
+        String previousProgressStatus = entity.getProgressStatus();
         entity.setProgressStatus(testExecutionReqDTO.getProgressStatus());
         entity.setRetryNo(testExecutionReqDTO.getRetryNo());
         entity.setStartedAt(testExecutionReqDTO.getStartedAt());
         entity.setCompletedAt(testExecutionReqDTO.getCompletedAt());
         entity.setPerformerId(testExecutionReqDTO.getPerformerId());
         entity.setUpdatedAt(LocalDateTime.now());
+
+        if (!isInProgress(previousProgressStatus) && isInProgress(entity.getProgressStatus())) {
+            ensureExamRecordExists(entity);
+        }
+
         return testExecutionResMapStruct.toDTO(testExecutionRepository.save(entity));
     }
 
     private ImagingDTO toImagingDTO(ImagingEntity entity) {
         ImagingDTO dto = new ImagingDTO();
         dto.setImagingExamId(entity.getImagingExamId());
-        dto.setVisitId(entity.getVisitId());
+        dto.setTestExecutionId(entity.getTestExecutionId());
         dto.setImagingType(entity.getImagingType());
         dto.setExamStatusYn(entity.getExamStatusYn());
         dto.setExamAt(entity.getExamAt());
@@ -434,8 +441,101 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         return dto;
     }
 
+    private void ensureExamRecordExists(TestExecutionEntity entity) {
+        String executionType = normalizeExecutionType(entity.getExecutionType());
+
+        switch (executionType) {
+            case "IMAGING" -> ensureImagingExists(entity);
+            case "ENDOSCOPY" -> ensureEndoscopyExists(entity);
+            case "PATHOLOGY" -> ensurePathologyExists(entity);
+            case "PHYSIOLOGICAL" -> ensurePhysiologicalExists(entity);
+            case "SPECIMEN" -> ensureSpecimenExists(entity);
+            default -> log.warn("Unsupported execution type for automatic exam creation. testExecutionId={}, executionType={}",
+                    entity.getTestExecutionId(), entity.getExecutionType());
+        }
+    }
+
+    private void ensureImagingExists(TestExecutionEntity entity) {
+        if (imagingRepository.existsByTestExecutionId(entity.getTestExecutionId())) {
+            return;
+        }
+
+        ImagingEntity imagingEntity = new ImagingEntity();
+        imagingEntity.setImagingExamId(createImagingId());
+        imagingEntity.setTestExecutionId(entity.getTestExecutionId());
+        imagingEntity.setImagingType(normalizeExecutionType(entity.getExecutionType()));
+        imagingEntity.setExamStatusYn("Y");
+        imagingEntity.setCreatedAt(LocalDateTime.now());
+        imagingRepository.save(imagingEntity);
+    }
+
+    private void ensureEndoscopyExists(TestExecutionEntity entity) {
+        if (endoscopyRepository.existsByTestExecutionId(entity.getTestExecutionId())) {
+            return;
+        }
+
+        EndoscopyEntity endoscopyEntity = new EndoscopyEntity();
+        endoscopyEntity.setEndoscopyExamId(createEndoscopyId());
+        endoscopyEntity.setTestExecutionId(entity.getTestExecutionId());
+        endoscopyEntity.setSedationYn("N");
+        endoscopyEntity.setStatus("ACTIVE");
+        endoscopyEntity.setCreatedAt(LocalDateTime.now());
+        endoscopyRepository.save(endoscopyEntity);
+    }
+
+    private void ensurePathologyExists(TestExecutionEntity entity) {
+        if (pathologyRepository.existsByTestExecutionId(entity.getTestExecutionId())) {
+            return;
+        }
+
+        PathologyEntity pathologyEntity = new PathologyEntity();
+        pathologyEntity.setPathologyExamId(createPathologyId());
+        pathologyEntity.setTestExecutionId(entity.getTestExecutionId());
+        pathologyEntity.setReexamYn("N");
+        pathologyEntity.setStatus("ACTIVE");
+        pathologyEntity.setCreatedAt(LocalDateTime.now());
+        pathologyRepository.save(pathologyEntity);
+    }
+
+    private void ensurePhysiologicalExists(TestExecutionEntity entity) {
+        if (physiologicalRepository.existsByTestExecutionId(entity.getTestExecutionId())) {
+            return;
+        }
+
+        PhysiologicalEntity physiologicalEntity = new PhysiologicalEntity();
+        physiologicalEntity.setPhysiologicalExamId(createPhysiologicalId());
+        physiologicalEntity.setTestExecutionId(entity.getTestExecutionId());
+        physiologicalEntity.setStatus("ACTIVE");
+        physiologicalEntity.setCreatedAt(LocalDateTime.now());
+        physiologicalRepository.save(physiologicalEntity);
+    }
+
+    private void ensureSpecimenExists(TestExecutionEntity entity) {
+        if (specimenRepository.existsByTestExecutionId(entity.getTestExecutionId())) {
+            return;
+        }
+
+        SpecimenEntity specimenEntity = new SpecimenEntity();
+        specimenEntity.setSpecimenExamId(createSpecimenId());
+        specimenEntity.setTestExecutionId(entity.getTestExecutionId());
+        specimenEntity.setSpecimenType(normalizeExecutionType(entity.getExecutionType()));
+        specimenEntity.setSpecimenStatus("COLLECTED");
+        specimenEntity.setRecollectionYn("N");
+        specimenEntity.setStatus("ACTIVE");
+        specimenEntity.setCreatedAt(LocalDateTime.now());
+        specimenRepository.save(specimenEntity);
+    }
+
     private boolean hasText(String value) {
         return value != null && !value.trim().isEmpty();
+    }
+
+    private boolean isInProgress(String progressStatus) {
+        return "IN_PROGRESS".equalsIgnoreCase(progressStatus != null ? progressStatus.trim() : null);
+    }
+
+    private String normalizeExecutionType(String executionType) {
+        return hasText(executionType) ? executionType.trim().toUpperCase() : "";
     }
 
     private String createSpecimenId() {

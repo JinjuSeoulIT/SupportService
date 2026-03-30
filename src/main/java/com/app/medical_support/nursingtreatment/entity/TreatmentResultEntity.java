@@ -10,18 +10,15 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(schema = "CHJ", name = "PROCEDURE_RESULT")
+@Table(schema = "CHJ", name = "TREATMENT_RESULT")
 @Getter
 @Setter
 @NoArgsConstructor
 public class TreatmentResultEntity {
 
     @Id
-    @Column(name = "PROCEDURE_RESULT_ID")
+    @Column(name = "TREATMENT_RESULT_ID")
     private String procedureResultId;
-
-    @Column(name = "ORDER_ITEM_ID")
-    private String orderItemId;
 
     @Column(name = "STATUS")
     private String status;

@@ -21,8 +21,8 @@ public class ImagingEntity {
     @Column(name = "IMAGING_EXAM_ID")
     private String imagingExamId;
 
-    @Column(name = "VISIT_ID")
-    private String visitId;
+    @Column(name = "TEST_EXECUTION_ID")
+    private String testExecutionId;
 
     @Column(name = "IMAGING_TYPE")
     private String imagingType;

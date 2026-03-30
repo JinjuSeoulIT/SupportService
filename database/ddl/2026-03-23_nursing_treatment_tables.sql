@@ -1,4 +1,4 @@
-prompt === Create CHJ.PROCEDURE_RESULT ===
+prompt === Create CHJ.TREATMENT_RESULT ===
 
 declare
     v_count number;
@@ -7,18 +7,18 @@ begin
       into v_count
       from all_tables
      where owner = 'CHJ'
-       and table_name = 'PROCEDURE_RESULT';
+       and table_name = 'TREATMENT_RESULT';
 
     if v_count = 0 then
         execute immediate q'[
-            create table CHJ.PROCEDURE_RESULT (
+            create table CHJ.TREATMENT_RESULT (
                 PROCEDURE_RESULT_ID varchar2(19) not null,
                 ORDER_ITEM_ID       varchar2(30),
                 STATUS              varchar2(20) default 'ACTIVE',
                 PERFORMED_AT        char(18),
                 PERFORMER_ID        char(18),
                 DETAIL              varchar2(1000),
-                constraint PK_PROCEDURE_RESULT primary key (PROCEDURE_RESULT_ID)
+                constraint PK_TREATMENT_RESULT primary key (PROCEDURE_RESULT_ID)
             )
         ]';
     end if;
@@ -62,11 +62,11 @@ begin
       into v_count
       from all_indexes
      where owner = 'CHJ'
-       and table_name = 'PROCEDURE_RESULT'
-       and index_name = 'IDX_PROC_RESULT_ORDER_ITEM';
+       and table_name = 'TREATMENT_RESULT'
+       and index_name = 'IDX_TREATMENT_RESULT_ORDER_ITEM';
 
     if v_count = 0 then
-        execute immediate 'create index CHJ.IDX_PROC_RESULT_ORDER_ITEM on CHJ.PROCEDURE_RESULT (ORDER_ITEM_ID)';
+        execute immediate 'create index CHJ.IDX_TREATMENT_RESULT_ORDER_ITEM on CHJ.TREATMENT_RESULT (ORDER_ITEM_ID)';
     end if;
 
     select count(*)

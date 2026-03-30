@@ -171,7 +171,6 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     public TreatmentResultDTO registerTreatmentResult(TreatmentResultDTO treatmentResultDTO) {
         TreatmentResultEntity entity = new TreatmentResultEntity();
         entity.setProcedureResultId(hasText(treatmentResultDTO.getProcedureResultId()) ? treatmentResultDTO.getProcedureResultId() : createTreatmentResultId());
-        entity.setOrderItemId(treatmentResultDTO.getOrderItemId());
         entity.setPerformedAt(treatmentResultDTO.getPerformedAt());
         entity.setPerformerId(treatmentResultDTO.getPerformerId());
         entity.setDetail(treatmentResultDTO.getDetail());
@@ -184,7 +183,6 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     public TreatmentResultDTO modifyTreatmentResult(String id, TreatmentResultDTO treatmentResultDTO) {
         TreatmentResultEntity entity = treatmentResultRepository.findById(id)
                 .orElseThrow(() -> new TreatmentResultNotFoundException(id));
-        entity.setOrderItemId(treatmentResultDTO.getOrderItemId());
         entity.setPerformedAt(treatmentResultDTO.getPerformedAt());
         entity.setPerformerId(treatmentResultDTO.getPerformerId());
         entity.setDetail(treatmentResultDTO.getDetail());
@@ -216,7 +214,6 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     private TreatmentResultDTO toTreatmentResultDTO(TreatmentResultEntity entity) {
         TreatmentResultDTO dto = new TreatmentResultDTO();
         dto.setProcedureResultId(entity.getProcedureResultId());
-        dto.setOrderItemId(entity.getOrderItemId());
         dto.setStatus(entity.getStatus());
         dto.setPerformedAt(entity.getPerformedAt());
         dto.setPerformerId(entity.getPerformerId());

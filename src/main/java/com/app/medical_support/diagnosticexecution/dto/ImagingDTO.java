@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class ImagingDTO {
 
     private String imagingExamId;
-    private String visitId;
+    private String testExecutionId;
     private String imagingType;
     private String examStatusYn;
     private LocalDateTime examAt;

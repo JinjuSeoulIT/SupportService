@@ -10,7 +10,6 @@ import lombok.Setter;
 public class TreatmentResultDTO {
 
     private String procedureResultId;
-    private String orderItemId;
     private String status;
     private String performedAt;
     private String performerId;
