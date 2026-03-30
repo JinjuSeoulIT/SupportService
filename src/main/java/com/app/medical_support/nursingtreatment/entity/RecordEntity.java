@@ -53,6 +53,9 @@ public class RecordEntity {
     @Column(name = "INITIAL_ASSESSMENT")
     private String initialAssessment;
 
+    @Column(name = "PAST_MEDICAL_HISTORY")
+    private String pastMedicalHistory;
+
     @Column(name = "STATUS")
     private String status;
 

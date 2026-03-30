@@ -29,6 +29,7 @@ public class RecordResponseDTO {
     private String receptionId;
     private String consciousnessLevel;
     private String initialAssessment;
+    private String pastMedicalHistory;
     private String updatedAt;
     private String patientName;
     private String painScore;

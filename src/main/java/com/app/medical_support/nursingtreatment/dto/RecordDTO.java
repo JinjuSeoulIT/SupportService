@@ -53,6 +53,9 @@ public class RecordDTO {
     @Schema(description = "초기 문진 요약 (과거력) ex)고혈압 과거력, 당뇨 약 복용중, 3일 전부터 기침 지속")
     private String initialAssessment;
 
+    @Schema(description = "과거력")
+    private String pastMedicalHistory;
+
     @Schema(description = "상태")
     private String status;
 

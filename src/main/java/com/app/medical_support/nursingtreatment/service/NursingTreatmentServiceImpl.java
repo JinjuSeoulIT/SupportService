@@ -89,6 +89,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         saved.setPainScore(recordDTO.getPainScore());
         saved.setConsciousnessLevel(recordDTO.getConsciousnessLevel());
         saved.setInitialAssessment(recordDTO.getInitialAssessment());
+        saved.setPastMedicalHistory(recordDTO.getPastMedicalHistory());
         saved.setStatus(recordDTO.getStatus());
         saved.setVisitId(recordDTO.getVisitId());
         saved.setNursingId(recordDTO.getNursingId());
