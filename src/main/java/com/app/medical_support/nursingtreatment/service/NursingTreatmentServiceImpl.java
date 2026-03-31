@@ -91,7 +91,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         saved.setInitialAssessment(recordDTO.getInitialAssessment());
         saved.setPastMedicalHistory(recordDTO.getPastMedicalHistory());
         saved.setStatus(recordDTO.getStatus());
-        saved.setVisitId(recordDTO.getVisitId());
+        saved.setReceptionId(recordDTO.getReceptionId());
         saved.setNursingId(recordDTO.getNursingId());
         saved.setUpdatedAt(LocalDateTime.now());
 

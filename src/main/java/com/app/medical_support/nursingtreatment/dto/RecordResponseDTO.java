@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class RecordResponseDTO {
 
     private String recordId;
-    private String visitId;
+    private Long receptionId;
     private LocalDateTime recordedAt;
     private String status;
     private String respiration;
@@ -26,7 +26,6 @@ public class RecordResponseDTO {
     private String nurseName;
     private String departmentName;
     private String shiftType;
-    private String receptionId;
     private String consciousnessLevel;
     private String initialAssessment;
     private String pastMedicalHistory;

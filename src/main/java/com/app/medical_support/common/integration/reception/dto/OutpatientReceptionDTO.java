@@ -14,17 +14,20 @@ public class OutpatientReceptionDTO {
     private Long receptionId;
     private Long patientId;
     private String patientName;
-
     private String departmentName;
     private String doctorName;
-
-    private String scheduledAt;
-    private String arrivedAt;
     private String status;
+    private Long doctorId;
+    private String receptionNo;
 
-//    private String receptionNo;
+
+//    private String scheduledAt;
+//    private String arrivedAt;
+
+
+
 //    private Long departmentId;
-//    private Long doctorId;
+
 //    private String visitType;
 //    private Long reservationId;
 //    private String note;

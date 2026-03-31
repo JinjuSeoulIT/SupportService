@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class RecordRequestDTO {
 
     private String recordId;
-    private String visitId;
+    private Long receptionId;
     private LocalDateTime recordedAt;
     private String status;
     private String observation;
@@ -23,7 +23,6 @@ public class RecordRequestDTO {
     private String nurseName;
     private String departmentName;
     private String shiftType;
-    private String receptionId;
     private String consciousnessLevel;
     private String initialAssessment;
     private String pastMedicalHistory;
@@ -31,6 +30,4 @@ public class RecordRequestDTO {
     private String patientName;
     private String heightCm;
     private String weightKg;
-
-
 }
