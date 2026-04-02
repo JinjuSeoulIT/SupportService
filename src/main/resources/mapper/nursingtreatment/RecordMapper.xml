@@ -28,15 +28,15 @@
             nr.height_cm,
             nr.weight_kg
         FROM CHJ.NURSING_RECORD nr
-        JOIN JCH.EMPLOYEE_NURSE en
-            ON nr.nursing_id = en.staff_id
-        JOIN JCH.EMPLOYEE e
+        LEFT JOIN JCH.EMPLOYEE_NURSE en
+            ON TRIM(nr.nursing_id) = TO_CHAR(en.staff_id)
+        LEFT JOIN JCH.EMPLOYEE e
             ON en.staff_id = e.staff_id
-        JOIN JCH.DEPARTMENT d
+        LEFT JOIN JCH.DEPARTMENT d
             ON e.dept_id = d.dept_id
-        JOIN HOSPITAL.RECEPTION rc
+        LEFT JOIN HOSPITAL.RECEPTION rc
             ON nr.reception_id = rc.reception_id
-        JOIN HOSPITAL.PATIENT p
+        LEFT JOIN HOSPITAL.PATIENT p
             ON rc.patient_id = p.patient_id
         <where>
             <choose>
@@ -83,15 +83,15 @@
             nr.height_cm,
             nr.weight_kg
         FROM CHJ.NURSING_RECORD nr
-        JOIN JCH.EMPLOYEE_NURSE en
-            ON nr.nursing_id = en.staff_id
-        JOIN JCH.EMPLOYEE e
+        LEFT JOIN JCH.EMPLOYEE_NURSE en
+            ON TRIM(nr.nursing_id) = TO_CHAR(en.staff_id)
+        LEFT JOIN JCH.EMPLOYEE e
             ON en.staff_id = e.staff_id
-        JOIN JCH.DEPARTMENT d
+        LEFT JOIN JCH.DEPARTMENT d
             ON e.dept_id = d.dept_id
-        JOIN HOSPITAL.RECEPTION rc
+        LEFT JOIN HOSPITAL.RECEPTION rc
             ON nr.reception_id = rc.reception_id
-        JOIN HOSPITAL.PATIENT p
+        LEFT JOIN HOSPITAL.PATIENT p
             ON rc.patient_id = p.patient_id
         ORDER BY nr.recorded_at DESC NULLS LAST, nr.record_id DESC
     </select>
@@ -121,13 +121,13 @@
             p.name AS patient_name,
             nr.pain_score
         FROM CHJ.NURSING_RECORD nr
-        JOIN JCH.EMPLOYEE_NURSE en
-            ON nr.nursing_id = en.staff_id
-        JOIN JCH.EMPLOYEE e
+        LEFT JOIN JCH.EMPLOYEE_NURSE en
+            ON TRIM(nr.nursing_id) = TO_CHAR(en.staff_id)
+        LEFT JOIN JCH.EMPLOYEE e
             ON en.staff_id = e.staff_id
-        JOIN HOSPITAL.RECEPTION rc
+        LEFT JOIN HOSPITAL.RECEPTION rc
             ON nr.reception_id = rc.reception_id
-        JOIN HOSPITAL.PATIENT p
+        LEFT JOIN HOSPITAL.PATIENT p
             ON rc.patient_id = p.patient_id
         WHERE nr.record_id = #{recordId}
     </select>

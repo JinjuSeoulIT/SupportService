@@ -64,10 +64,6 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
             entity.setRecordId(createRecordId());
         }
 
-        if (!hasText(entity.getNursingId())) {
-            entity.setNursingId("NUR_" + System.currentTimeMillis());
-        }
-
         entity.setStatus("ACTIVE");
         entity.setCreatedAt(LocalDateTime.now());
         return recordResMapStruct.toDTO(recordRepository.save(entity));
