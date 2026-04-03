@@ -24,25 +24,6 @@ public class ReceptionIntegrationController {
 
     private final ReceptionIntegrationService receptionIntegrationService;
 
-    @Operation(summary = "접수 대기 환자 목록 조회")
-    @GetMapping("/waiting")
-    public ResponseEntity<ApiResponse<List<OutpatientReceptionDTO>>> findWaitingList(
-            @Parameter(description = "Department ID")
-            @RequestParam(required = false) Long departmentId,
-            @Parameter(description = "Doctor ID")
-            @RequestParam(required = false) Long doctorId,
-            @Parameter(description = "Date (YYYY-MM-DD)")
-            @RequestParam(required = false) String date
-    ) {
-        return ResponseEntity.ok(
-                new ApiResponse<>(
-                        true,
-                        "Reception waiting list loaded.",
-                        receptionIntegrationService.findWaitingList(departmentId, doctorId, date)
-                )
-        );
-    }
-
     @Operation(summary = "접수 상세 조회")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<OutpatientReceptionDTO>> findDetail(

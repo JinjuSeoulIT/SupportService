@@ -35,7 +35,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-    implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
+   implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
+    //스웨거
 
     implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.1'
@@ -56,4 +57,7 @@ dependencies {
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    //공공데이터 xml->json
+    implementation group: 'org.json', name: 'json', version: '20240303'
 }

@@ -39,38 +39,6 @@ public class ReceptionApiClient {
         this.baseUrl = normalizeBaseUrl(baseUrl);
     }
 
-    public List<OutpatientReceptionDTO> fetchQueue(Long departmentId, Long doctorId, String date) {
-        String uri = UriComponentsBuilder.fromHttpUrl(baseUrl)
-                .path("/api/receptions/queue")
-                .queryParamIfPresent("departmentId", java.util.Optional.ofNullable(departmentId))
-                .queryParamIfPresent("doctorId", java.util.Optional.ofNullable(doctorId))
-                .queryParamIfPresent("date", java.util.Optional.ofNullable(trimToNull(date)))
-                .build(true)
-                .toUriString();
-
-        try {
-            ResponseEntity<ApiResponse<List<OutpatientReceptionDTO>>> responseEntity = restTemplate.exchange(
-                    uri,
-                    HttpMethod.GET,
-                    null,
-                    new ParameterizedTypeReference<ApiResponse<List<OutpatientReceptionDTO>>>() {
-                    }
-            );
-
-            return unwrapResult(responseEntity.getBody(), "Reception queue fetch failed.");
-        } catch (HttpClientErrorException.NotFound ex) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Reception queue not found.", ex);
-        } catch (HttpClientErrorException ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Reception queue request failed.", ex);
-        } catch (HttpServerErrorException ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Reception service failed.", ex);
-        } catch (ResourceAccessException ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Reception service is unreachable.", ex);
-        } catch (RestClientException ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Reception service call failed.", ex);
-        }
-    }
-
     public OutpatientReceptionDTO fetchDetail(Long id) {
         String uri = UriComponentsBuilder.fromHttpUrl(baseUrl)
                 .path("/api/receptions/{id}")
