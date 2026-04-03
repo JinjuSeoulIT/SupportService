@@ -73,9 +73,9 @@ public class RecordDTO {
     @Schema(description = "Nursing ID")
     private String nursingId;
 
-    @Schema(description = "Height")
-    private String height;
+    @Schema(description = "Height (cm)")
+    private String heightCm;
 
-    @Schema(description = "Weight")
-    private String weight;
+    @Schema(description = "Weight (kg)")
+    private String weightKg;
 }

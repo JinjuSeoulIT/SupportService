@@ -59,13 +59,15 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     @Transactional
     public RecordDTO registerRecord(RecordRequestDTO recordRequestDTO) {
         RecordEntity entity = recordReqMapStruct.toEntity(recordRequestDTO);
+        LocalDateTime now = LocalDateTime.now();
 
         if (!hasText(entity.getRecordId())) {
             entity.setRecordId(createRecordId());
         }
 
         entity.setStatus("ACTIVE");
-        entity.setCreatedAt(LocalDateTime.now());
+        entity.setCreatedAt(now);
+        entity.setUpdatedAt(now);
         return recordResMapStruct.toDTO(recordRepository.save(entity));
     }
 
@@ -75,6 +77,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         RecordEntity saved = recordRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException(id));
 
+        saved.setRecordedAt(recordDTO.getRecordedAt());
         saved.setSystolicBp(recordDTO.getSystolicBp());
         saved.setDiastolicBp(recordDTO.getDiastolicBp());
         saved.setPulse(recordDTO.getPulse());
@@ -86,9 +89,11 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         saved.setConsciousnessLevel(recordDTO.getConsciousnessLevel());
         saved.setInitialAssessment(recordDTO.getInitialAssessment());
         saved.setPastMedicalHistory(recordDTO.getPastMedicalHistory());
-        saved.setStatus(recordDTO.getStatus());
+        saved.setStatus(normalizeStatus(recordDTO.getStatus()));
         saved.setReceptionId(recordDTO.getReceptionId());
         saved.setNursingId(recordDTO.getNursingId());
+        saved.setHeightCm(recordDTO.getHeightCm());
+        saved.setWeightKg(recordDTO.getWeightKg());
         saved.setUpdatedAt(LocalDateTime.now());
 
         return recordResMapStruct.toDTO(recordRepository.save(saved));
@@ -100,7 +105,8 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         RecordEntity entity = recordRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException(id));
 
-        entity.setStatus(status);
+        entity.setStatus(normalizeStatus(status));
+        entity.setUpdatedAt(LocalDateTime.now());
         return recordResMapStruct.toDTO(recordRepository.save(entity));
     }
 

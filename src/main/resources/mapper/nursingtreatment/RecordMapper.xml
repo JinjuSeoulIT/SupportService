@@ -19,10 +19,11 @@
             nr.temperature,
             nr.consciousness_level,
             nr.spo2,
+            nr.nursing_id,
             nr.initial_assessment,
             nr.past_medical_history,
             e.name AS nurse_name,
-            d.dept_name AS department_name,
+            NVL(receipt_dept.department_name, nurse_dept.dept_name) AS department_name,
             en.shift_type,
             p.name AS patient_name,
             nr.height_cm,
@@ -30,12 +31,16 @@
         FROM CHJ.NURSING_RECORD nr
         LEFT JOIN JCH.EMPLOYEE_NURSE en
             ON TRIM(nr.nursing_id) = TO_CHAR(en.staff_id)
+            OR TRIM(nr.nursing_id) = TO_CHAR(en.nurse_id)
+            OR TRIM(nr.nursing_id) = 'NUR_' || LPAD(TO_CHAR(en.nurse_id), 3, '0')
         LEFT JOIN JCH.EMPLOYEE e
             ON en.staff_id = e.staff_id
-        LEFT JOIN JCH.DEPARTMENT d
-            ON e.dept_id = d.dept_id
         LEFT JOIN HOSPITAL.RECEPTION rc
             ON nr.reception_id = rc.reception_id
+        LEFT JOIN HOSPITAL.DEPARTMENT receipt_dept
+            ON rc.department_id = receipt_dept.department_id
+        LEFT JOIN JCH.DEPARTMENT nurse_dept
+            ON e.dept_id = nurse_dept.dept_id
         LEFT JOIN HOSPITAL.PATIENT p
             ON rc.patient_id = p.patient_id
         <where>
@@ -74,10 +79,11 @@
             nr.temperature,
             nr.consciousness_level,
             nr.spo2,
+            nr.nursing_id,
             nr.initial_assessment,
             nr.past_medical_history,
             e.name AS nurse_name,
-            d.dept_name AS department_name,
+            NVL(receipt_dept.department_name, nurse_dept.dept_name) AS department_name,
             en.shift_type,
             p.name AS patient_name,
             nr.height_cm,
@@ -85,12 +91,16 @@
         FROM CHJ.NURSING_RECORD nr
         LEFT JOIN JCH.EMPLOYEE_NURSE en
             ON TRIM(nr.nursing_id) = TO_CHAR(en.staff_id)
+            OR TRIM(nr.nursing_id) = TO_CHAR(en.nurse_id)
+            OR TRIM(nr.nursing_id) = 'NUR_' || LPAD(TO_CHAR(en.nurse_id), 3, '0')
         LEFT JOIN JCH.EMPLOYEE e
             ON en.staff_id = e.staff_id
-        LEFT JOIN JCH.DEPARTMENT d
-            ON e.dept_id = d.dept_id
         LEFT JOIN HOSPITAL.RECEPTION rc
             ON nr.reception_id = rc.reception_id
+        LEFT JOIN HOSPITAL.DEPARTMENT receipt_dept
+            ON rc.department_id = receipt_dept.department_id
+        LEFT JOIN JCH.DEPARTMENT nurse_dept
+            ON e.dept_id = nurse_dept.dept_id
         LEFT JOIN HOSPITAL.PATIENT p
             ON rc.patient_id = p.patient_id
         ORDER BY nr.recorded_at DESC NULLS LAST, nr.record_id DESC
@@ -117,16 +127,23 @@
             nr.height_cm,
             nr.weight_kg,
             e.name AS nurse_name,
+            NVL(receipt_dept.department_name, nurse_dept.dept_name) AS department_name,
             en.shift_type,
             p.name AS patient_name,
             nr.pain_score
         FROM CHJ.NURSING_RECORD nr
         LEFT JOIN JCH.EMPLOYEE_NURSE en
             ON TRIM(nr.nursing_id) = TO_CHAR(en.staff_id)
+            OR TRIM(nr.nursing_id) = TO_CHAR(en.nurse_id)
+            OR TRIM(nr.nursing_id) = 'NUR_' || LPAD(TO_CHAR(en.nurse_id), 3, '0')
         LEFT JOIN JCH.EMPLOYEE e
             ON en.staff_id = e.staff_id
         LEFT JOIN HOSPITAL.RECEPTION rc
             ON nr.reception_id = rc.reception_id
+        LEFT JOIN HOSPITAL.DEPARTMENT receipt_dept
+            ON rc.department_id = receipt_dept.department_id
+        LEFT JOIN JCH.DEPARTMENT nurse_dept
+            ON e.dept_id = nurse_dept.dept_id
         LEFT JOIN HOSPITAL.PATIENT p
             ON rc.patient_id = p.patient_id
         WHERE nr.record_id = #{recordId}

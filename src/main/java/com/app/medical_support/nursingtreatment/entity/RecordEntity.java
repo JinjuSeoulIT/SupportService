@@ -71,4 +71,10 @@ public class RecordEntity {
     @Column(name = "NURSING_ID")
     private String nursingId;
 
+    @Column(name = "HEIGHT_CM")
+    private String heightCm;
+
+    @Column(name = "WEIGHT_KG")
+    private String weightKg;
+
 }

@@ -1,7 +1,5 @@
 package com.app.medical_support.nursingtreatment.mapstruct;
 
-
-import com.app.medical_support.nursingtreatment.dto.RecordDTO;
 import com.app.medical_support.nursingtreatment.dto.RecordRequestDTO;
 import com.app.medical_support.nursingtreatment.entity.RecordEntity;
 import org.mapstruct.Mapper;

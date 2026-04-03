@@ -17,8 +17,10 @@ public class RecordRequestDTO {
     private Integer systolicBp;
     private Integer diastolicBp;
     private Integer pulse;
+    private Integer respiration;
     private Double temperature;
     private Integer spo2;
+    private Integer painScore;
     private String nursingId;
     private String nurseName;
     private String departmentName;
