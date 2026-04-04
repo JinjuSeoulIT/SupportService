@@ -25,7 +25,6 @@ public class RecordResponseDTO {
     private String nursingId;
     private String nurseName;
     private String departmentName;
-    private String shiftType;
     private String consciousnessLevel;
     private String initialAssessment;
     private String pastMedicalHistory;

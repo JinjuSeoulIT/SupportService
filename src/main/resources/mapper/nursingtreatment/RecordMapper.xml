@@ -24,7 +24,6 @@
             nr.past_medical_history,
             e.name AS nurse_name,
             NVL(receipt_dept.department_name, nurse_dept.dept_name) AS department_name,
-            en.shift_type,
             p.name AS patient_name,
             nr.height_cm,
             nr.weight_kg
@@ -84,7 +83,6 @@
             nr.past_medical_history,
             e.name AS nurse_name,
             NVL(receipt_dept.department_name, nurse_dept.dept_name) AS department_name,
-            en.shift_type,
             p.name AS patient_name,
             nr.height_cm,
             nr.weight_kg
@@ -128,7 +126,6 @@
             nr.weight_kg,
             e.name AS nurse_name,
             NVL(receipt_dept.department_name, nurse_dept.dept_name) AS department_name,
-            en.shift_type,
             p.name AS patient_name,
             nr.pain_score
         FROM CHJ.NURSING_RECORD nr
