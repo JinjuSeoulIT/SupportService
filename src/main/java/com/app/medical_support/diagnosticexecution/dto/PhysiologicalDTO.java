@@ -16,7 +16,9 @@ public class PhysiologicalDTO {
     private String examEquipmentId;
     private String rawData;
     private String reportDocId;
+    private String performerId;
     private String status;
+    private String progressStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

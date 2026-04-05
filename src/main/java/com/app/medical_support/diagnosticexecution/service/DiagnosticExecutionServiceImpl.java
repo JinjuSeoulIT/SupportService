@@ -68,7 +68,9 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setImagingExamId(hasText(imagingDTO.getImagingExamId()) ? imagingDTO.getImagingExamId() : createImagingId());
         entity.setTestExecutionId(imagingDTO.getTestExecutionId());
         entity.setImagingType(imagingDTO.getImagingType());
-        entity.setExamStatusYn(normalizeYnStatus(imagingDTO.getExamStatusYn()));
+        entity.setStatus(normalizeStatus(imagingDTO.getStatus()));
+        entity.setProgressStatus(normalizeProgressStatus(imagingDTO.getProgressStatus()));
+        entity.setPerformerId(normalizeOptionalValue(imagingDTO.getPerformerId()));
         entity.setExamAt(imagingDTO.getExamAt());
         entity.setCreatedAt(LocalDateTime.now());
         return toImagingDTO(imagingRepository.save(entity));
@@ -81,7 +83,8 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
                 .orElseThrow(() -> new DiagnosticExecutionNotFoundException("Imaging exam not found. id=" + id));
         entity.setTestExecutionId(imagingDTO.getTestExecutionId());
         entity.setImagingType(imagingDTO.getImagingType());
-        entity.setExamStatusYn(normalizeYnStatus(imagingDTO.getExamStatusYn()));
+        entity.setProgressStatus(resolveProgressStatus(imagingDTO.getProgressStatus(), entity.getProgressStatus()));
+        entity.setPerformerId(normalizeOptionalValue(imagingDTO.getPerformerId()));
         entity.setExamAt(imagingDTO.getExamAt());
         entity.setUpdatedAt(LocalDateTime.now());
         return toImagingDTO(imagingRepository.save(entity));
@@ -92,7 +95,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     public void deleteImaging(String id) {
         ImagingEntity entity = imagingRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticExecutionNotFoundException("Imaging exam not found. id=" + id));
-        entity.setExamStatusYn("N");
+        entity.setStatus("INACTIVE");
         entity.setUpdatedAt(LocalDateTime.now());
         imagingRepository.save(entity);
     }
@@ -117,9 +120,10 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setProcedureRoom(endoscopyDTO.getProcedureRoom());
         entity.setEquipment(endoscopyDTO.getEquipment());
         entity.setSedationYn(normalizeYnFlag(endoscopyDTO.getSedationYn()));
-        entity.setOperationId(endoscopyDTO.getOperationId());
+        entity.setPerformerId(normalizeOptionalValue(endoscopyDTO.getPerformerId()));
         entity.setProcedureAt(endoscopyDTO.getProcedureAt());
         entity.setStatus(normalizeStatus(endoscopyDTO.getStatus()));
+        entity.setProgressStatus(normalizeProgressStatus(endoscopyDTO.getProgressStatus()));
         entity.setCreatedAt(LocalDateTime.now());
         return toEndoscopyDTO(endoscopyRepository.save(entity));
     }
@@ -133,9 +137,9 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setProcedureRoom(endoscopyDTO.getProcedureRoom());
         entity.setEquipment(endoscopyDTO.getEquipment());
         entity.setSedationYn(normalizeYnFlag(endoscopyDTO.getSedationYn()));
-        entity.setOperationId(endoscopyDTO.getOperationId());
+        entity.setPerformerId(normalizeOptionalValue(endoscopyDTO.getPerformerId()));
         entity.setProcedureAt(endoscopyDTO.getProcedureAt());
-        entity.setStatus(normalizeStatus(endoscopyDTO.getStatus()));
+        entity.setProgressStatus(resolveProgressStatus(endoscopyDTO.getProgressStatus(), entity.getProgressStatus()));
         entity.setUpdatedAt(LocalDateTime.now());
         return toEndoscopyDTO(endoscopyRepository.save(entity));
     }
@@ -172,9 +176,10 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setTissueSite(pathologyDTO.getTissueSite());
         entity.setTissueType(pathologyDTO.getTissueType());
         entity.setCollectedAt(pathologyDTO.getCollectedAt());
-        entity.setCollectedById(pathologyDTO.getCollectedById());
+        entity.setPerformerId(normalizeOptionalValue(pathologyDTO.getPerformerId()));
         entity.setReexamYn(normalizeYnFlag(pathologyDTO.getReexamYn()));
         entity.setStatus(normalizeStatus(pathologyDTO.getStatus()));
+        entity.setProgressStatus(normalizeProgressStatus(pathologyDTO.getProgressStatus()));
         entity.setCreatedAt(LocalDateTime.now());
         return toPathologyDTO(pathologyRepository.save(entity));
     }
@@ -190,9 +195,9 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setTissueSite(pathologyDTO.getTissueSite());
         entity.setTissueType(pathologyDTO.getTissueType());
         entity.setCollectedAt(pathologyDTO.getCollectedAt());
-        entity.setCollectedById(pathologyDTO.getCollectedById());
+        entity.setPerformerId(normalizeOptionalValue(pathologyDTO.getPerformerId()));
         entity.setReexamYn(normalizeYnFlag(pathologyDTO.getReexamYn()));
-        entity.setStatus(normalizeStatus(pathologyDTO.getStatus()));
+        entity.setProgressStatus(resolveProgressStatus(pathologyDTO.getProgressStatus(), entity.getProgressStatus()));
         entity.setUpdatedAt(LocalDateTime.now());
         return toPathologyDTO(pathologyRepository.save(entity));
     }
@@ -227,7 +232,9 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setExamEquipmentId(physiologicalDTO.getExamEquipmentId());
         entity.setRawData(physiologicalDTO.getRawData());
         entity.setReportDocId(physiologicalDTO.getReportDocId());
+        entity.setPerformerId(normalizeOptionalValue(physiologicalDTO.getPerformerId()));
         entity.setStatus(normalizeStatus(physiologicalDTO.getStatus()));
+        entity.setProgressStatus(normalizeProgressStatus(physiologicalDTO.getProgressStatus()));
         entity.setCreatedAt(LocalDateTime.now());
         return toPhysiologicalDTO(physiologicalRepository.save(entity));
     }
@@ -241,7 +248,8 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setExamEquipmentId(physiologicalDTO.getExamEquipmentId());
         entity.setRawData(physiologicalDTO.getRawData());
         entity.setReportDocId(physiologicalDTO.getReportDocId());
-        entity.setStatus(normalizeStatus(physiologicalDTO.getStatus()));
+        entity.setPerformerId(normalizeOptionalValue(physiologicalDTO.getPerformerId()));
+        entity.setProgressStatus(resolveProgressStatus(physiologicalDTO.getProgressStatus(), entity.getProgressStatus()));
         entity.setUpdatedAt(LocalDateTime.now());
         return toPhysiologicalDTO(physiologicalRepository.save(entity));
     }
@@ -298,7 +306,9 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         }
         entity.setSpecimenStatus(hasText(entity.getSpecimenStatus()) ? entity.getSpecimenStatus().trim().toUpperCase() : "COLLECTED");
         entity.setRecollectionYn(normalizeYnFlag(entity.getRecollectionYn()));
+        entity.setPerformerId(normalizeOptionalValue(entity.getPerformerId()));
         entity.setStatus(normalizeStatus(entity.getStatus()));
+        entity.setProgressStatus(normalizeProgressStatus(entity.getProgressStatus()));
         entity.setCreatedAt(LocalDateTime.now());
         return specimenResMapStruct.toDTO(specimenRepository.save(entity));
     }
@@ -312,10 +322,10 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setSpecimenType(specimenDTO.getSpecimenType());
         entity.setSpecimenStatus(hasText(specimenDTO.getSpecimenStatus()) ? specimenDTO.getSpecimenStatus().trim().toUpperCase() : entity.getSpecimenStatus());
         entity.setCollectedAt(specimenDTO.getCollectedAt());
-        entity.setCollectedById(specimenDTO.getCollectedById());
+        entity.setPerformerId(normalizeOptionalValue(specimenDTO.getPerformerId()));
         entity.setCollectionSite(specimenDTO.getCollectionSite());
         entity.setRecollectionYn(normalizeYnFlag(specimenDTO.getRecollectionYn()));
-        entity.setStatus(normalizeStatus(specimenDTO.getStatus()));
+        entity.setProgressStatus(resolveProgressStatus(specimenDTO.getProgressStatus(), entity.getProgressStatus()));
         entity.setUpdatedAt(LocalDateTime.now());
         return specimenResMapStruct.toDTO(specimenRepository.save(entity));
     }
@@ -389,7 +399,9 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         dto.setImagingExamId(entity.getImagingExamId());
         dto.setTestExecutionId(entity.getTestExecutionId());
         dto.setImagingType(entity.getImagingType());
-        dto.setExamStatusYn(entity.getExamStatusYn());
+        dto.setStatus(entity.getStatus());
+        dto.setProgressStatus(entity.getProgressStatus());
+        dto.setPerformerId(entity.getPerformerId());
         dto.setExamAt(entity.getExamAt());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());
@@ -403,9 +415,10 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         dto.setProcedureRoom(entity.getProcedureRoom());
         dto.setEquipment(entity.getEquipment());
         dto.setSedationYn(entity.getSedationYn());
-        dto.setOperationId(entity.getOperationId());
+        dto.setPerformerId(entity.getPerformerId());
         dto.setProcedureAt(entity.getProcedureAt());
         dto.setStatus(entity.getStatus());
+        dto.setProgressStatus(entity.getProgressStatus());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());
         return dto;
@@ -420,9 +433,10 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         dto.setTissueSite(entity.getTissueSite());
         dto.setTissueType(entity.getTissueType());
         dto.setCollectedAt(entity.getCollectedAt());
-        dto.setCollectedById(entity.getCollectedById());
+        dto.setPerformerId(entity.getPerformerId());
         dto.setReexamYn(entity.getReexamYn());
         dto.setStatus(entity.getStatus());
+        dto.setProgressStatus(entity.getProgressStatus());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());
         return dto;
@@ -435,7 +449,9 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         dto.setExamEquipmentId(entity.getExamEquipmentId());
         dto.setRawData(entity.getRawData());
         dto.setReportDocId(entity.getReportDocId());
+        dto.setPerformerId(entity.getPerformerId());
         dto.setStatus(entity.getStatus());
+        dto.setProgressStatus(entity.getProgressStatus());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());
         return dto;
@@ -464,7 +480,8 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         imagingEntity.setImagingExamId(createImagingId());
         imagingEntity.setTestExecutionId(entity.getTestExecutionId());
         imagingEntity.setImagingType(normalizeExecutionType(entity.getExecutionType()));
-        imagingEntity.setExamStatusYn("Y");
+        imagingEntity.setStatus("ACTIVE");
+        imagingEntity.setProgressStatus("WAITING");
         imagingEntity.setCreatedAt(LocalDateTime.now());
         imagingRepository.save(imagingEntity);
     }
@@ -479,6 +496,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         endoscopyEntity.setTestExecutionId(entity.getTestExecutionId());
         endoscopyEntity.setSedationYn("N");
         endoscopyEntity.setStatus("ACTIVE");
+        endoscopyEntity.setProgressStatus("WAITING");
         endoscopyEntity.setCreatedAt(LocalDateTime.now());
         endoscopyRepository.save(endoscopyEntity);
     }
@@ -493,6 +511,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         pathologyEntity.setTestExecutionId(entity.getTestExecutionId());
         pathologyEntity.setReexamYn("N");
         pathologyEntity.setStatus("ACTIVE");
+        pathologyEntity.setProgressStatus("WAITING");
         pathologyEntity.setCreatedAt(LocalDateTime.now());
         pathologyRepository.save(pathologyEntity);
     }
@@ -506,6 +525,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         physiologicalEntity.setPhysiologicalExamId(createPhysiologicalId());
         physiologicalEntity.setTestExecutionId(entity.getTestExecutionId());
         physiologicalEntity.setStatus("ACTIVE");
+        physiologicalEntity.setProgressStatus("WAITING");
         physiologicalEntity.setCreatedAt(LocalDateTime.now());
         physiologicalRepository.save(physiologicalEntity);
     }
@@ -522,6 +542,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         specimenEntity.setSpecimenStatus("COLLECTED");
         specimenEntity.setRecollectionYn("N");
         specimenEntity.setStatus("ACTIVE");
+        specimenEntity.setProgressStatus("WAITING");
         specimenEntity.setCreatedAt(LocalDateTime.now());
         specimenRepository.save(specimenEntity);
     }
@@ -591,16 +612,28 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         return "N";
     }
 
-    private String normalizeYnStatus(String value) {
+    private String normalizeProgressStatus(String value) {
         if (!hasText(value)) {
-            return "Y";
+            return "WAITING";
         }
 
         String trimmed = value.trim().toUpperCase();
-        if ("ACTIVE".equals(trimmed) || "Y".equals(trimmed)) {
-            return "Y";
+        if ("WAITING".equals(trimmed) || "IN_PROGRESS".equals(trimmed) || "COMPLETED".equals(trimmed)) {
+            return trimmed;
         }
 
-        return "N";
+        return "WAITING";
+    }
+
+    private String resolveProgressStatus(String newValue, String currentValue) {
+        if (!hasText(newValue)) {
+            return hasText(currentValue) ? normalizeProgressStatus(currentValue) : "WAITING";
+        }
+
+        return normalizeProgressStatus(newValue);
+    }
+
+    private String normalizeOptionalValue(String value) {
+        return hasText(value) ? value.trim() : null;
     }
 }

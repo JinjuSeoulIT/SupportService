@@ -18,9 +18,10 @@ public class PathologyDTO {
     private String tissueSite;
     private String tissueType;
     private LocalDateTime collectedAt;
-    private String collectedById;
+    private String performerId;
     private String reexamYn;
     private String status;
+    private String progressStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

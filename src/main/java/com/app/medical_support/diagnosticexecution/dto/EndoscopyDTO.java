@@ -16,9 +16,10 @@ public class EndoscopyDTO {
     private String procedureRoom;
     private String equipment;
     private String sedationYn;
-    private String operationId;
+    private String performerId;
     private LocalDateTime procedureAt;
     private String status;
+    private String progressStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

@@ -27,8 +27,14 @@ public class ImagingEntity {
     @Column(name = "IMAGING_TYPE")
     private String imagingType;
 
-    @Column(name = "EXAM_STATUS_YN")
-    private String examStatusYn;
+    @Column(name = "STATUS")
+    private String status;
+
+    @Column(name = "PROGRESS_STATUS")
+    private String progressStatus;
+
+    @Column(name = "PERFORMER_ID")
+    private String performerId;
 
     @Column(name = "EXAM_AT")
     private LocalDateTime examAt;

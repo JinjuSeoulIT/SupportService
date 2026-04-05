@@ -33,8 +33,8 @@ public class SpecimenEntity {
     @Column(name = "COLLECTED_AT")
     private LocalDateTime collectedAt;
 
-    @Column(name = "COLLECTED_BY_ID")
-    private String collectedById;
+    @Column(name = "PERFORMER_ID")
+    private String performerId;
 
     @Column(name = "COLLECTION_SITE")
     private String collectionSite;
@@ -44,6 +44,9 @@ public class SpecimenEntity {
 
     @Column(name = "STATUS")
     private String status;
+
+    @Column(name = "PROGRESS_STATUS")
+    private String progressStatus;
 
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;

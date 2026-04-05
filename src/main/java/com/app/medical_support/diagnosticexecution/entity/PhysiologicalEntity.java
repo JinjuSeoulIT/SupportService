@@ -33,8 +33,14 @@ public class PhysiologicalEntity {
     @Column(name = "REPORT_DOC_ID")
     private String reportDocId;
 
+    @Column(name = "PERFORMER_ID")
+    private String performerId;
+
     @Column(name = "STATUS")
     private String status;
+
+    @Column(name = "PROGRESS_STATUS")
+    private String progressStatus;
 
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;

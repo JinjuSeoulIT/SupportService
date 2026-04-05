@@ -33,14 +33,17 @@ public class EndoscopyEntity {
     @Column(name = "SEDATION_YN")
     private String sedationYn;
 
-    @Column(name = "OPERATION_ID")
-    private String operationId;
+    @Column(name = "PERFORMER_ID")
+    private String performerId;
 
     @Column(name = "PROCEDURE_AT")
     private LocalDateTime procedureAt;
 
     @Column(name = "STATUS")
     private String status;
+
+    @Column(name = "PROGRESS_STATUS")
+    private String progressStatus;
 
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;

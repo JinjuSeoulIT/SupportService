@@ -28,8 +28,8 @@ public class SpecimenDTO {
     @Schema(description = "Collected date time")
     private LocalDateTime collectedAt;
 
-    @Schema(description = "Collected by")
-    private String collectedById;
+    @Schema(description = "Performer ID")
+    private String performerId;
 
     @Schema(description = "Collection site")
     private String collectionSite;
@@ -39,6 +39,9 @@ public class SpecimenDTO {
 
     @Schema(description = "Status")
     private String status;
+
+    @Schema(description = "Progress status")
+    private String progressStatus;
 
     @Schema(description = "Created at")
     private LocalDateTime createdAt;
