@@ -17,7 +17,6 @@ public class ImagingDTO {
     private String status;
     private String progressStatus;
     private String performerId;
-    private LocalDateTime examAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

@@ -36,9 +36,6 @@ public class ImagingEntity {
     @Column(name = "PERFORMER_ID")
     private String performerId;
 
-    @Column(name = "EXAM_AT")
-    private LocalDateTime examAt;
-
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;
 

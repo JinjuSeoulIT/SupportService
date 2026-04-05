@@ -71,7 +71,6 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setStatus(normalizeStatus(imagingDTO.getStatus()));
         entity.setProgressStatus(normalizeProgressStatus(imagingDTO.getProgressStatus()));
         entity.setPerformerId(normalizeOptionalValue(imagingDTO.getPerformerId()));
-        entity.setExamAt(imagingDTO.getExamAt());
         entity.setCreatedAt(LocalDateTime.now());
         return toImagingDTO(imagingRepository.save(entity));
     }
@@ -85,7 +84,6 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setImagingType(imagingDTO.getImagingType());
         entity.setProgressStatus(resolveProgressStatus(imagingDTO.getProgressStatus(), entity.getProgressStatus()));
         entity.setPerformerId(normalizeOptionalValue(imagingDTO.getPerformerId()));
-        entity.setExamAt(imagingDTO.getExamAt());
         entity.setUpdatedAt(LocalDateTime.now());
         return toImagingDTO(imagingRepository.save(entity));
     }
@@ -402,7 +400,6 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         dto.setStatus(entity.getStatus());
         dto.setProgressStatus(entity.getProgressStatus());
         dto.setPerformerId(entity.getPerformerId());
-        dto.setExamAt(entity.getExamAt());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());
         return dto;
