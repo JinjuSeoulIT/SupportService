@@ -1,9 +1,7 @@
 package com.app.medical_support.nursingtreatment.exception.handler;
 
 import com.app.medical_support.common.ApiResponse;
-import com.app.medical_support.nursingtreatment.exception.MedicationRecordNotFoundException;
-import com.app.medical_support.nursingtreatment.exception.RecordNotFoundException;
-import com.app.medical_support.nursingtreatment.exception.TreatmentResultNotFoundException;
+import com.app.medical_support.nursingtreatment.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -16,6 +14,20 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Slf4j
 public class RecordExceptionHandler {
+
+    @ExceptionHandler(RecordReceptionValidationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleRecordReceptionValidation(RecordReceptionValidationException ex) {
+        log.warn("RecordReceptionValidationException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
+
+    @ExceptionHandler(RecordReceptionLookupException.class)
+    public ResponseEntity<ApiResponse<Void>> handleRecordReceptionLookup(RecordReceptionLookupException ex) {
+        log.warn("RecordReceptionLookupException: {}", ex.getMessage());
+        return ResponseEntity.status(ex.getStatusCode())
+                .body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
 
     @ExceptionHandler(RecordNotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleRecordNotFound(RecordNotFoundException ex) {
@@ -37,4 +49,12 @@ public class RecordExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ApiResponse<>(false, ex.getMessage(), null));
     }
+
+    @ExceptionHandler(RecordSearchValidationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleRecordSearchValidation(RecordSearchValidationException ex) {
+        log.warn("RecordSearchValidationException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
+
 }

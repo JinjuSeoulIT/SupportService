@@ -1,5 +1,7 @@
 package com.app.medical_support.nursingtreatment.service;
 
+import com.app.medical_support.common.integration.reception.dto.OutpatientReceptionDTO;
+import com.app.medical_support.common.integration.reception.service.ReceptionIntegrationService;
 import com.app.medical_support.nursingtreatment.dto.MedicationRecordDTO;
 import com.app.medical_support.nursingtreatment.dto.RecordDTO;
 import com.app.medical_support.nursingtreatment.dto.RecordRequestDTO;
@@ -8,9 +10,7 @@ import com.app.medical_support.nursingtreatment.dto.TreatmentResultDTO;
 import com.app.medical_support.nursingtreatment.entity.MedicationRecordEntity;
 import com.app.medical_support.nursingtreatment.entity.RecordEntity;
 import com.app.medical_support.nursingtreatment.entity.TreatmentResultEntity;
-import com.app.medical_support.nursingtreatment.exception.MedicationRecordNotFoundException;
-import com.app.medical_support.nursingtreatment.exception.RecordNotFoundException;
-import com.app.medical_support.nursingtreatment.exception.TreatmentResultNotFoundException;
+import com.app.medical_support.nursingtreatment.exception.*;
 import com.app.medical_support.nursingtreatment.mapper.RecordMapper;
 import com.app.medical_support.nursingtreatment.mapstruct.RecordReqMapStruct;
 import com.app.medical_support.nursingtreatment.mapstruct.RecordResMapStruct;
@@ -19,10 +19,13 @@ import com.app.medical_support.nursingtreatment.repository.RecordRepository;
 import com.app.medical_support.nursingtreatment.repository.TreatmentResultRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -35,10 +38,20 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     private final RecordMapper recordMapper;
     private final MedicationRecordRepository medicationRecordRepository;
     private final TreatmentResultRepository treatmentResultRepository;
+    private final ReceptionIntegrationService receptionIntegrationService;
 
     @Override
     public List<RecordResponseDTO> search(String searchType, String searchValue, String startDate, String endDate) {
+        if (!"recordId".equals(searchType)
+                && !"nurseName".equals(searchType)
+                && !"patientName".equals(searchType)
+                && !"departmentName".equals(searchType)
+                && !"recordedAt".equals(searchType)) {
+            throw new RecordSearchValidationException("지원하지 않는 검색 타입입니다: " + searchType);
+        }
         return recordMapper.search(searchType, searchValue, startDate, endDate);
+
+
     }
 
     @Override
@@ -58,6 +71,8 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     @Override
     @Transactional
     public RecordDTO registerRecord(RecordRequestDTO recordRequestDTO) {
+        validateReceptionRecordRequest(recordRequestDTO);
+
         RecordEntity entity = recordReqMapStruct.toEntity(recordRequestDTO);
         LocalDateTime now = LocalDateTime.now();
 
@@ -242,6 +257,70 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         }
 
         return trimmed;
+    }
+
+    private void validateReceptionRecordRequest(RecordRequestDTO recordRequestDTO) {
+        Long receptionId = recordRequestDTO.getReceptionId();
+        if (receptionId == null) {
+            throw new RecordReceptionValidationException("접수 정보 검증 실패: receptionId는 필수입니다.");
+        }
+
+        String requestPatientName = trimToNull(recordRequestDTO.getPatientName());
+        String requestDepartmentName = trimToNull(recordRequestDTO.getDepartmentName());
+        List<String> validationErrors = new ArrayList<>();
+
+        if (requestPatientName == null) {
+            validationErrors.add("환자명 값이 없습니다");
+        }
+        if (requestDepartmentName == null) {
+            validationErrors.add("진료과 값이 없습니다");
+        }
+        if (!validationErrors.isEmpty()) {
+            throw new RecordReceptionValidationException("접수 정보 검증 실패: " + String.join(", ", validationErrors));
+        }
+
+        OutpatientReceptionDTO receptionDetail;
+        try {
+            receptionDetail = receptionIntegrationService.findDetail(receptionId);
+        } catch (ResponseStatusException ex) {
+            if (HttpStatus.NOT_FOUND.equals(ex.getStatus())) {
+                throw new RecordReceptionValidationException("접수 정보 검증 실패: 유효하지 않은 receptionId입니다. receptionId=" + receptionId);
+            }
+            throw new RecordReceptionLookupException(
+                    ex.getStatus(),
+                    firstNonBlank(ex.getReason(), "접수 상세 조회에 실패했습니다.")
+            );
+        }
+
+        String actualPatientName = trimToNull(receptionDetail.getPatientName());
+        String actualDepartmentName = trimToNull(receptionDetail.getDepartmentName());
+        List<String> mismatchErrors = new ArrayList<>();
+
+        if (!requestPatientName.equals(actualPatientName)) {
+            mismatchErrors.add("환자명 불일치");
+        }
+        if (!requestDepartmentName.equals(actualDepartmentName)) {
+            mismatchErrors.add("진료과 불일치");
+        }
+
+        if (!mismatchErrors.isEmpty()) {
+            throw new RecordReceptionValidationException("접수 정보 검증 실패: " + String.join(", ", mismatchErrors));
+        }
+    }
+
+    private String trimToNull(String value) {
+        if (!hasText(value)) {
+            return null;
+        }
+        return value.trim();
+    }
+
+    private String firstNonBlank(String first, String second) {
+        String firstValue = trimToNull(first);
+        if (firstValue != null) {
+            return firstValue;
+        }
+        return trimToNull(second);
     }
 
     private String createRecordId() {

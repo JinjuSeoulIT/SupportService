@@ -50,6 +50,12 @@
                 <when test="searchType != null and searchType.equals('nurseName') and searchValue != null and searchValue != ''">
                     e.name LIKE '%' || #{searchValue} || '%'
                 </when>
+                <when test="searchType != null and searchType.equals('patientName') and searchValue != null and searchValue != ''">
+                    p.name LIKE '%' || #{searchValue} || '%'
+                </when>
+                <when test="searchType != null and searchType.equals('departmentName') and searchValue != null and searchValue != ''">
+                    NVL(receipt_dept.department_name, nurse_dept.dept_name) LIKE '%' || #{searchValue} || '%'
+                </when>
                 <when test="searchType != null and searchType.equals('recordedAt') and startDate != null and endDate != null">
                     nr.recorded_at BETWEEN
                     TO_TIMESTAMP(#{startDate} || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS')
