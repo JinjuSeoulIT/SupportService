@@ -9,7 +9,6 @@
         SELECT
             nr.record_id,
             nr.reception_id,
-            nr.recorded_at,
             nr.status,
             nr.respiration,
             nr.observation,
@@ -26,7 +25,8 @@
             NVL(receipt_dept.department_name, nurse_dept.dept_name) AS department_name,
             p.name AS patient_name,
             nr.height_cm,
-            nr.weight_kg
+            nr.weight_kg,
+            nr.createdAt
         FROM CHJ.NURSING_RECORD nr
         LEFT JOIN JCH.EMPLOYEE_NURSE en
             ON TRIM(nr.nursing_id) = TO_CHAR(en.staff_id)
@@ -56,8 +56,8 @@
                 <when test="searchType != null and searchType.equals('departmentName') and searchValue != null and searchValue != ''">
                     NVL(receipt_dept.department_name, nurse_dept.dept_name) LIKE '%' || #{searchValue} || '%'
                 </when>
-                <when test="searchType != null and searchType.equals('recordedAt') and startDate != null and endDate != null">
-                    nr.recorded_at BETWEEN
+                <when test="searchType != null and searchType.equals('createdAt') and startDate != null and endDate != null">
+                    nr.created_at BETWEEN
                     TO_TIMESTAMP(#{startDate} || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS')
                     AND
                     TO_TIMESTAMP(#{endDate} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
@@ -74,7 +74,7 @@
         SELECT
             nr.record_id,
             nr.reception_id,
-            nr.recorded_at,
+            nr.created_at,
             nr.respiration,
             nr.status,
             nr.observation,
@@ -107,14 +107,14 @@
             ON e.dept_id = nurse_dept.dept_id
         LEFT JOIN HOSPITAL.PATIENT p
             ON rc.patient_id = p.patient_id
-        ORDER BY nr.recorded_at DESC NULLS LAST, nr.record_id DESC
+        ORDER BY nr.created_at DESC NULLS LAST, nr.record_id DESC
     </select>
 
     <select id="findRecordDetail" resultType="com.app.medical_support.nursingtreatment.dto.RecordResponseDTO">
         SELECT
             nr.record_id,
             nr.reception_id,
-            nr.recorded_at,
+            nr.created_at,
             nr.status,
             nr.respiration,
             nr.observation,

@@ -20,9 +20,6 @@ public class RecordEntity {
     @Column(name = "RECORD_ID")
     private String recordId;
 
-    @Column(name = "RECORDED_AT")
-    private LocalDateTime recordedAt;
-
     @Column(name = "SYSTOLIC_BP")
     private Integer systolicBp;
 

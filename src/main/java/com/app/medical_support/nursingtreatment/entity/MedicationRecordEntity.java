@@ -20,9 +20,6 @@ public class MedicationRecordEntity {
     @Column(name = "MEDICATION_ID")
     private String medicationId;
 
-    @Column(name = "ORDER_ITEM_ID")
-    private String orderItemId;
-
     @Column(name = "ADMINISTERED_AT")
     private String administeredAt;
 
@@ -32,8 +29,8 @@ public class MedicationRecordEntity {
     @Column(name = "DOSE_UNIT")
     private String doseUnit;
 
-    @Column(name = "NURSE_ID")
-    private String nurseId;
+    @Column(name = "NURSING_ID")
+    private String nursingId;
 
     @Column(name = "STATUS")
     private String status;

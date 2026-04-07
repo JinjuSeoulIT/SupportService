@@ -46,7 +46,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
                 && !"nurseName".equals(searchType)
                 && !"patientName".equals(searchType)
                 && !"departmentName".equals(searchType)
-                && !"recordedAt".equals(searchType)) {
+                && !"createdAt".equals(searchType)) {
             throw new RecordSearchValidationException("지원하지 않는 검색 타입입니다: " + searchType);
         }
         return recordMapper.search(searchType, searchValue, startDate, endDate);
@@ -92,7 +92,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         RecordEntity saved = recordRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException(id));
 
-        saved.setRecordedAt(recordDTO.getRecordedAt());
+
         saved.setSystolicBp(recordDTO.getSystolicBp());
         saved.setDiastolicBp(recordDTO.getDiastolicBp());
         saved.setPulse(recordDTO.getPulse());
@@ -141,11 +141,10 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     public MedicationRecordDTO registerMedicationRecord(MedicationRecordDTO medicationRecordDTO) {
         MedicationRecordEntity entity = new MedicationRecordEntity();
         entity.setMedicationId(hasText(medicationRecordDTO.getMedicationId()) ? medicationRecordDTO.getMedicationId() : createMedicationId());
-        entity.setOrderItemId(medicationRecordDTO.getOrderItemId());
         entity.setAdministeredAt(medicationRecordDTO.getAdministeredAt());
         entity.setDoseNumber(medicationRecordDTO.getDoseNumber());
         entity.setDoseUnit(medicationRecordDTO.getDoseUnit());
-        entity.setNurseId(medicationRecordDTO.getNurseId());
+        entity.setNursingId(medicationRecordDTO.getNursingId());
         entity.setStatus(normalizeStatus(medicationRecordDTO.getStatus()));
         return toMedicationRecordDTO(medicationRecordRepository.save(entity));
     }
@@ -155,11 +154,10 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     public MedicationRecordDTO modifyMedicationRecord(String id, MedicationRecordDTO medicationRecordDTO) {
         MedicationRecordEntity entity = medicationRecordRepository.findById(id)
                 .orElseThrow(() -> new MedicationRecordNotFoundException(id));
-        entity.setOrderItemId(medicationRecordDTO.getOrderItemId());
         entity.setAdministeredAt(medicationRecordDTO.getAdministeredAt());
         entity.setDoseNumber(medicationRecordDTO.getDoseNumber());
         entity.setDoseUnit(medicationRecordDTO.getDoseUnit());
-        entity.setNurseId(medicationRecordDTO.getNurseId());
+        entity.setNursingId(medicationRecordDTO.getNursingId());
         entity.setStatus(normalizeStatus(medicationRecordDTO.getStatus()));
         return toMedicationRecordDTO(medicationRecordRepository.save(entity));
     }
@@ -220,11 +218,10 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     private MedicationRecordDTO toMedicationRecordDTO(MedicationRecordEntity entity) {
         MedicationRecordDTO dto = new MedicationRecordDTO();
         dto.setMedicationId(entity.getMedicationId());
-        dto.setOrderItemId(entity.getOrderItemId());
         dto.setAdministeredAt(entity.getAdministeredAt());
         dto.setDoseNumber(entity.getDoseNumber());
         dto.setDoseUnit(entity.getDoseUnit());
-        dto.setNurseId(entity.getNurseId());
+        dto.setNursingId(entity.getNursingId());
         dto.setStatus(entity.getStatus());
         return dto;
     }

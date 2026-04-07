@@ -10,10 +10,9 @@ import lombok.Setter;
 public class MedicationRecordDTO {
 
     private String medicationId;
-    private String orderItemId;
     private String administeredAt;
     private Double doseNumber;
     private String doseUnit;
-    private String nurseId;
+    private String nursingId;
     private String status;
 }

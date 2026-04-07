@@ -10,5 +10,5 @@ public interface RecordRepository extends JpaRepository<RecordEntity, String> {
 //재정의, 프로시저를 생성해서 여기다가 쓸 수 있다. 간호사 아이디는 NUR_ 로 저장할 수 있도록
 
     List<RecordEntity> findByRecordIdContaining(String recordId);
-    List<RecordEntity> findByRecordedAtBetween(LocalDateTime start, LocalDateTime end);
+    List<RecordEntity> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 }

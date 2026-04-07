@@ -13,7 +13,6 @@ public class RecordResponseDTO {
 
     private String recordId;
     private Long receptionId;
-    private LocalDateTime recordedAt;
     private String status;
     private String respiration;
     private String observation;
@@ -33,4 +32,5 @@ public class RecordResponseDTO {
     private String painScore;
     private String heightCm;
     private String weightKg;
+    private String createdAt;
 }

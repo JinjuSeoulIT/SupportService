@@ -11,7 +11,6 @@ public class RecordRequestDTO {
 
     private String recordId;
     private Long receptionId;
-    private LocalDateTime recordedAt;
     private String status;
     private String observation;
     private Integer systolicBp;
