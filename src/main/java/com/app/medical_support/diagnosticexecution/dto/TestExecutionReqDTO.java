@@ -25,9 +25,6 @@ public class TestExecutionReqDTO {
     @Schema(description = "Completed at")
     private LocalDateTime completedAt;
 
-    @Schema(description = "Performer ID")
-    private Long performerId;
-
     @Schema(description = "Patient ID")
     private Long patientId;
 
@@ -43,6 +40,7 @@ public class TestExecutionReqDTO {
     @Schema(description = "Execution type")
     private String executionType;
 
-
+    @Schema(description = "Performer ID")
+    private Long performerId;
 
 }
