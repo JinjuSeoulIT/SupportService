@@ -11,7 +11,10 @@ public class TreatmentResultDTO {
 
     private String procedureResultId;
     private String status;
-    private String performedAt;
-    private String performerId;
+    private String createdAt;
+    private String nursingId;
     private String detail;
+    private Long patientId;
+    private String patientName;
+    private String departmentName;
 }

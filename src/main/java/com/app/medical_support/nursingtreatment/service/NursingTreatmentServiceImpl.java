@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +33,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class NursingTreatmentServiceImpl implements NursingTreatmentService {
+    private static final DateTimeFormatter CHAR_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
     private final RecordRepository recordRepository;
     private final RecordReqMapStruct recordReqMapStruct;
     private final RecordResMapStruct recordResMapStruct;
@@ -146,6 +149,10 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         entity.setDoseUnit(medicationRecordDTO.getDoseUnit());
         entity.setNursingId(medicationRecordDTO.getNursingId());
         entity.setStatus(normalizeStatus(medicationRecordDTO.getStatus()));
+        entity.setCreatedAt(LocalDateTime.now().format(CHAR_DATE_TIME_FORMATTER));
+        entity.setPatientId(medicationRecordDTO.getPatientId());
+        entity.setPatientName(medicationRecordDTO.getPatientName());
+        entity.setDepartmentName(medicationRecordDTO.getDepartmentName());
         return toMedicationRecordDTO(medicationRecordRepository.save(entity));
     }
 
@@ -159,6 +166,9 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         entity.setDoseUnit(medicationRecordDTO.getDoseUnit());
         entity.setNursingId(medicationRecordDTO.getNursingId());
         entity.setStatus(normalizeStatus(medicationRecordDTO.getStatus()));
+        entity.setPatientId(medicationRecordDTO.getPatientId());
+        entity.setPatientName(medicationRecordDTO.getPatientName());
+        entity.setDepartmentName(medicationRecordDTO.getDepartmentName());
         return toMedicationRecordDTO(medicationRecordRepository.save(entity));
     }
 
@@ -187,10 +197,13 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     public TreatmentResultDTO registerTreatmentResult(TreatmentResultDTO treatmentResultDTO) {
         TreatmentResultEntity entity = new TreatmentResultEntity();
         entity.setProcedureResultId(hasText(treatmentResultDTO.getProcedureResultId()) ? treatmentResultDTO.getProcedureResultId() : createTreatmentResultId());
-        entity.setPerformedAt(treatmentResultDTO.getPerformedAt());
-        entity.setPerformerId(treatmentResultDTO.getPerformerId());
+        entity.setCreatedAt(LocalDateTime.now().format(CHAR_DATE_TIME_FORMATTER));
+        entity.setNursingId(treatmentResultDTO.getNursingId());
         entity.setDetail(treatmentResultDTO.getDetail());
         entity.setStatus(normalizeStatus(treatmentResultDTO.getStatus()));
+        entity.setPatientId(treatmentResultDTO.getPatientId());
+        entity.setPatientName(treatmentResultDTO.getPatientName());
+        entity.setDepartmentName(treatmentResultDTO.getDepartmentName());
         return toTreatmentResultDTO(treatmentResultRepository.save(entity));
     }
 
@@ -199,10 +212,12 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     public TreatmentResultDTO modifyTreatmentResult(String id, TreatmentResultDTO treatmentResultDTO) {
         TreatmentResultEntity entity = treatmentResultRepository.findById(id)
                 .orElseThrow(() -> new TreatmentResultNotFoundException(id));
-        entity.setPerformedAt(treatmentResultDTO.getPerformedAt());
-        entity.setPerformerId(treatmentResultDTO.getPerformerId());
+        entity.setNursingId(treatmentResultDTO.getNursingId());
         entity.setDetail(treatmentResultDTO.getDetail());
         entity.setStatus(normalizeStatus(treatmentResultDTO.getStatus()));
+        entity.setPatientId(treatmentResultDTO.getPatientId());
+        entity.setPatientName(treatmentResultDTO.getPatientName());
+        entity.setDepartmentName(treatmentResultDTO.getDepartmentName());
         return toTreatmentResultDTO(treatmentResultRepository.save(entity));
     }
 
@@ -223,6 +238,10 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         dto.setDoseUnit(entity.getDoseUnit());
         dto.setNursingId(entity.getNursingId());
         dto.setStatus(entity.getStatus());
+        dto.setCreatedAt(entity.getCreatedAt());
+        dto.setPatientId(entity.getPatientId());
+        dto.setPatientName(entity.getPatientName());
+        dto.setDepartmentName(entity.getDepartmentName());
         return dto;
     }
 
@@ -230,9 +249,12 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         TreatmentResultDTO dto = new TreatmentResultDTO();
         dto.setProcedureResultId(entity.getProcedureResultId());
         dto.setStatus(entity.getStatus());
-        dto.setPerformedAt(entity.getPerformedAt());
-        dto.setPerformerId(entity.getPerformerId());
+        dto.setCreatedAt(entity.getCreatedAt());
+        dto.setNursingId(entity.getNursingId());
         dto.setDetail(entity.getDetail());
+        dto.setPatientId(entity.getPatientId());
+        dto.setPatientName(entity.getPatientName());
+        dto.setDepartmentName(entity.getDepartmentName());
         return dto;
     }
 

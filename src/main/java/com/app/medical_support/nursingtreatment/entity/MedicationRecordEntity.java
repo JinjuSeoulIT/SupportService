@@ -34,4 +34,16 @@ public class MedicationRecordEntity {
 
     @Column(name = "STATUS")
     private String status;
+
+    @Column(name = "CREATED_AT")
+    private String createdAt;
+
+    @Column(name = "PATIENT_ID")
+    private Long patientId;
+
+    @Column(name = "PATIENT_NAME")
+    private String patientName;
+
+    @Column(name = "DEPARTMENT_NAME")
+    private String departmentName;
 }

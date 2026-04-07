@@ -23,12 +23,21 @@ public class TreatmentResultEntity {
     @Column(name = "STATUS")
     private String status;
 
-    @Column(name = "PERFORMED_AT")
-    private String performedAt;
+    @Column(name = "CREATED_AT")
+    private String createdAt;
 
-    @Column(name = "PERFORMER_ID")
-    private String performerId;
+    @Column(name = "NURSING_ID")
+    private String nursingId;
 
     @Column(name = "DETAIL")
     private String detail;
+
+    @Column(name = "PATIENT_ID")
+    private Long patientId;
+
+    @Column(name = "PATIENT_NAME")
+    private String patientName;
+
+    @Column(name = "DEPARTMENT_NAME")
+    private String departmentName;
 }

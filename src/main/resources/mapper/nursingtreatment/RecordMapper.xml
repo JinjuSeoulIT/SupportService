@@ -26,7 +26,7 @@
             p.name AS patient_name,
             nr.height_cm,
             nr.weight_kg,
-            nr.createdAt
+            nr.created_at
         FROM CHJ.NURSING_RECORD nr
         LEFT JOIN JCH.EMPLOYEE_NURSE en
             ON TRIM(nr.nursing_id) = TO_CHAR(en.staff_id)

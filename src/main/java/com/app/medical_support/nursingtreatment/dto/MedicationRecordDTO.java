@@ -15,4 +15,8 @@ public class MedicationRecordDTO {
     private String doseUnit;
     private String nursingId;
     private String status;
+    private String createdAt;
+    private Long patientId;
+    private String patientName;
+    private String departmentName;
 }

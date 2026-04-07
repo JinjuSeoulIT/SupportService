@@ -40,6 +40,15 @@ public class TestExecutionEntity {
     @Column(name = "PERFORMER_ID")
     private Long performerId;
 
+    @Column(name = "PATIENT_ID")
+    private Long patientId;
+
+    @Column(name = "PATIENT_NAME")
+    private String patientName;
+
+    @Column(name = "DEPARTMENT_NAME")
+    private String departmentName;
+
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;
 

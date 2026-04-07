@@ -7,36 +7,48 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "진료 검사 수행 정보")
+@Schema(description = "Test execution data")
 @Getter
 @Setter
 @NoArgsConstructor
 public class TestExecutionDTO {
 
-    @Schema(description = "검사수행ID")
+    @Schema(description = "Test execution ID")
     private String testExecutionId;
 
-    @Schema(description = "오더항목ID")
+    @Schema(description = "Order item ID")
     private Long orderItemId;
 
-    @Schema(description = "검사수행유형")
+    @Schema(description = "Execution type")
     private String executionType;
 
-    @Schema(description = "진행상태")
+    @Schema(description = "Progress status")
     private String progressStatus;
 
-    @Schema(description = "재시도횟수")
+    @Schema(description = "Retry count")
     private Integer retryNo;
 
-    @Schema(description = "시작일시")
+    @Schema(description = "Started at")
     private LocalDateTime startedAt;
 
-    @Schema(description = "완료일시")
+    @Schema(description = "Completed at")
     private LocalDateTime completedAt;
 
-    @Schema(description = "수행자ID")
+    @Schema(description = "Performer ID")
     private Long performerId;
 
-    @Schema(description = "수정일시")
+    @Schema(description = "Patient ID")
+    private Long patientId;
+
+    @Schema(description = "Patient name")
+    private String patientName;
+
+    @Schema(description = "Department name")
+    private String departmentName;
+
+    @Schema(description = "Created at")
+    private LocalDateTime createdAt;
+
+    @Schema(description = "Updated at")
     private LocalDateTime updatedAt;
 }
