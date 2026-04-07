@@ -30,12 +30,12 @@ public class TestExecutionEntity {
 
     @Column(name = "RETRY_NO")
     private Integer retryNo;
-//
-//    @Column(name = "STARTED_AT")
-//    private LocalDateTime startedAt;
-//
-//    @Column(name = "COMPLETED_AT")
-//    private LocalDateTime completedAt;
+
+    @Column(name = "STARTED_AT")
+    private LocalDateTime startedAt;
+
+    @Column(name = "COMPLETED_AT")
+    private LocalDateTime completedAt;
 
     @Column(name = "PERFORMER_ID")
     private Long performerId;

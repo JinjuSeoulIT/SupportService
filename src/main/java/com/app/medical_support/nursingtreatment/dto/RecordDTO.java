@@ -19,6 +19,10 @@ public class RecordDTO {
     @Schema(description = "Record ID")
     private String recordId;
 
+    @Schema(description = "Recorded at")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime recordedAt;
+
     @Schema(description = "Systolic blood pressure")
     private Integer systolicBp;
 
