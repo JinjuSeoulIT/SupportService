@@ -380,8 +380,6 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         String previousProgressStatus = entity.getProgressStatus();
         entity.setProgressStatus(testExecutionReqDTO.getProgressStatus());
         entity.setRetryNo(testExecutionReqDTO.getRetryNo());
-        entity.setStartedAt(testExecutionReqDTO.getStartedAt());
-        entity.setCompletedAt(testExecutionReqDTO.getCompletedAt());
         entity.setPerformerId(testExecutionReqDTO.getPerformerId());
         entity.setPatientId(testExecutionReqDTO.getPatientId());
         entity.setPatientName(testExecutionReqDTO.getPatientName());
