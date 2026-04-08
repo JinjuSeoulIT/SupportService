@@ -17,6 +17,9 @@ import javax.persistence.Table;
 public class TreatmentResultEntity {
 
     @Id
+    @Column(name = "TREATMENT_RESULT_ID")
+    private String treatmentResultId;
+
     @Column(name = "PROCEDURE_RESULT_ID")
     private String procedureResultId;
 

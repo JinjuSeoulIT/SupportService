@@ -17,6 +17,9 @@ import javax.persistence.Table;
 public class MedicationRecordEntity {
 
     @Id
+    @Column(name = "MEDICATION_RECORD_ID")
+    private String medicationRecordId;
+
     @Column(name = "MEDICATION_ID")
     private String medicationId;
 
