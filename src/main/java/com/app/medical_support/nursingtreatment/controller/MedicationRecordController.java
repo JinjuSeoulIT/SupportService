@@ -2,6 +2,7 @@ package com.app.medical_support.nursingtreatment.controller;
 
 import com.app.medical_support.common.ApiResponse;
 import com.app.medical_support.nursingtreatment.dto.MedicationRecordDTO;
+import com.app.medical_support.nursingtreatment.dto.MedicationRecordReqDTO;
 import com.app.medical_support.nursingtreatment.dto.RecordStatusRequest;
 import com.app.medical_support.nursingtreatment.service.NursingTreatmentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,13 +42,13 @@ public class MedicationRecordController {
 
     @Operation(summary = "투약 기록 등록")
     @PostMapping
-    public ResponseEntity<ApiResponse<MedicationRecordDTO>> register(@RequestBody MedicationRecordDTO dto) {
+    public ResponseEntity<ApiResponse<MedicationRecordDTO>> register(@RequestBody MedicationRecordReqDTO dto) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Medication record created.", nursingTreatmentService.registerMedicationRecord(dto)));
     }
 
     @Operation(summary = "투약 기록 수정")
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<MedicationRecordDTO>> modify(@PathVariable String id, @RequestBody MedicationRecordDTO dto) {
+    public ResponseEntity<ApiResponse<MedicationRecordDTO>> modify(@PathVariable String id, @RequestBody MedicationRecordReqDTO dto) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Medication record updated.", nursingTreatmentService.modifyMedicationRecord(id, dto)));
     }
 

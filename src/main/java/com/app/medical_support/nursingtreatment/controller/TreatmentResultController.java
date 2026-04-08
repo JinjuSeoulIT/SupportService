@@ -3,6 +3,7 @@ package com.app.medical_support.nursingtreatment.controller;
 import com.app.medical_support.common.ApiResponse;
 import com.app.medical_support.nursingtreatment.dto.RecordStatusRequest;
 import com.app.medical_support.nursingtreatment.dto.TreatmentResultDTO;
+import com.app.medical_support.nursingtreatment.dto.TreatmentResultReqDTO;
 import com.app.medical_support.nursingtreatment.service.NursingTreatmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,13 +42,13 @@ public class TreatmentResultController {
 
     @Operation(summary = "처치 결과 등록")
     @PostMapping
-    public ResponseEntity<ApiResponse<TreatmentResultDTO>> register(@RequestBody TreatmentResultDTO dto) {
+    public ResponseEntity<ApiResponse<TreatmentResultDTO>> register(@RequestBody TreatmentResultReqDTO dto) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Treatment result created.", nursingTreatmentService.registerTreatmentResult(dto)));
     }
 
     @Operation(summary = "처치 결과 수정")
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<TreatmentResultDTO>> modify(@PathVariable String id, @RequestBody TreatmentResultDTO dto) {
+    public ResponseEntity<ApiResponse<TreatmentResultDTO>> modify(@PathVariable String id, @RequestBody TreatmentResultReqDTO dto) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Treatment result updated.", nursingTreatmentService.modifyTreatmentResult(id, dto)));
     }
 

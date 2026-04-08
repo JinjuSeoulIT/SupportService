@@ -3,10 +3,12 @@ package com.app.medical_support.nursingtreatment.service;
 import com.app.medical_support.common.integration.reception.dto.OutpatientReceptionDTO;
 import com.app.medical_support.common.integration.reception.service.ReceptionIntegrationService;
 import com.app.medical_support.nursingtreatment.dto.MedicationRecordDTO;
+import com.app.medical_support.nursingtreatment.dto.MedicationRecordReqDTO;
 import com.app.medical_support.nursingtreatment.dto.RecordDTO;
 import com.app.medical_support.nursingtreatment.dto.RecordRequestDTO;
 import com.app.medical_support.nursingtreatment.dto.RecordResponseDTO;
 import com.app.medical_support.nursingtreatment.dto.TreatmentResultDTO;
+import com.app.medical_support.nursingtreatment.dto.TreatmentResultReqDTO;
 import com.app.medical_support.nursingtreatment.entity.MedicationRecordEntity;
 import com.app.medical_support.nursingtreatment.entity.RecordEntity;
 import com.app.medical_support.nursingtreatment.entity.TreatmentResultEntity;
@@ -141,9 +143,10 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
 
     @Override
     @Transactional
-    public MedicationRecordDTO registerMedicationRecord(MedicationRecordDTO medicationRecordDTO) {
+    public MedicationRecordDTO registerMedicationRecord(MedicationRecordReqDTO medicationRecordDTO) {
         MedicationRecordEntity entity = new MedicationRecordEntity();
-        entity.setMedicationId(hasText(medicationRecordDTO.getMedicationId()) ? medicationRecordDTO.getMedicationId() : createMedicationId());
+        entity.setMedicationRecordId(createMedicationRecordId());
+        entity.setMedicationId(medicationRecordDTO.getMedicationId());
         entity.setAdministeredAt(medicationRecordDTO.getAdministeredAt());
         entity.setDoseNumber(medicationRecordDTO.getDoseNumber());
         entity.setDoseUnit(medicationRecordDTO.getDoseUnit());
@@ -158,9 +161,10 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
 
     @Override
     @Transactional
-    public MedicationRecordDTO modifyMedicationRecord(String id, MedicationRecordDTO medicationRecordDTO) {
+    public MedicationRecordDTO modifyMedicationRecord(String id, MedicationRecordReqDTO medicationRecordDTO) {
         MedicationRecordEntity entity = medicationRecordRepository.findById(id)
                 .orElseThrow(() -> new MedicationRecordNotFoundException(id));
+        entity.setMedicationId(medicationRecordDTO.getMedicationId());
         entity.setAdministeredAt(medicationRecordDTO.getAdministeredAt());
         entity.setDoseNumber(medicationRecordDTO.getDoseNumber());
         entity.setDoseUnit(medicationRecordDTO.getDoseUnit());
@@ -194,9 +198,10 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
 
     @Override
     @Transactional
-    public TreatmentResultDTO registerTreatmentResult(TreatmentResultDTO treatmentResultDTO) {
+    public TreatmentResultDTO registerTreatmentResult(TreatmentResultReqDTO treatmentResultDTO) {
         TreatmentResultEntity entity = new TreatmentResultEntity();
-        entity.setProcedureResultId(hasText(treatmentResultDTO.getProcedureResultId()) ? treatmentResultDTO.getProcedureResultId() : createTreatmentResultId());
+        entity.setTreatmentResultId(createTreatmentResultId());
+        entity.setProcedureResultId(treatmentResultDTO.getProcedureResultId());
         entity.setCreatedAt(LocalDateTime.now().format(CHAR_DATE_TIME_FORMATTER));
         entity.setNursingId(treatmentResultDTO.getNursingId());
         entity.setDetail(treatmentResultDTO.getDetail());
@@ -209,9 +214,10 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
 
     @Override
     @Transactional
-    public TreatmentResultDTO modifyTreatmentResult(String id, TreatmentResultDTO treatmentResultDTO) {
+    public TreatmentResultDTO modifyTreatmentResult(String id, TreatmentResultReqDTO treatmentResultDTO) {
         TreatmentResultEntity entity = treatmentResultRepository.findById(id)
                 .orElseThrow(() -> new TreatmentResultNotFoundException(id));
+        entity.setProcedureResultId(treatmentResultDTO.getProcedureResultId());
         entity.setNursingId(treatmentResultDTO.getNursingId());
         entity.setDetail(treatmentResultDTO.getDetail());
         entity.setStatus(normalizeStatus(treatmentResultDTO.getStatus()));
@@ -346,7 +352,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         return "REC_" + System.currentTimeMillis();
     }
 
-    private String createMedicationId() {
+    private String createMedicationRecordId() {
         return "MED_" + System.currentTimeMillis();
     }
 
