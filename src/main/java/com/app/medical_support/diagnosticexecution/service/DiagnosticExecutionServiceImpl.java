@@ -26,6 +26,8 @@ import com.app.medical_support.diagnosticexecution.repository.PathologyRepositor
 import com.app.medical_support.diagnosticexecution.repository.PhysiologicalRepository;
 import com.app.medical_support.diagnosticexecution.repository.SpecimenRepository;
 import com.app.medical_support.diagnosticexecution.repository.TestExecutionRepository;
+import com.app.medical_support.diagnosticresult.entity.ImagingResultEntity;
+import com.app.medical_support.diagnosticresult.repository.ImagingResultRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,6 +42,7 @@ import java.util.List;
 public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionService {
 
     private final ImagingRepository imagingRepository;
+    private final ImagingResultRepository imagingResultRepository;
     private final EndoscopyRepository endoscopyRepository;
     private final PathologyRepository pathologyRepository;
     private final PhysiologicalRepository physiologicalRepository;
@@ -80,12 +83,19 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     public ImagingDTO modifyImaging(String id, ImagingDTO imagingDTO) {
         ImagingEntity entity = imagingRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticExecutionNotFoundException("Imaging exam not found. id=" + id));
+        String previousProgressStatus = entity.getProgressStatus();
         entity.setTestExecutionId(imagingDTO.getTestExecutionId());
         entity.setImagingType(imagingDTO.getImagingType());
         entity.setProgressStatus(resolveProgressStatus(imagingDTO.getProgressStatus(), entity.getProgressStatus()));
         entity.setPerformerId(normalizeOptionalValue(imagingDTO.getPerformerId()));
         entity.setUpdatedAt(LocalDateTime.now());
-        return toImagingDTO(imagingRepository.save(entity));
+        ImagingEntity savedEntity = imagingRepository.save(entity);
+
+        if (!isCompleted(previousProgressStatus) && isCompleted(savedEntity.getProgressStatus())) {
+            ensureImagingResultExists(savedEntity);
+        }
+
+        return toImagingDTO(savedEntity);
     }
 
     @Override
@@ -484,6 +494,19 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         imagingRepository.save(imagingEntity);
     }
 
+    private void ensureImagingResultExists(ImagingEntity entity) {
+        if (imagingResultRepository.existsByImagingExamId(entity.getImagingExamId())) {
+            return;
+        }
+
+        ImagingResultEntity resultEntity = new ImagingResultEntity();
+        resultEntity.setImagingResultId(createImagingResultId());
+        resultEntity.setImagingExamId(entity.getImagingExamId());
+        resultEntity.setStatus("ACTIVE");
+        resultEntity.setCreatedAt(LocalDateTime.now());
+        imagingResultRepository.save(resultEntity);
+    }
+
     private void ensureEndoscopyExists(TestExecutionEntity entity) {
         if (endoscopyRepository.existsByTestExecutionId(entity.getTestExecutionId())) {
             return;
@@ -553,6 +576,10 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         return "IN_PROGRESS".equalsIgnoreCase(progressStatus != null ? progressStatus.trim() : null);
     }
 
+    private boolean isCompleted(String progressStatus) {
+        return "COMPLETED".equalsIgnoreCase(progressStatus != null ? progressStatus.trim() : null);
+    }
+
     private String normalizeExecutionType(String executionType) {
         return hasText(executionType) ? executionType.trim().toUpperCase() : "";
     }
@@ -571,6 +598,10 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
 
     private String createEndoscopyId() {
         return "ENDO_" + System.currentTimeMillis();
+    }
+
+    private String createImagingResultId() {
+        return "IMG_RES_" + System.currentTimeMillis();
     }
 
     private String createPathologyId() {

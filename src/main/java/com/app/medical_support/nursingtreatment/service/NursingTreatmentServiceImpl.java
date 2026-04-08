@@ -255,6 +255,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
 
     private TreatmentResultDTO toTreatmentResultDTO(TreatmentResultEntity entity) {
         TreatmentResultDTO dto = new TreatmentResultDTO();
+        dto.setTreatmentResultId(entity.getTreatmentResultId());
         dto.setProcedureResultId(entity.getProcedureResultId());
         dto.setStatus(entity.getStatus());
         dto.setCreatedAt(entity.getCreatedAt());
