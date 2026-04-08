@@ -9,6 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class TreatmentResultDTO {
 
+    private String treatmentResultId;
     private String procedureResultId;
     private String status;
     private String createdAt;
