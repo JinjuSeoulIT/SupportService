@@ -150,6 +150,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         entity.setAdministeredAt(medicationRecordDTO.getAdministeredAt());
         entity.setDoseNumber(medicationRecordDTO.getDoseNumber());
         entity.setDoseUnit(medicationRecordDTO.getDoseUnit());
+        entity.setDoseKind(medicationRecordDTO.getDoseKind());
         entity.setNursingId(medicationRecordDTO.getNursingId());
         entity.setStatus(normalizeStatus(medicationRecordDTO.getStatus()));
         entity.setCreatedAt(LocalDateTime.now().format(CHAR_DATE_TIME_FORMATTER));
@@ -168,6 +169,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         entity.setAdministeredAt(medicationRecordDTO.getAdministeredAt());
         entity.setDoseNumber(medicationRecordDTO.getDoseNumber());
         entity.setDoseUnit(medicationRecordDTO.getDoseUnit());
+        entity.setDoseKind(medicationRecordDTO.getDoseKind());
         entity.setNursingId(medicationRecordDTO.getNursingId());
         entity.setStatus(normalizeStatus(medicationRecordDTO.getStatus()));
         entity.setPatientId(medicationRecordDTO.getPatientId());

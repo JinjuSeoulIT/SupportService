@@ -32,6 +32,9 @@ public class MedicationRecordEntity {
     @Column(name = "DOSE_UNIT")
     private String doseUnit;
 
+    @Column(name = "DOSE_KIND")
+    private String doseKind;
+
     @Column(name = "NURSING_ID")
     private String nursingId;
 
