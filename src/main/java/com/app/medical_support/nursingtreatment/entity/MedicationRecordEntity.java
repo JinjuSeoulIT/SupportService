@@ -38,6 +38,9 @@ public class MedicationRecordEntity {
     @Column(name = "NURSING_ID")
     private String nursingId;
 
+    @Column(name = "NURSE_NAME")
+    private String nurseName;
+
     @Column(name = "STATUS")
     private String status;
 

@@ -14,6 +14,7 @@ public class MedicationRecordReqDTO {
     private String doseUnit;
     private String doseKind;
     private String nursingId;
+    private String nurseName;
     private String status;
     private Long patientId;
     private String patientName;

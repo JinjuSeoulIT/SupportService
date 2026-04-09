@@ -19,6 +19,9 @@ public class TestExecutionReqDTO {
     @Schema(description = "Retry count")
     private Integer retryNo;
 
+    @Schema(description = "Detail Code")
+    private String detailCode;
+
     @Schema(description = "Started at")
     private LocalDateTime startedAt;
 

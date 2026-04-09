@@ -32,6 +32,9 @@ public class TreatmentResultEntity {
     @Column(name = "NURSING_ID")
     private String nursingId;
 
+    @Column(name = "NURSE_NAME")
+    private String nurseName;
+
     @Column(name = "DETAIL")
     private String detail;
 

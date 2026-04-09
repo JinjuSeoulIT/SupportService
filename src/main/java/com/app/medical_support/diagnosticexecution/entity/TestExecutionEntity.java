@@ -19,6 +19,9 @@ public class TestExecutionEntity {
     @Column(name = "TEST_EXECUTION_ID")
     private String testExecutionId;
 
+    @Column(name = "DETAIL_CODE")
+    private String detailCode;
+
     @Column(name = "ORDER_ITEM_ID")
     private Long orderItemId;
 

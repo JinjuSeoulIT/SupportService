@@ -26,8 +26,16 @@ import com.app.medical_support.diagnosticexecution.repository.PathologyRepositor
 import com.app.medical_support.diagnosticexecution.repository.PhysiologicalRepository;
 import com.app.medical_support.diagnosticexecution.repository.SpecimenRepository;
 import com.app.medical_support.diagnosticexecution.repository.TestExecutionRepository;
+import com.app.medical_support.diagnosticresult.entity.EndoscopyResultEntity;
 import com.app.medical_support.diagnosticresult.entity.ImagingResultEntity;
+import com.app.medical_support.diagnosticresult.entity.PathologyResultEntity;
+import com.app.medical_support.diagnosticresult.entity.PhysiologicalResultEntity;
+import com.app.medical_support.diagnosticresult.entity.SpecimenTestResultEntity;
+import com.app.medical_support.diagnosticresult.repository.EndoscopyResultRepository;
 import com.app.medical_support.diagnosticresult.repository.ImagingResultRepository;
+import com.app.medical_support.diagnosticresult.repository.PathologyResultRepository;
+import com.app.medical_support.diagnosticresult.repository.PhysiologicalResultRepository;
+import com.app.medical_support.diagnosticresult.repository.SpecimenTestResultRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -44,9 +52,13 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     private final ImagingRepository imagingRepository;
     private final ImagingResultRepository imagingResultRepository;
     private final EndoscopyRepository endoscopyRepository;
+    private final EndoscopyResultRepository endoscopyResultRepository;
     private final PathologyRepository pathologyRepository;
+    private final PathologyResultRepository pathologyResultRepository;
     private final PhysiologicalRepository physiologicalRepository;
+    private final PhysiologicalResultRepository physiologicalResultRepository;
     private final SpecimenRepository specimenRepository;
+    private final SpecimenTestResultRepository specimenTestResultRepository;
     private final SpecimenReqMapStruct specimenReqMapStruct;
     private final SpecimenResMapStruct specimenResMapStruct;
     private final TestExecutionRepository testExecutionRepository;
@@ -141,6 +153,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     public EndoscopyDTO modifyEndoscopy(String id, EndoscopyDTO endoscopyDTO) {
         EndoscopyEntity entity = endoscopyRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticExecutionNotFoundException("Endoscopy exam not found. id=" + id));
+        String previousProgressStatus = entity.getProgressStatus();
         entity.setTestExecutionId(endoscopyDTO.getTestExecutionId());
         entity.setProcedureRoom(endoscopyDTO.getProcedureRoom());
         entity.setEquipment(endoscopyDTO.getEquipment());
@@ -149,7 +162,13 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setProcedureAt(endoscopyDTO.getProcedureAt());
         entity.setProgressStatus(resolveProgressStatus(endoscopyDTO.getProgressStatus(), entity.getProgressStatus()));
         entity.setUpdatedAt(LocalDateTime.now());
-        return toEndoscopyDTO(endoscopyRepository.save(entity));
+        EndoscopyEntity savedEntity = endoscopyRepository.save(entity);
+
+        if (!isCompleted(previousProgressStatus) && isCompleted(savedEntity.getProgressStatus())) {
+            ensureEndoscopyResultExists(savedEntity);
+        }
+
+        return toEndoscopyDTO(savedEntity);
     }
 
     @Override
@@ -197,6 +216,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     public PathologyDTO modifyPathology(String id, PathologyDTO pathologyDTO) {
         PathologyEntity entity = pathologyRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticExecutionNotFoundException("Pathology exam not found. id=" + id));
+        String previousProgressStatus = entity.getProgressStatus();
         entity.setTestExecutionId(pathologyDTO.getTestExecutionId());
         entity.setTissueStatus(pathologyDTO.getTissueStatus());
         entity.setCollectionMethod(pathologyDTO.getCollectionMethod());
@@ -207,7 +227,13 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setReexamYn(normalizeYnFlag(pathologyDTO.getReexamYn()));
         entity.setProgressStatus(resolveProgressStatus(pathologyDTO.getProgressStatus(), entity.getProgressStatus()));
         entity.setUpdatedAt(LocalDateTime.now());
-        return toPathologyDTO(pathologyRepository.save(entity));
+        PathologyEntity savedEntity = pathologyRepository.save(entity);
+
+        if (!isCompleted(previousProgressStatus) && isCompleted(savedEntity.getProgressStatus())) {
+            ensurePathologyResultExists(savedEntity);
+        }
+
+        return toPathologyDTO(savedEntity);
     }
 
     @Override
@@ -252,6 +278,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     public PhysiologicalDTO modifyPhysiological(String id, PhysiologicalDTO physiologicalDTO) {
         PhysiologicalEntity entity = physiologicalRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticExecutionNotFoundException("Physiological exam not found. id=" + id));
+        String previousProgressStatus = entity.getProgressStatus();
         entity.setTestExecutionId(physiologicalDTO.getTestExecutionId());
         entity.setExamEquipmentId(physiologicalDTO.getExamEquipmentId());
         entity.setRawData(physiologicalDTO.getRawData());
@@ -259,7 +286,13 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setPerformerId(normalizeOptionalValue(physiologicalDTO.getPerformerId()));
         entity.setProgressStatus(resolveProgressStatus(physiologicalDTO.getProgressStatus(), entity.getProgressStatus()));
         entity.setUpdatedAt(LocalDateTime.now());
-        return toPhysiologicalDTO(physiologicalRepository.save(entity));
+        PhysiologicalEntity savedEntity = physiologicalRepository.save(entity);
+
+        if (!isCompleted(previousProgressStatus) && isCompleted(savedEntity.getProgressStatus())) {
+            ensurePhysiologicalResultExists(savedEntity);
+        }
+
+        return toPhysiologicalDTO(savedEntity);
     }
 
     @Override
@@ -326,6 +359,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     public SpecimenDTO modifySpecimen(String id, SpecimenDTO specimenDTO) {
         SpecimenEntity entity = specimenRepository.findById(id)
                 .orElseThrow(() -> new SpecimenNotFoundException("Specimen exam not found. id=" + id));
+        String previousProgressStatus = entity.getProgressStatus();
         entity.setTestExecutionId(specimenDTO.getTestExecutionId());
         entity.setSpecimenType(specimenDTO.getSpecimenType());
         entity.setSpecimenStatus(hasText(specimenDTO.getSpecimenStatus()) ? specimenDTO.getSpecimenStatus().trim().toUpperCase() : entity.getSpecimenStatus());
@@ -335,7 +369,13 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setRecollectionYn(normalizeYnFlag(specimenDTO.getRecollectionYn()));
         entity.setProgressStatus(resolveProgressStatus(specimenDTO.getProgressStatus(), entity.getProgressStatus()));
         entity.setUpdatedAt(LocalDateTime.now());
-        return specimenResMapStruct.toDTO(specimenRepository.save(entity));
+        SpecimenEntity savedEntity = specimenRepository.save(entity);
+
+        if (!isCompleted(previousProgressStatus) && isCompleted(savedEntity.getProgressStatus())) {
+            ensureSpecimenResultExists(savedEntity);
+        }
+
+        return specimenResMapStruct.toDTO(savedEntity);
     }
 
     @Override
@@ -368,6 +408,8 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     @Transactional
     public TestExecutionDTO registerTestExecution(TestExecutionDTO testExecutionDTO) {
         TestExecutionEntity entity = testExecutionReqMapStruct.toEntity(testExecutionDTO);
+        entity.setDetailCode(testExecutionDTO.getDetailCode());
+
         if (!hasText(entity.getTestExecutionId())) {
             entity.setTestExecutionId(createTestExecutionId());
         }
@@ -387,9 +429,11 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         TestExecutionEntity entity = testExecutionRepository.findById(id)
                 .orElseThrow(() -> new TestExecutionNotFoundExecution("Test execution not found. id=" + id));
 
+
         String previousProgressStatus = entity.getProgressStatus();
         entity.setProgressStatus(testExecutionReqDTO.getProgressStatus());
         entity.setRetryNo(testExecutionReqDTO.getRetryNo());
+        entity.setDetailCode(testExecutionReqDTO.getDetailCode());
         entity.setPerformerId(testExecutionReqDTO.getPerformerId());
         entity.setPatientId(testExecutionReqDTO.getPatientId());
         entity.setPatientName(testExecutionReqDTO.getPatientName());
@@ -507,6 +551,19 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         imagingResultRepository.save(resultEntity);
     }
 
+    private void ensureEndoscopyResultExists(EndoscopyEntity entity) {
+        if (endoscopyResultRepository.existsByEndoscopyExamId(entity.getEndoscopyExamId())) {
+            return;
+        }
+
+        EndoscopyResultEntity resultEntity = new EndoscopyResultEntity();
+        resultEntity.setEndoscopyResultId(createEndoscopyResultId());
+        resultEntity.setEndoscopyExamId(entity.getEndoscopyExamId());
+        resultEntity.setStatus("ACTIVE");
+        resultEntity.setCreatedAt(LocalDateTime.now());
+        endoscopyResultRepository.save(resultEntity);
+    }
+
     private void ensureEndoscopyExists(TestExecutionEntity entity) {
         if (endoscopyRepository.existsByTestExecutionId(entity.getTestExecutionId())) {
             return;
@@ -537,6 +594,19 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         pathologyRepository.save(pathologyEntity);
     }
 
+    private void ensurePathologyResultExists(PathologyEntity entity) {
+        if (pathologyResultRepository.existsByPathologyExamId(entity.getPathologyExamId())) {
+            return;
+        }
+
+        PathologyResultEntity resultEntity = new PathologyResultEntity();
+        resultEntity.setPathologyExamResultId(createPathologyResultId());
+        resultEntity.setPathologyExamId(entity.getPathologyExamId());
+        resultEntity.setStatus("ACTIVE");
+        resultEntity.setCreatedAt(LocalDateTime.now());
+        pathologyResultRepository.save(resultEntity);
+    }
+
     private void ensurePhysiologicalExists(TestExecutionEntity entity) {
         if (physiologicalRepository.existsByTestExecutionId(entity.getTestExecutionId())) {
             return;
@@ -549,6 +619,19 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         physiologicalEntity.setProgressStatus("WAITING");
         physiologicalEntity.setCreatedAt(LocalDateTime.now());
         physiologicalRepository.save(physiologicalEntity);
+    }
+
+    private void ensurePhysiologicalResultExists(PhysiologicalEntity entity) {
+        if (physiologicalResultRepository.existsByPhysiologicalExamId(entity.getPhysiologicalExamId())) {
+            return;
+        }
+
+        PhysiologicalResultEntity resultEntity = new PhysiologicalResultEntity();
+        resultEntity.setPhysiologicalExamResultId(createPhysiologicalResultId());
+        resultEntity.setPhysiologicalExamId(entity.getPhysiologicalExamId());
+        resultEntity.setStatus("ACTIVE");
+        resultEntity.setCreatedAt(LocalDateTime.now());
+        physiologicalResultRepository.save(resultEntity);
     }
 
     private void ensureSpecimenExists(TestExecutionEntity entity) {
@@ -566,6 +649,19 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         specimenEntity.setProgressStatus("WAITING");
         specimenEntity.setCreatedAt(LocalDateTime.now());
         specimenRepository.save(specimenEntity);
+    }
+
+    private void ensureSpecimenResultExists(SpecimenEntity entity) {
+        if (specimenTestResultRepository.existsBySpecimenExamId(entity.getSpecimenExamId())) {
+            return;
+        }
+
+        SpecimenTestResultEntity resultEntity = new SpecimenTestResultEntity();
+        resultEntity.setSpecimenExamResultId(createSpecimenResultId());
+        resultEntity.setSpecimenExamId(entity.getSpecimenExamId());
+        resultEntity.setStatus("ACTIVE");
+        resultEntity.setCreatedAt(LocalDateTime.now());
+        specimenTestResultRepository.save(resultEntity);
     }
 
     private boolean hasText(String value) {
@@ -604,12 +700,28 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         return "IMG_RES_" + System.currentTimeMillis();
     }
 
+    private String createEndoscopyResultId() {
+        return "ENDO_RES_" + System.currentTimeMillis();
+    }
+
     private String createPathologyId() {
         return "PATH_" + System.currentTimeMillis();
     }
 
+    private String createPathologyResultId() {
+        return "PATH_RES_" + System.currentTimeMillis();
+    }
+
     private String createPhysiologicalId() {
         return "PHYS_" + System.currentTimeMillis();
+    }
+
+    private String createPhysiologicalResultId() {
+        return "PHYS_RES_" + System.currentTimeMillis();
+    }
+
+    private String createSpecimenResultId() {
+        return "SPEC_RES_" + System.currentTimeMillis();
     }
 
     private String normalizeStatus(String status) {

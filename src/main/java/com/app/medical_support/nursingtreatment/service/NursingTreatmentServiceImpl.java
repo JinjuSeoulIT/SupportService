@@ -2,13 +2,7 @@ package com.app.medical_support.nursingtreatment.service;
 
 import com.app.medical_support.common.integration.reception.dto.OutpatientReceptionDTO;
 import com.app.medical_support.common.integration.reception.service.ReceptionIntegrationService;
-import com.app.medical_support.nursingtreatment.dto.MedicationRecordDTO;
-import com.app.medical_support.nursingtreatment.dto.MedicationRecordReqDTO;
-import com.app.medical_support.nursingtreatment.dto.RecordDTO;
-import com.app.medical_support.nursingtreatment.dto.RecordRequestDTO;
-import com.app.medical_support.nursingtreatment.dto.RecordResponseDTO;
-import com.app.medical_support.nursingtreatment.dto.TreatmentResultDTO;
-import com.app.medical_support.nursingtreatment.dto.TreatmentResultReqDTO;
+import com.app.medical_support.nursingtreatment.dto.*;
 import com.app.medical_support.nursingtreatment.entity.MedicationRecordEntity;
 import com.app.medical_support.nursingtreatment.entity.RecordEntity;
 import com.app.medical_support.nursingtreatment.entity.TreatmentResultEntity;
@@ -146,12 +140,14 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     public MedicationRecordDTO registerMedicationRecord(MedicationRecordReqDTO medicationRecordDTO) {
         MedicationRecordEntity entity = new MedicationRecordEntity();
         entity.setMedicationRecordId(createMedicationRecordId());
+
         entity.setMedicationId(medicationRecordDTO.getMedicationId());
         entity.setAdministeredAt(medicationRecordDTO.getAdministeredAt());
         entity.setDoseNumber(medicationRecordDTO.getDoseNumber());
         entity.setDoseUnit(medicationRecordDTO.getDoseUnit());
         entity.setDoseKind(medicationRecordDTO.getDoseKind());
         entity.setNursingId(medicationRecordDTO.getNursingId());
+        entity.setNurseName(medicationRecordDTO.getNurseName());
         entity.setStatus(normalizeStatus(medicationRecordDTO.getStatus()));
         entity.setCreatedAt(LocalDateTime.now().format(CHAR_DATE_TIME_FORMATTER));
         entity.setPatientId(medicationRecordDTO.getPatientId());
@@ -162,15 +158,15 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
 
     @Override
     @Transactional
-    public MedicationRecordDTO modifyMedicationRecord(String id, MedicationRecordReqDTO medicationRecordDTO) {
+    public MedicationRecordDTO modifyMedicationRecord(String id, MedicationRecordUpdateDTO medicationRecordDTO) {
         MedicationRecordEntity entity = medicationRecordRepository.findById(id)
                 .orElseThrow(() -> new MedicationRecordNotFoundException(id));
-        entity.setMedicationId(medicationRecordDTO.getMedicationId());
         entity.setAdministeredAt(medicationRecordDTO.getAdministeredAt());
         entity.setDoseNumber(medicationRecordDTO.getDoseNumber());
         entity.setDoseUnit(medicationRecordDTO.getDoseUnit());
         entity.setDoseKind(medicationRecordDTO.getDoseKind());
         entity.setNursingId(medicationRecordDTO.getNursingId());
+        entity.setNurseName(medicationRecordDTO.getNurseName());
         entity.setStatus(normalizeStatus(medicationRecordDTO.getStatus()));
         entity.setPatientId(medicationRecordDTO.getPatientId());
         entity.setPatientName(medicationRecordDTO.getPatientName());
@@ -206,6 +202,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         entity.setProcedureResultId(treatmentResultDTO.getProcedureResultId());
         entity.setCreatedAt(LocalDateTime.now().format(CHAR_DATE_TIME_FORMATTER));
         entity.setNursingId(treatmentResultDTO.getNursingId());
+        entity.setNurseName(treatmentResultDTO.getNurseName());
         entity.setDetail(treatmentResultDTO.getDetail());
         entity.setStatus(normalizeStatus(treatmentResultDTO.getStatus()));
         entity.setPatientId(treatmentResultDTO.getPatientId());
@@ -221,6 +218,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
                 .orElseThrow(() -> new TreatmentResultNotFoundException(id));
         entity.setProcedureResultId(treatmentResultDTO.getProcedureResultId());
         entity.setNursingId(treatmentResultDTO.getNursingId());
+        entity.setNurseName(treatmentResultDTO.getNurseName());
         entity.setDetail(treatmentResultDTO.getDetail());
         entity.setStatus(normalizeStatus(treatmentResultDTO.getStatus()));
         entity.setPatientId(treatmentResultDTO.getPatientId());
@@ -240,11 +238,14 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
 
     private MedicationRecordDTO toMedicationRecordDTO(MedicationRecordEntity entity) {
         MedicationRecordDTO dto = new MedicationRecordDTO();
+        dto.setMedicationRecordId(entity.getMedicationRecordId());
         dto.setMedicationId(entity.getMedicationId());
         dto.setAdministeredAt(entity.getAdministeredAt());
         dto.setDoseNumber(entity.getDoseNumber());
         dto.setDoseUnit(entity.getDoseUnit());
+        dto.setDoseKind(entity.getDoseKind());
         dto.setNursingId(entity.getNursingId());
+        dto.setNurseName(entity.getNurseName());
         dto.setStatus(entity.getStatus());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setPatientId(entity.getPatientId());
@@ -260,6 +261,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         dto.setStatus(entity.getStatus());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setNursingId(entity.getNursingId());
+        dto.setNurseName(entity.getNurseName());
         dto.setDetail(entity.getDetail());
         dto.setPatientId(entity.getPatientId());
         dto.setPatientName(entity.getPatientName());

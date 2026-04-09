@@ -7,16 +7,19 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class TreatmentResultDTO {
+public class MedicationRecordUpdateDTO {
 
-    private String treatmentResultId;
-    private String procedureResultId;
-    private String status;
-    private String createdAt;
+
+    private String medicationRecordId;
+    private String administeredAt;
+    private Double doseNumber;
+    private String doseUnit;
+    private String doseKind;
     private String nursingId;
     private String nurseName;
-    private String detail;
+    private String status;
     private Long patientId;
     private String patientName;
     private String departmentName;
+    private String medicationId;
 }

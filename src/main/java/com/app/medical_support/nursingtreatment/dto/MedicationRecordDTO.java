@@ -9,12 +9,15 @@ import lombok.Setter;
 @NoArgsConstructor
 public class MedicationRecordDTO {
 
+
+    private String medicationRecordId;
     private String medicationId;
     private String administeredAt;
     private Double doseNumber;
     private String doseUnit;
     private String doseKind;
     private String nursingId;
+    private String nurseName;
     private String status;
     private String createdAt;
     private Long patientId;

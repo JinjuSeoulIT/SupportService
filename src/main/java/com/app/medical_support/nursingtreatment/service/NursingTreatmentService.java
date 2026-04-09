@@ -1,12 +1,6 @@
 package com.app.medical_support.nursingtreatment.service;
 
-import com.app.medical_support.nursingtreatment.dto.MedicationRecordDTO;
-import com.app.medical_support.nursingtreatment.dto.MedicationRecordReqDTO;
-import com.app.medical_support.nursingtreatment.dto.RecordDTO;
-import com.app.medical_support.nursingtreatment.dto.RecordRequestDTO;
-import com.app.medical_support.nursingtreatment.dto.RecordResponseDTO;
-import com.app.medical_support.nursingtreatment.dto.TreatmentResultDTO;
-import com.app.medical_support.nursingtreatment.dto.TreatmentResultReqDTO;
+import com.app.medical_support.nursingtreatment.dto.*;
 
 import java.util.List;
 
@@ -21,7 +15,7 @@ public interface NursingTreatmentService {
     List<MedicationRecordDTO> findMedicationRecordList();
     MedicationRecordDTO findMedicationRecordDetail(String id);
     MedicationRecordDTO registerMedicationRecord(MedicationRecordReqDTO medicationRecordDTO);
-    MedicationRecordDTO modifyMedicationRecord(String id, MedicationRecordReqDTO medicationRecordDTO);
+    MedicationRecordDTO modifyMedicationRecord(String id, MedicationRecordUpdateDTO medicationRecordDTO);
     MedicationRecordDTO updateMedicationRecordStatus(String id, String status);
 
     List<TreatmentResultDTO> findTreatmentResultList();

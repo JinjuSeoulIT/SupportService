@@ -17,4 +17,6 @@ public class TreatmentResultReqDTO {
     private String patientName;
     private String departmentName;
     private String procedureResultId;
+    private String nurseName;
+
 }

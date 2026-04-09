@@ -16,6 +16,9 @@ public class TestExecutionDTO {
     @Schema(description = "Test execution ID")
     private String testExecutionId;
 
+    @Schema(description = "Detail Code")
+    private String detailCode;
+
     @Schema(description = "Order item ID")
     private Long orderItemId;
 
