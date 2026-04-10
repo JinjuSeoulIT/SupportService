@@ -28,6 +28,7 @@ public class RecordResponseDTO {
     private String initialAssessment;
     private String pastMedicalHistory;
     private String updatedAt;
+    private Long patientId;
     private String patientName;
     private String painScore;
     private String heightCm;

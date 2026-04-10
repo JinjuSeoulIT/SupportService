@@ -13,6 +13,8 @@ public class EndoscopyDTO {
 
     private String endoscopyExamId;
     private String testExecutionId;
+    private String detailCode;
+    private Long patientId;
     private String patientName;
     private String departmentName;
     private String procedureRoom;

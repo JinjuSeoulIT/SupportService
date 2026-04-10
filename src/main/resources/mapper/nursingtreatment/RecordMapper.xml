@@ -132,6 +132,7 @@
             nr.weight_kg,
             e.name AS nurse_name,
             NVL(receipt_dept.department_name, nurse_dept.dept_name) AS department_name,
+            rc.patient_id AS patient_id,
             p.name AS patient_name,
             nr.pain_score
         FROM CHJ.NURSING_RECORD nr

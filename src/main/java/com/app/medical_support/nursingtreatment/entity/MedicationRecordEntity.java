@@ -44,6 +44,9 @@ public class MedicationRecordEntity {
     @Column(name = "STATUS")
     private String status;
 
+    @Column(name = "PROGRESS_STATUS")
+    private String progressStatus;
+
     @Column(name = "CREATED_AT")
     private String createdAt;
 

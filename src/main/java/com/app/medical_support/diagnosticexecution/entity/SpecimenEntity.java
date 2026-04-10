@@ -24,6 +24,12 @@ public class SpecimenEntity {
     @Column(name = "TEST_EXECUTION_ID")
     private String testExecutionId;
 
+    @Column(name = "DETAIL_CODE")
+    private String detailCode;
+
+    @Column(name = "PATIENT_ID")
+    private Long patientId;
+
     @Column(name = "PATIENT_NAME")
     private String patientName;
 

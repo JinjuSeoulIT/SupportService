@@ -149,6 +149,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         entity.setNursingId(medicationRecordDTO.getNursingId());
         entity.setNurseName(medicationRecordDTO.getNurseName());
         entity.setStatus(normalizeStatus(medicationRecordDTO.getStatus()));
+        entity.setProgressStatus(normalizeProgressStatus(medicationRecordDTO.getProgressStatus()));
         entity.setCreatedAt(LocalDateTime.now().format(CHAR_DATE_TIME_FORMATTER));
         entity.setPatientId(medicationRecordDTO.getPatientId());
         entity.setPatientName(medicationRecordDTO.getPatientName());
@@ -168,6 +169,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         entity.setNursingId(medicationRecordDTO.getNursingId());
         entity.setNurseName(medicationRecordDTO.getNurseName());
         entity.setStatus(normalizeStatus(medicationRecordDTO.getStatus()));
+        entity.setProgressStatus(resolveProgressStatus(medicationRecordDTO.getProgressStatus(), entity.getProgressStatus()));
         entity.setPatientId(medicationRecordDTO.getPatientId());
         entity.setPatientName(medicationRecordDTO.getPatientName());
         entity.setDepartmentName(medicationRecordDTO.getDepartmentName());
@@ -205,6 +207,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         entity.setNurseName(treatmentResultDTO.getNurseName());
         entity.setDetail(treatmentResultDTO.getDetail());
         entity.setStatus(normalizeStatus(treatmentResultDTO.getStatus()));
+        entity.setProgressStatus(normalizeProgressStatus(treatmentResultDTO.getProgressStatus()));
         entity.setPatientId(treatmentResultDTO.getPatientId());
         entity.setPatientName(treatmentResultDTO.getPatientName());
         entity.setDepartmentName(treatmentResultDTO.getDepartmentName());
@@ -221,6 +224,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         entity.setNurseName(treatmentResultDTO.getNurseName());
         entity.setDetail(treatmentResultDTO.getDetail());
         entity.setStatus(normalizeStatus(treatmentResultDTO.getStatus()));
+        entity.setProgressStatus(resolveProgressStatus(treatmentResultDTO.getProgressStatus(), entity.getProgressStatus()));
         entity.setPatientId(treatmentResultDTO.getPatientId());
         entity.setPatientName(treatmentResultDTO.getPatientName());
         entity.setDepartmentName(treatmentResultDTO.getDepartmentName());
@@ -247,6 +251,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         dto.setNursingId(entity.getNursingId());
         dto.setNurseName(entity.getNurseName());
         dto.setStatus(entity.getStatus());
+        dto.setProgressStatus(entity.getProgressStatus());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setPatientId(entity.getPatientId());
         dto.setPatientName(entity.getPatientName());
@@ -259,6 +264,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         dto.setTreatmentResultId(entity.getTreatmentResultId());
         dto.setProcedureResultId(entity.getProcedureResultId());
         dto.setStatus(entity.getStatus());
+        dto.setProgressStatus(entity.getProgressStatus());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setNursingId(entity.getNursingId());
         dto.setNurseName(entity.getNurseName());
@@ -287,6 +293,22 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         }
 
         return trimmed;
+    }
+
+    private String normalizeProgressStatus(String progressStatus) {
+        if (!hasText(progressStatus)) {
+            return "WAITING";
+        }
+
+        return progressStatus.trim().toUpperCase();
+    }
+
+    private String resolveProgressStatus(String newValue, String currentValue) {
+        if (!hasText(newValue)) {
+            return hasText(currentValue) ? normalizeProgressStatus(currentValue) : "WAITING";
+        }
+
+        return normalizeProgressStatus(newValue);
     }
 
     private void validateReceptionRecordRequest(RecordRequestDTO recordRequestDTO) {

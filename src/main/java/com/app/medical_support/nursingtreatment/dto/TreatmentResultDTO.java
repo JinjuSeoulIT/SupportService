@@ -1,5 +1,7 @@
 package com.app.medical_support.nursingtreatment.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +14,9 @@ public class TreatmentResultDTO {
     private String treatmentResultId;
     private String procedureResultId;
     private String status;
+    @JsonProperty("progress_status")
+    @JsonAlias("progressStatus")
+    private String progressStatus;
     private String createdAt;
     private String nursingId;
     private String nurseName;
