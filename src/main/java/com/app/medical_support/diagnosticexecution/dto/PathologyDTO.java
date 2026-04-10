@@ -13,6 +13,8 @@ public class PathologyDTO {
 
     private String pathologyExamId;
     private String testExecutionId;
+    private String patientName;
+    private String departmentName;
     private String tissueStatus;
     private String collectionMethod;
     private String tissueSite;

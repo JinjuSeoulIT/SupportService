@@ -13,6 +13,8 @@ public class PhysiologicalDTO {
 
     private String physiologicalExamId;
     private String testExecutionId;
+    private String patientName;
+    private String departmentName;
     private String examEquipmentId;
     private String rawData;
     private String reportDocId;

@@ -24,6 +24,12 @@ public class PhysiologicalEntity {
     @Column(name = "TEST_EXECUTION_ID")
     private String testExecutionId;
 
+    @Column(name = "PATIENT_NAME")
+    private String patientName;
+
+    @Column(name = "DEPARTMENT_NAME")
+    private String departmentName;
+
     @Column(name = "EXAM_EQUIPMENT_ID")
     private String examEquipmentId;
 

@@ -14,6 +14,8 @@ public class ImagingDTO {
     private String imagingExamId;
     private String testExecutionId;
     private String imagingType;
+    private String patientName;
+    private String departmentName;
     private String status;
     private String progressStatus;
     private String performerId;

@@ -19,6 +19,12 @@ public class SpecimenDTO {
     @Schema(description = "Test execution ID")
     private String testExecutionId;
 
+    @Schema(description = "Patient name")
+    private String patientName;
+
+    @Schema(description = "Department name")
+    private String departmentName;
+
     @Schema(description = "Specimen type")
     private String specimenType;
 

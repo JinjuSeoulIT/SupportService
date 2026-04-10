@@ -27,6 +27,12 @@ public class ImagingEntity {
     @Column(name = "IMAGING_TYPE")
     private String imagingType;
 
+    @Column(name = "PATIENT_NAME")
+    private String patientName;
+
+    @Column(name = "DEPARTMENT_NAME")
+    private String departmentName;
+
     @Column(name = "STATUS")
     private String status;
 

@@ -452,6 +452,8 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         dto.setImagingExamId(entity.getImagingExamId());
         dto.setTestExecutionId(entity.getTestExecutionId());
         dto.setImagingType(entity.getImagingType());
+        dto.setPatientName(entity.getPatientName());
+        dto.setDepartmentName(entity.getDepartmentName());
         dto.setStatus(entity.getStatus());
         dto.setProgressStatus(entity.getProgressStatus());
         dto.setPerformerId(entity.getPerformerId());
@@ -464,6 +466,8 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         EndoscopyDTO dto = new EndoscopyDTO();
         dto.setEndoscopyExamId(entity.getEndoscopyExamId());
         dto.setTestExecutionId(entity.getTestExecutionId());
+        dto.setPatientName(entity.getPatientName());
+        dto.setDepartmentName(entity.getDepartmentName());
         dto.setProcedureRoom(entity.getProcedureRoom());
         dto.setEquipment(entity.getEquipment());
         dto.setSedationYn(entity.getSedationYn());
@@ -480,6 +484,8 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         PathologyDTO dto = new PathologyDTO();
         dto.setPathologyExamId(entity.getPathologyExamId());
         dto.setTestExecutionId(entity.getTestExecutionId());
+        dto.setPatientName(entity.getPatientName());
+        dto.setDepartmentName(entity.getDepartmentName());
         dto.setTissueStatus(entity.getTissueStatus());
         dto.setCollectionMethod(entity.getCollectionMethod());
         dto.setTissueSite(entity.getTissueSite());
@@ -498,6 +504,8 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         PhysiologicalDTO dto = new PhysiologicalDTO();
         dto.setPhysiologicalExamId(entity.getPhysiologicalExamId());
         dto.setTestExecutionId(entity.getTestExecutionId());
+        dto.setPatientName(entity.getPatientName());
+        dto.setDepartmentName(entity.getDepartmentName());
         dto.setExamEquipmentId(entity.getExamEquipmentId());
         dto.setRawData(entity.getRawData());
         dto.setReportDocId(entity.getReportDocId());
