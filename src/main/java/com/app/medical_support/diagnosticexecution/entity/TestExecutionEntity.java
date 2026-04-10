@@ -28,6 +28,9 @@ public class TestExecutionEntity {
     @Column(name = "EXECUTION_TYPE")
     private String executionType;
 
+    @Column(name = "STATUS")
+    private String status;
+
     @Column(name = "PROGRESS_STATUS")
     private String progressStatus;
 

@@ -48,6 +48,9 @@ public class SpecimenEntity {
     @Column(name = "PERFORMER_ID")
     private String performerId;
 
+    @Column(name = "PERFORMER_NAME")
+    private String performerName;
+
     @Column(name = "COLLECTION_SITE")
     private String collectionSite;
 

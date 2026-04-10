@@ -48,6 +48,9 @@ public class PhysiologicalEntity {
     @Column(name = "PERFORMER_ID")
     private String performerId;
 
+    @Column(name = "PERFORMER_NAME")
+    private String performerName;
+
     @Column(name = "STATUS")
     private String status;
 

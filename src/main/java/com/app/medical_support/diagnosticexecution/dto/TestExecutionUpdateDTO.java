@@ -5,14 +5,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Schema(description = "Test execution request")
+@Schema(description = "Test execution update request")
 @Getter
 @Setter
 @NoArgsConstructor
-public class TestExecutionReqDTO {
+public class TestExecutionUpdateDTO {
 
     @Schema(description = "Progress status")
     private String progressStatus;
+
+    @Schema(description = "Status")
+    private String status;
 
     @Schema(description = "Retry count")
     private Integer retryNo;
@@ -37,5 +40,4 @@ public class TestExecutionReqDTO {
 
     @Schema(description = "Performer ID")
     private Long performerId;
-
 }

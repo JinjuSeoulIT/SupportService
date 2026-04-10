@@ -48,6 +48,9 @@ public class EndoscopyEntity {
     @Column(name = "PERFORMER_ID")
     private String performerId;
 
+    @Column(name = "PERFORMER_NAME")
+    private String performerName;
+
     @Column(name = "PROCEDURE_AT")
     private LocalDateTime procedureAt;
 

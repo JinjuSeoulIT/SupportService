@@ -48,6 +48,9 @@ public class ImagingEntity {
     @Column(name = "PERFORMER_ID")
     private String performerId;
 
+    @Column(name = "PERFORMER_NAME")
+    private String performerName;
+
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;
 

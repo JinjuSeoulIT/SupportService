@@ -6,7 +6,7 @@ import com.app.medical_support.diagnosticexecution.dto.PathologyDTO;
 import com.app.medical_support.diagnosticexecution.dto.PhysiologicalDTO;
 import com.app.medical_support.diagnosticexecution.dto.SpecimenDTO;
 import com.app.medical_support.diagnosticexecution.dto.TestExecutionDTO;
-import com.app.medical_support.diagnosticexecution.dto.TestExecutionReqDTO;
+import com.app.medical_support.diagnosticexecution.dto.TestExecutionUpdateDTO;
 import com.app.medical_support.diagnosticexecution.entity.TestExecutionEntity;
 
 import java.util.List;
@@ -47,5 +47,5 @@ public interface DiagnosticExecutionService {
     List<TestExecutionDTO> findTestExecutionList(String executionType);
     TestExecutionDTO findTestExecutionDetail(String id);
     TestExecutionDTO registerTestExecution(TestExecutionDTO testExecutionDTO);
-    TestExecutionDTO modifyTestExecution(String id, TestExecutionReqDTO testExecutionReqDTO);
+    TestExecutionDTO modifyTestExecution(String id, TestExecutionUpdateDTO testExecutionUpdateDTO);
 }

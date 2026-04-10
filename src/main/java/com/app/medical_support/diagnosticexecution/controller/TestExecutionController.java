@@ -2,7 +2,7 @@ package com.app.medical_support.diagnosticexecution.controller;
 
 import com.app.medical_support.common.ApiResponse;
 import com.app.medical_support.diagnosticexecution.dto.TestExecutionDTO;
-import com.app.medical_support.diagnosticexecution.dto.TestExecutionReqDTO;
+import com.app.medical_support.diagnosticexecution.dto.TestExecutionUpdateDTO;
 import com.app.medical_support.diagnosticexecution.service.DiagnosticExecutionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -65,8 +65,8 @@ public class TestExecutionController {
             @Parameter(description = "Test execution ID")
             @PathVariable String id,
             @Parameter(description = "Test execution update request body")
-            @RequestBody TestExecutionReqDTO testExecutionReqDTO
+            @RequestBody TestExecutionUpdateDTO testExecutionUpdateDTO
     ) {
-        return ResponseEntity.ok(new ApiResponse<>(true, "Test execution updated.", testExecutionService.modifyTestExecution(id, testExecutionReqDTO)));
+        return ResponseEntity.ok(new ApiResponse<>(true, "Test execution updated.", testExecutionService.modifyTestExecution(id, testExecutionUpdateDTO)));
     }
 }

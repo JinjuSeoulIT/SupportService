@@ -297,7 +297,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
 
     private String normalizeProgressStatus(String progressStatus) {
         if (!hasText(progressStatus)) {
-            return "WAITING";
+            return "REQUESTED";
         }
 
         return progressStatus.trim().toUpperCase();
@@ -305,7 +305,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
 
     private String resolveProgressStatus(String newValue, String currentValue) {
         if (!hasText(newValue)) {
-            return hasText(currentValue) ? normalizeProgressStatus(currentValue) : "WAITING";
+            return hasText(currentValue) ? normalizeProgressStatus(currentValue) : "REQUESTED";
         }
 
         return normalizeProgressStatus(newValue);

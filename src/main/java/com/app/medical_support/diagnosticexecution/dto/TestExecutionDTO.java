@@ -25,6 +25,9 @@ public class TestExecutionDTO {
     @Schema(description = "Execution type")
     private String executionType;
 
+    @Schema(description = "Status")
+    private String status;
+
     @Schema(description = "Progress status")
     private String progressStatus;
 

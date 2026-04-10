@@ -43,6 +43,9 @@ public class SpecimenDTO {
     @Schema(description = "Performer ID")
     private String performerId;
 
+    @Schema(description = "Performer name")
+    private String performerName;
+
     @Schema(description = "Collection site")
     private String collectionSite;
 

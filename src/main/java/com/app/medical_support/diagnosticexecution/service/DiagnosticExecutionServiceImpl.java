@@ -6,7 +6,7 @@ import com.app.medical_support.diagnosticexecution.dto.PathologyDTO;
 import com.app.medical_support.diagnosticexecution.dto.PhysiologicalDTO;
 import com.app.medical_support.diagnosticexecution.dto.SpecimenDTO;
 import com.app.medical_support.diagnosticexecution.dto.TestExecutionDTO;
-import com.app.medical_support.diagnosticexecution.dto.TestExecutionReqDTO;
+import com.app.medical_support.diagnosticexecution.dto.TestExecutionUpdateDTO;
 import com.app.medical_support.diagnosticexecution.entity.EndoscopyEntity;
 import com.app.medical_support.diagnosticexecution.entity.ImagingEntity;
 import com.app.medical_support.diagnosticexecution.entity.PathologyEntity;
@@ -90,6 +90,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setStatus(normalizeStatus(imagingDTO.getStatus()));
         entity.setProgressStatus(normalizeProgressStatus(imagingDTO.getProgressStatus()));
         entity.setPerformerId(normalizeOptionalValue(imagingDTO.getPerformerId()));
+        entity.setPerformerName(normalizeOptionalValue(imagingDTO.getPerformerName()));
         entity.setCreatedAt(LocalDateTime.now());
         return toImagingDTO(imagingRepository.save(entity));
     }
@@ -108,6 +109,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setDepartmentName(imagingDTO.getDepartmentName());
         entity.setProgressStatus(resolveProgressStatus(imagingDTO.getProgressStatus(), entity.getProgressStatus()));
         entity.setPerformerId(normalizeOptionalValue(imagingDTO.getPerformerId()));
+        entity.setPerformerName(normalizeOptionalValue(imagingDTO.getPerformerName()));
         entity.setUpdatedAt(LocalDateTime.now());
         ImagingEntity savedEntity = imagingRepository.save(entity);
 
@@ -153,6 +155,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setEquipment(endoscopyDTO.getEquipment());
         entity.setSedationYn(normalizeYnFlag(endoscopyDTO.getSedationYn()));
         entity.setPerformerId(normalizeOptionalValue(endoscopyDTO.getPerformerId()));
+        entity.setPerformerName(normalizeOptionalValue(endoscopyDTO.getPerformerName()));
         entity.setProcedureAt(endoscopyDTO.getProcedureAt());
         entity.setStatus(normalizeStatus(endoscopyDTO.getStatus()));
         entity.setProgressStatus(normalizeProgressStatus(endoscopyDTO.getProgressStatus()));
@@ -175,6 +178,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setEquipment(endoscopyDTO.getEquipment());
         entity.setSedationYn(normalizeYnFlag(endoscopyDTO.getSedationYn()));
         entity.setPerformerId(normalizeOptionalValue(endoscopyDTO.getPerformerId()));
+        entity.setPerformerName(normalizeOptionalValue(endoscopyDTO.getPerformerName()));
         entity.setProcedureAt(endoscopyDTO.getProcedureAt());
         entity.setProgressStatus(resolveProgressStatus(endoscopyDTO.getProgressStatus(), entity.getProgressStatus()));
         entity.setUpdatedAt(LocalDateTime.now());
@@ -224,6 +228,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setTissueType(pathologyDTO.getTissueType());
         entity.setCollectedAt(pathologyDTO.getCollectedAt());
         entity.setPerformerId(normalizeOptionalValue(pathologyDTO.getPerformerId()));
+        entity.setPerformerName(normalizeOptionalValue(pathologyDTO.getPerformerName()));
         entity.setReexamYn(normalizeYnFlag(pathologyDTO.getReexamYn()));
         entity.setStatus(normalizeStatus(pathologyDTO.getStatus()));
         entity.setProgressStatus(normalizeProgressStatus(pathologyDTO.getProgressStatus()));
@@ -248,6 +253,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setTissueType(pathologyDTO.getTissueType());
         entity.setCollectedAt(pathologyDTO.getCollectedAt());
         entity.setPerformerId(normalizeOptionalValue(pathologyDTO.getPerformerId()));
+        entity.setPerformerName(normalizeOptionalValue(pathologyDTO.getPerformerName()));
         entity.setReexamYn(normalizeYnFlag(pathologyDTO.getReexamYn()));
         entity.setProgressStatus(resolveProgressStatus(pathologyDTO.getProgressStatus(), entity.getProgressStatus()));
         entity.setUpdatedAt(LocalDateTime.now());
@@ -295,6 +301,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setRawData(physiologicalDTO.getRawData());
         entity.setReportDocId(physiologicalDTO.getReportDocId());
         entity.setPerformerId(normalizeOptionalValue(physiologicalDTO.getPerformerId()));
+        entity.setPerformerName(normalizeOptionalValue(physiologicalDTO.getPerformerName()));
         entity.setStatus(normalizeStatus(physiologicalDTO.getStatus()));
         entity.setProgressStatus(normalizeProgressStatus(physiologicalDTO.getProgressStatus()));
         entity.setCreatedAt(LocalDateTime.now());
@@ -316,6 +323,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setRawData(physiologicalDTO.getRawData());
         entity.setReportDocId(physiologicalDTO.getReportDocId());
         entity.setPerformerId(normalizeOptionalValue(physiologicalDTO.getPerformerId()));
+        entity.setPerformerName(normalizeOptionalValue(physiologicalDTO.getPerformerName()));
         entity.setProgressStatus(resolveProgressStatus(physiologicalDTO.getProgressStatus(), entity.getProgressStatus()));
         entity.setUpdatedAt(LocalDateTime.now());
         PhysiologicalEntity savedEntity = physiologicalRepository.save(entity);
@@ -380,6 +388,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setSpecimenStatus(hasText(entity.getSpecimenStatus()) ? entity.getSpecimenStatus().trim().toUpperCase() : "COLLECTED");
         entity.setRecollectionYn(normalizeYnFlag(entity.getRecollectionYn()));
         entity.setPerformerId(normalizeOptionalValue(entity.getPerformerId()));
+        entity.setPerformerName(normalizeOptionalValue(entity.getPerformerName()));
         entity.setStatus(normalizeStatus(entity.getStatus()));
         entity.setProgressStatus(normalizeProgressStatus(entity.getProgressStatus()));
         entity.setCreatedAt(LocalDateTime.now());
@@ -401,6 +410,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         entity.setSpecimenStatus(hasText(specimenDTO.getSpecimenStatus()) ? specimenDTO.getSpecimenStatus().trim().toUpperCase() : entity.getSpecimenStatus());
         entity.setCollectedAt(specimenDTO.getCollectedAt());
         entity.setPerformerId(normalizeOptionalValue(specimenDTO.getPerformerId()));
+        entity.setPerformerName(normalizeOptionalValue(specimenDTO.getPerformerName()));
         entity.setCollectionSite(specimenDTO.getCollectionSite());
         entity.setRecollectionYn(normalizeYnFlag(specimenDTO.getRecollectionYn()));
         entity.setProgressStatus(resolveProgressStatus(specimenDTO.getProgressStatus(), entity.getProgressStatus()));
@@ -449,6 +459,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         if (!hasText(entity.getTestExecutionId())) {
             entity.setTestExecutionId(createTestExecutionId());
         }
+        entity.setStatus(normalizeStatus(testExecutionDTO.getStatus()));
         entity.setCreatedAt(LocalDateTime.now());
         if (!hasText(entity.getProgressStatus())) {
             entity.setProgressStatus("WAITING");
@@ -461,19 +472,22 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
 
     @Override
     @Transactional
-    public TestExecutionDTO modifyTestExecution(String id, TestExecutionReqDTO testExecutionReqDTO) {
+    public TestExecutionDTO modifyTestExecution(String id, TestExecutionUpdateDTO testExecutionUpdateDTO) {
         TestExecutionEntity entity = testExecutionRepository.findById(id)
                 .orElseThrow(() -> new TestExecutionNotFoundExecution("Test execution not found. id=" + id));
 
 
         String previousProgressStatus = entity.getProgressStatus();
-        entity.setProgressStatus(testExecutionReqDTO.getProgressStatus());
-        entity.setRetryNo(testExecutionReqDTO.getRetryNo());
-        entity.setDetailCode(testExecutionReqDTO.getDetailCode());
-        entity.setPerformerId(testExecutionReqDTO.getPerformerId());
-        entity.setPatientId(testExecutionReqDTO.getPatientId());
-        entity.setPatientName(testExecutionReqDTO.getPatientName());
-        entity.setDepartmentName(testExecutionReqDTO.getDepartmentName());
+        entity.setProgressStatus(testExecutionUpdateDTO.getProgressStatus());
+        entity.setStatus(hasText(testExecutionUpdateDTO.getStatus())
+                ? normalizeStatus(testExecutionUpdateDTO.getStatus())
+                : normalizeStatus(entity.getStatus()));
+        entity.setRetryNo(testExecutionUpdateDTO.getRetryNo());
+        entity.setDetailCode(testExecutionUpdateDTO.getDetailCode());
+        entity.setPerformerId(testExecutionUpdateDTO.getPerformerId());
+        entity.setPatientId(testExecutionUpdateDTO.getPatientId());
+        entity.setPatientName(testExecutionUpdateDTO.getPatientName());
+        entity.setDepartmentName(testExecutionUpdateDTO.getDepartmentName());
         entity.setUpdatedAt(LocalDateTime.now());
 
         if (!isInProgress(previousProgressStatus) && isInProgress(entity.getProgressStatus())) {
@@ -495,6 +509,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         dto.setStatus(entity.getStatus());
         dto.setProgressStatus(entity.getProgressStatus());
         dto.setPerformerId(entity.getPerformerId());
+        dto.setPerformerName(entity.getPerformerName());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());
         return dto;
@@ -512,6 +527,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         dto.setEquipment(entity.getEquipment());
         dto.setSedationYn(entity.getSedationYn());
         dto.setPerformerId(entity.getPerformerId());
+        dto.setPerformerName(entity.getPerformerName());
         dto.setProcedureAt(entity.getProcedureAt());
         dto.setStatus(entity.getStatus());
         dto.setProgressStatus(entity.getProgressStatus());
@@ -534,6 +550,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         dto.setTissueType(entity.getTissueType());
         dto.setCollectedAt(entity.getCollectedAt());
         dto.setPerformerId(entity.getPerformerId());
+        dto.setPerformerName(entity.getPerformerName());
         dto.setReexamYn(entity.getReexamYn());
         dto.setStatus(entity.getStatus());
         dto.setProgressStatus(entity.getProgressStatus());
@@ -554,6 +571,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         dto.setRawData(entity.getRawData());
         dto.setReportDocId(entity.getReportDocId());
         dto.setPerformerId(entity.getPerformerId());
+        dto.setPerformerName(entity.getPerformerName());
         dto.setStatus(entity.getStatus());
         dto.setProgressStatus(entity.getProgressStatus());
         dto.setCreatedAt(entity.getCreatedAt());
