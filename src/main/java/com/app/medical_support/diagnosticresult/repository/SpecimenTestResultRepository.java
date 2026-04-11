@@ -28,6 +28,7 @@ public interface SpecimenTestResultRepository extends JpaRepository<SpecimenTest
                 r.unit,
                 r.referenceRange,
                 r.judgement,
+                r.confirmedAt,
                 r.status,
                 r.createdAt
             )
@@ -53,6 +54,7 @@ public interface SpecimenTestResultRepository extends JpaRepository<SpecimenTest
                 r.unit,
                 r.referenceRange,
                 r.judgement,
+                r.confirmedAt,
                 r.status,
                 r.createdAt
             )

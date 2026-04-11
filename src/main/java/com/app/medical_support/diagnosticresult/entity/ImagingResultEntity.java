@@ -32,6 +32,9 @@ public class ImagingResultEntity {
     @Column(name = "READING_DETAIL")
     private String readingDetail;
 
+    @Column(name = "CONFIRMED_AT")
+    private LocalDateTime confirmedAt;
+
     @Column(name = "STATUS")
     private String status;
 

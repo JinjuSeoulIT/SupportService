@@ -23,6 +23,7 @@ public class PhysiologicalResultDTO {
     private String resultValue;
     private String report;
     private String measuredItemCode;
+    private LocalDateTime confirmedAt;
     private String status;
     private LocalDateTime createdAt;
 
@@ -39,6 +40,7 @@ public class PhysiologicalResultDTO {
             String resultValue,
             String report,
             String measuredItemCode,
+            LocalDateTime confirmedAt,
             String status,
             LocalDateTime createdAt
     ) {
@@ -54,6 +56,7 @@ public class PhysiologicalResultDTO {
         this.resultValue = resultValue;
         this.report = report;
         this.measuredItemCode = measuredItemCode;
+        this.confirmedAt = confirmedAt;
         this.status = status;
         this.createdAt = createdAt;
     }

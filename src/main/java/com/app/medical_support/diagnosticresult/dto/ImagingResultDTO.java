@@ -22,6 +22,7 @@ public class ImagingResultDTO {
     private String performerName;
     private String readingSummary;
     private String readingDetail;
+    private LocalDateTime confirmedAt;
     private String status;
     private LocalDateTime createdAt;
 
@@ -37,6 +38,7 @@ public class ImagingResultDTO {
             String performerName,
             String readingSummary,
             String readingDetail,
+            LocalDateTime confirmedAt,
             String status,
             LocalDateTime createdAt
     ) {
@@ -51,6 +53,7 @@ public class ImagingResultDTO {
         this.performerName = performerName;
         this.readingSummary = readingSummary;
         this.readingDetail = readingDetail;
+        this.confirmedAt = confirmedAt;
         this.status = status;
         this.createdAt = createdAt;
     }

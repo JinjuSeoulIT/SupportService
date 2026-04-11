@@ -39,6 +39,9 @@ public class SpecimenTestResultEntity {
     @Column(name = "JUDGEMENT")
     private String judgement;
 
+    @Column(name = "CONFIRMED_AT")
+    private LocalDateTime confirmedAt;
+
     @Column(name = "STATUS")
     private String status;
 

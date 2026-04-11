@@ -61,6 +61,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setImagingExamId(dto.getImagingExamId());
         entity.setReadingSummary(dto.getReadingSummary());
         entity.setReadingDetail(dto.getReadingDetail());
+        entity.setConfirmedAt(dto.getConfirmedAt());
         entity.setStatus(normalizeStatus(dto.getStatus()));
         entity.setCreatedAt(LocalDateTime.now());
         ImagingResultEntity savedEntity = imagingResultRepository.save(entity);
@@ -74,6 +75,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Imaging result not found. id=" + id));
         entity.setReadingSummary(dto.getReadingSummary());
         entity.setReadingDetail(dto.getReadingDetail());
+        entity.setConfirmedAt(dto.getConfirmedAt());
         entity.setStatus(normalizeStatus(dto.getStatus()));
         ImagingResultEntity savedEntity = imagingResultRepository.save(entity);
         return getImagingResultResponse(savedEntity.getImagingResultId());
@@ -207,6 +209,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setResultValue(dto.getResultValue());
         entity.setReport(dto.getReport());
         entity.setMeasuredItemCode(dto.getMeasuredItemCode());
+        entity.setConfirmedAt(dto.getConfirmedAt());
         entity.setStatus(normalizeStatus(dto.getStatus()));
         entity.setCreatedAt(LocalDateTime.now());
         PhysiologicalResultEntity savedEntity = physiologicalResultRepository.save(entity);
@@ -221,6 +224,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setResultValue(dto.getResultValue());
         entity.setReport(dto.getReport());
         entity.setMeasuredItemCode(dto.getMeasuredItemCode());
+        entity.setConfirmedAt(dto.getConfirmedAt());
         entity.setStatus(normalizeStatus(dto.getStatus()));
         PhysiologicalResultEntity savedEntity = physiologicalResultRepository.save(entity);
         return getPhysiologicalResultResponse(savedEntity.getPhysiologicalExamResultId());
@@ -256,6 +260,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setUnit(dto.getUnit());
         entity.setReferenceRange(dto.getReferenceRange());
         entity.setJudgement(dto.getJudgement());
+        entity.setConfirmedAt(dto.getConfirmedAt());
         entity.setStatus(normalizeStatus(dto.getStatus()));
         entity.setCreatedAt(LocalDateTime.now());
         SpecimenTestResultEntity savedEntity = specimenTestResultRepository.save(entity);
@@ -272,6 +277,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setUnit(dto.getUnit());
         entity.setReferenceRange(dto.getReferenceRange());
         entity.setJudgement(dto.getJudgement());
+        entity.setConfirmedAt(dto.getConfirmedAt());
         entity.setStatus(normalizeStatus(dto.getStatus()));
         SpecimenTestResultEntity savedEntity = specimenTestResultRepository.save(entity);
         return getSpecimenResultResponse(savedEntity.getSpecimenExamResultId());

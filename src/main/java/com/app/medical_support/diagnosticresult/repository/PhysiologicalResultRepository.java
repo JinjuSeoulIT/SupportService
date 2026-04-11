@@ -26,6 +26,7 @@ public interface PhysiologicalResultRepository extends JpaRepository<Physiologic
                 r.resultValue,
                 r.report,
                 r.measuredItemCode,
+                r.confirmedAt,
                 r.status,
                 r.createdAt
             )
@@ -49,6 +50,7 @@ public interface PhysiologicalResultRepository extends JpaRepository<Physiologic
                 r.resultValue,
                 r.report,
                 r.measuredItemCode,
+                r.confirmedAt,
                 r.status,
                 r.createdAt
             )

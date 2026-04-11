@@ -25,6 +25,7 @@ public class SpecimenTestResultDTO {
     private String unit;
     private String referenceRange;
     private String judgement;
+    private LocalDateTime confirmedAt;
     private String status;
     private LocalDateTime createdAt;
 
@@ -43,6 +44,7 @@ public class SpecimenTestResultDTO {
             String unit,
             String referenceRange,
             String judgement,
+            LocalDateTime confirmedAt,
             String status,
             LocalDateTime createdAt
     ) {
@@ -60,6 +62,7 @@ public class SpecimenTestResultDTO {
         this.unit = unit;
         this.referenceRange = referenceRange;
         this.judgement = judgement;
+        this.confirmedAt = confirmedAt;
         this.status = status;
         this.createdAt = createdAt;
     }

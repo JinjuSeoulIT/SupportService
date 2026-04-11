@@ -33,6 +33,9 @@ public class PhysiologicalResultEntity {
     @Column(name = "MEASURED_ITEM_CODE")
     private String measuredItemCode;
 
+    @Column(name = "CONFIRMED_AT")
+    private LocalDateTime confirmedAt;
+
     @Column(name = "STATUS")
     private String status;
 
