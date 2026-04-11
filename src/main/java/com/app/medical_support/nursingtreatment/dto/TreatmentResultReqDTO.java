@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,6 +18,7 @@ public class TreatmentResultReqDTO {
     @JsonProperty("progress_status")
     @JsonAlias("progressStatus")
     private String progressStatus;
+    private LocalDateTime treatmentAt;
     private String nursingId;
     private String detail;
     private Long patientId;

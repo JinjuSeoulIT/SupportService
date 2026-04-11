@@ -20,5 +20,4 @@ public class SpecimenTestResultDTO {
     private String judgement;
     private String status;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }

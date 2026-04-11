@@ -202,12 +202,12 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         TreatmentResultEntity entity = new TreatmentResultEntity();
         entity.setTreatmentResultId(createTreatmentResultId());
         entity.setProcedureResultId(treatmentResultDTO.getProcedureResultId());
-        entity.setCreatedAt(LocalDateTime.now().format(CHAR_DATE_TIME_FORMATTER));
         entity.setNursingId(treatmentResultDTO.getNursingId());
         entity.setNurseName(treatmentResultDTO.getNurseName());
         entity.setDetail(treatmentResultDTO.getDetail());
         entity.setStatus(normalizeStatus(treatmentResultDTO.getStatus()));
         entity.setProgressStatus(normalizeProgressStatus(treatmentResultDTO.getProgressStatus()));
+        entity.setTreatmentAt(treatmentResultDTO.getTreatmentAt());
         entity.setPatientId(treatmentResultDTO.getPatientId());
         entity.setPatientName(treatmentResultDTO.getPatientName());
         entity.setDepartmentName(treatmentResultDTO.getDepartmentName());
@@ -225,6 +225,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         entity.setDetail(treatmentResultDTO.getDetail());
         entity.setStatus(normalizeStatus(treatmentResultDTO.getStatus()));
         entity.setProgressStatus(resolveProgressStatus(treatmentResultDTO.getProgressStatus(), entity.getProgressStatus()));
+        entity.setTreatmentAt(treatmentResultDTO.getTreatmentAt());
         entity.setPatientId(treatmentResultDTO.getPatientId());
         entity.setPatientName(treatmentResultDTO.getPatientName());
         entity.setDepartmentName(treatmentResultDTO.getDepartmentName());
@@ -265,7 +266,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         dto.setProcedureResultId(entity.getProcedureResultId());
         dto.setStatus(entity.getStatus());
         dto.setProgressStatus(entity.getProgressStatus());
-        dto.setCreatedAt(entity.getCreatedAt());
+        dto.setTreatmentAt(entity.getTreatmentAt());
         dto.setNursingId(entity.getNursingId());
         dto.setNurseName(entity.getNurseName());
         dto.setDetail(entity.getDetail());

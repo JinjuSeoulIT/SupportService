@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Schema(description = "Test execution update request")
 @Getter
 @Setter
@@ -19,6 +21,9 @@ public class TestExecutionUpdateDTO {
 
     @Schema(description = "Retry count")
     private Integer retryNo;
+
+    @Schema(description = "Completed at")
+    private LocalDateTime completedAt;
 
     @Schema(description = "Detail Code")
     private String detailCode;
@@ -39,5 +44,8 @@ public class TestExecutionUpdateDTO {
     private String executionType;
 
     @Schema(description = "Performer ID")
-    private Long performerId;
+    private String performerId;
+
+    @Schema(description = "Performer name")
+    private String performerName;
 }

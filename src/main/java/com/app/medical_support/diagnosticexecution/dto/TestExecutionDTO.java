@@ -34,14 +34,14 @@ public class TestExecutionDTO {
     @Schema(description = "Retry count")
     private Integer retryNo;
 
-    @Schema(description = "Started at")
-    private LocalDateTime startedAt;
-
     @Schema(description = "Completed at")
     private LocalDateTime completedAt;
 
     @Schema(description = "Performer ID")
-    private Long performerId;
+    private String performerId;
+
+    @Schema(description = "Performer name")
+    private String performerName;
 
     @Schema(description = "Patient ID")
     private Long patientId;

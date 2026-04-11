@@ -36,6 +36,6 @@ public class TestExecutionReqDTO {
     private String executionType;
 
     @Schema(description = "Performer ID")
-    private Long performerId;
+    private String performerId;
 
 }

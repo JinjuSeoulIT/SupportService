@@ -20,5 +20,4 @@ public class PathologyResultDTO {
     private String diagnosisName;
     private String status;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }

@@ -455,6 +455,8 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     public TestExecutionDTO registerTestExecution(TestExecutionDTO testExecutionDTO) {
         TestExecutionEntity entity = testExecutionReqMapStruct.toEntity(testExecutionDTO);
         entity.setDetailCode(testExecutionDTO.getDetailCode());
+        entity.setPerformerId(normalizeOptionalValue(testExecutionDTO.getPerformerId()));
+        entity.setPerformerName(normalizeOptionalValue(testExecutionDTO.getPerformerName()));
 
         if (!hasText(entity.getTestExecutionId())) {
             entity.setTestExecutionId(createTestExecutionId());
@@ -483,8 +485,10 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
                 ? normalizeStatus(testExecutionUpdateDTO.getStatus())
                 : normalizeStatus(entity.getStatus()));
         entity.setRetryNo(testExecutionUpdateDTO.getRetryNo());
+        entity.setCompletedAt(testExecutionUpdateDTO.getCompletedAt());
         entity.setDetailCode(testExecutionUpdateDTO.getDetailCode());
-        entity.setPerformerId(testExecutionUpdateDTO.getPerformerId());
+        entity.setPerformerId(normalizeOptionalValue(testExecutionUpdateDTO.getPerformerId()));
+        entity.setPerformerName(normalizeOptionalValue(testExecutionUpdateDTO.getPerformerName()));
         entity.setPatientId(testExecutionUpdateDTO.getPatientId());
         entity.setPatientName(testExecutionUpdateDTO.getPatientName());
         entity.setDepartmentName(testExecutionUpdateDTO.getDepartmentName());
@@ -606,6 +610,8 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         imagingEntity.setPatientId(entity.getPatientId());
         imagingEntity.setPatientName(entity.getPatientName());
         imagingEntity.setDepartmentName(entity.getDepartmentName());
+        imagingEntity.setPerformerId(normalizeOptionalValue(entity.getPerformerId()));
+        imagingEntity.setPerformerName(normalizeOptionalValue(entity.getPerformerName()));
         imagingEntity.setStatus("ACTIVE");
         imagingEntity.setProgressStatus("WAITING");
         imagingEntity.setCreatedAt(LocalDateTime.now());
@@ -650,6 +656,8 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         endoscopyEntity.setPatientId(entity.getPatientId());
         endoscopyEntity.setPatientName(entity.getPatientName());
         endoscopyEntity.setDepartmentName(entity.getDepartmentName());
+        endoscopyEntity.setPerformerId(normalizeOptionalValue(entity.getPerformerId()));
+        endoscopyEntity.setPerformerName(normalizeOptionalValue(entity.getPerformerName()));
         endoscopyEntity.setSedationYn("N");
         endoscopyEntity.setStatus("ACTIVE");
         endoscopyEntity.setProgressStatus("WAITING");
@@ -669,6 +677,8 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         pathologyEntity.setPatientId(entity.getPatientId());
         pathologyEntity.setPatientName(entity.getPatientName());
         pathologyEntity.setDepartmentName(entity.getDepartmentName());
+        pathologyEntity.setPerformerId(normalizeOptionalValue(entity.getPerformerId()));
+        pathologyEntity.setPerformerName(normalizeOptionalValue(entity.getPerformerName()));
         pathologyEntity.setReexamYn("N");
         pathologyEntity.setStatus("ACTIVE");
         pathologyEntity.setProgressStatus("WAITING");
@@ -701,6 +711,8 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         physiologicalEntity.setPatientId(entity.getPatientId());
         physiologicalEntity.setPatientName(entity.getPatientName());
         physiologicalEntity.setDepartmentName(entity.getDepartmentName());
+        physiologicalEntity.setPerformerId(normalizeOptionalValue(entity.getPerformerId()));
+        physiologicalEntity.setPerformerName(normalizeOptionalValue(entity.getPerformerName()));
         physiologicalEntity.setStatus("ACTIVE");
         physiologicalEntity.setProgressStatus("WAITING");
         physiologicalEntity.setCreatedAt(LocalDateTime.now());
@@ -733,6 +745,8 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         specimenEntity.setPatientId(entity.getPatientId());
         specimenEntity.setPatientName(entity.getPatientName());
         specimenEntity.setDepartmentName(entity.getDepartmentName());
+        specimenEntity.setPerformerId(normalizeOptionalValue(entity.getPerformerId()));
+        specimenEntity.setPerformerName(normalizeOptionalValue(entity.getPerformerName()));
         specimenEntity.setSpecimenStatus("COLLECTED");
         specimenEntity.setRecollectionYn("N");
         specimenEntity.setStatus("ACTIVE");

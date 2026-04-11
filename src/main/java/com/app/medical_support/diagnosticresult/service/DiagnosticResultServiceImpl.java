@@ -66,7 +66,6 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setReadingSummary(dto.getReadingSummary());
         entity.setReadingDetail(dto.getReadingDetail());
         entity.setStatus(normalizeStatus(dto.getStatus()));
-        entity.setUpdatedAt(LocalDateTime.now());
         return toImagingResultDTO(imagingResultRepository.save(entity));
     }
 
@@ -76,7 +75,6 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         ImagingResultEntity entity = imagingResultRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Imaging result not found. id=" + id));
         entity.setStatus("INACTIVE");
-        entity.setUpdatedAt(LocalDateTime.now());
         imagingResultRepository.save(entity);
     }
 
@@ -117,7 +115,6 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setConfirmedAt(dto.getConfirmedAt());
         entity.setReaderId(dto.getReaderId());
         entity.setStatus(normalizeStatus(dto.getStatus()));
-        entity.setUpdatedAt(LocalDateTime.now());
         return toEndoscopyResultDTO(endoscopyResultRepository.save(entity));
     }
 
@@ -127,7 +124,6 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         EndoscopyResultEntity entity = endoscopyResultRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Endoscopy result not found. id=" + id));
         entity.setStatus("INACTIVE");
-        entity.setUpdatedAt(LocalDateTime.now());
         endoscopyResultRepository.save(entity);
     }
 
@@ -170,7 +166,6 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setReaderId(dto.getReaderId());
         entity.setDiagnosisName(dto.getDiagnosisName());
         entity.setStatus(normalizeStatus(dto.getStatus()));
-        entity.setUpdatedAt(LocalDateTime.now());
         return toPathologyResultDTO(pathologyResultRepository.save(entity));
     }
 
@@ -180,7 +175,6 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         PathologyResultEntity entity = pathologyResultRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Pathology result not found. id=" + id));
         entity.setStatus("INACTIVE");
-        entity.setUpdatedAt(LocalDateTime.now());
         pathologyResultRepository.save(entity);
     }
 
@@ -219,7 +213,6 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setReport(dto.getReport());
         entity.setMeasuredItemCode(dto.getMeasuredItemCode());
         entity.setStatus(normalizeStatus(dto.getStatus()));
-        entity.setUpdatedAt(LocalDateTime.now());
         return toPhysiologicalResultDTO(physiologicalResultRepository.save(entity));
     }
 
@@ -229,7 +222,6 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         PhysiologicalResultEntity entity = physiologicalResultRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Physiological result not found. id=" + id));
         entity.setStatus("INACTIVE");
-        entity.setUpdatedAt(LocalDateTime.now());
         physiologicalResultRepository.save(entity);
     }
 
@@ -272,7 +264,6 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setReferenceRange(dto.getReferenceRange());
         entity.setJudgement(dto.getJudgement());
         entity.setStatus(normalizeStatus(dto.getStatus()));
-        entity.setUpdatedAt(LocalDateTime.now());
         return toSpecimenResultDTO(specimenTestResultRepository.save(entity));
     }
 
@@ -282,7 +273,6 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         SpecimenTestResultEntity entity = specimenTestResultRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Specimen result not found. id=" + id));
         entity.setStatus("INACTIVE");
-        entity.setUpdatedAt(LocalDateTime.now());
         specimenTestResultRepository.save(entity);
     }
 
@@ -294,7 +284,6 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         dto.setReadingDetail(entity.getReadingDetail());
         dto.setStatus(entity.getStatus());
         dto.setCreatedAt(entity.getCreatedAt());
-        dto.setUpdatedAt(entity.getUpdatedAt());
         return dto;
     }
 
@@ -308,7 +297,6 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         dto.setReaderId(entity.getReaderId());
         dto.setStatus(entity.getStatus());
         dto.setCreatedAt(entity.getCreatedAt());
-        dto.setUpdatedAt(entity.getUpdatedAt());
         return dto;
     }
 
@@ -323,7 +311,6 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         dto.setDiagnosisName(entity.getDiagnosisName());
         dto.setStatus(entity.getStatus());
         dto.setCreatedAt(entity.getCreatedAt());
-        dto.setUpdatedAt(entity.getUpdatedAt());
         return dto;
     }
 
@@ -336,7 +323,6 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         dto.setMeasuredItemCode(entity.getMeasuredItemCode());
         dto.setStatus(entity.getStatus());
         dto.setCreatedAt(entity.getCreatedAt());
-        dto.setUpdatedAt(entity.getUpdatedAt());
         return dto;
     }
 
@@ -351,7 +337,6 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         dto.setJudgement(entity.getJudgement());
         dto.setStatus(entity.getStatus());
         dto.setCreatedAt(entity.getCreatedAt());
-        dto.setUpdatedAt(entity.getUpdatedAt());
         return dto;
     }
 

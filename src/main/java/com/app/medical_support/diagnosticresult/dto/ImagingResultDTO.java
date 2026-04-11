@@ -17,5 +17,4 @@ public class ImagingResultDTO {
     private String readingDetail;
     private String status;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }

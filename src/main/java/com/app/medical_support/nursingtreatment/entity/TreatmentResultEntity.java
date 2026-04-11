@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(schema = "CHJ", name = "TREATMENT_RESULT")
@@ -29,8 +30,8 @@ public class TreatmentResultEntity {
     @Column(name = "PROGRESS_STATUS")
     private String progressStatus;
 
-    @Column(name = "CREATED_AT")
-    private String createdAt;
+    @Column(name = "TREATMENT_AT")
+    private LocalDateTime treatmentAt;
 
     @Column(name = "NURSING_ID")
     private String nursingId;

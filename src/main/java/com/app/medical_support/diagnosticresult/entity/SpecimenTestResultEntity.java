@@ -44,7 +44,4 @@ public class SpecimenTestResultEntity {
 
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;
-
-    @Column(name = "UPDATED_AT")
-    private LocalDateTime updatedAt;
 }
