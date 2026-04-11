@@ -1,10 +1,20 @@
 package com.app.medical_support.diagnosticresult.service;
 
+import com.app.medical_support.diagnosticresult.dto.EndoscopyResultCreateReqDTO;
 import com.app.medical_support.diagnosticresult.dto.EndoscopyResultDTO;
+import com.app.medical_support.diagnosticresult.dto.EndoscopyResultUpdateReqDTO;
+import com.app.medical_support.diagnosticresult.dto.ImagingResultCreateReqDTO;
 import com.app.medical_support.diagnosticresult.dto.ImagingResultDTO;
+import com.app.medical_support.diagnosticresult.dto.ImagingResultUpdateReqDTO;
+import com.app.medical_support.diagnosticresult.dto.PathologyResultCreateReqDTO;
 import com.app.medical_support.diagnosticresult.dto.PathologyResultDTO;
+import com.app.medical_support.diagnosticresult.dto.PathologyResultUpdateReqDTO;
+import com.app.medical_support.diagnosticresult.dto.PhysiologicalResultCreateReqDTO;
 import com.app.medical_support.diagnosticresult.dto.PhysiologicalResultDTO;
+import com.app.medical_support.diagnosticresult.dto.PhysiologicalResultUpdateReqDTO;
+import com.app.medical_support.diagnosticresult.dto.SpecimenTestResultCreateReqDTO;
 import com.app.medical_support.diagnosticresult.dto.SpecimenTestResultDTO;
+import com.app.medical_support.diagnosticresult.dto.SpecimenTestResultUpdateReqDTO;
 import com.app.medical_support.diagnosticresult.entity.EndoscopyResultEntity;
 import com.app.medical_support.diagnosticresult.entity.ImagingResultEntity;
 import com.app.medical_support.diagnosticresult.entity.PathologyResultEntity;
@@ -35,18 +45,17 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
 
     @Override
     public List<ImagingResultDTO> findImagingResultList() {
-        return imagingResultRepository.findAll().stream().map(this::toImagingResultDTO).toList();
+        return imagingResultRepository.findImagingResultResponseList();
     }
 
     @Override
     public ImagingResultDTO findImagingResultDetail(String id) {
-        return toImagingResultDTO(imagingResultRepository.findById(id)
-                .orElseThrow(() -> new DiagnosticResultNotFoundException("Imaging result not found. id=" + id)));
+        return getImagingResultResponse(id);
     }
 
     @Override
     @Transactional
-    public ImagingResultDTO registerImagingResult(ImagingResultDTO dto) {
+    public ImagingResultDTO registerImagingResult(ImagingResultCreateReqDTO dto) {
         ImagingResultEntity entity = new ImagingResultEntity();
         entity.setImagingResultId(hasText(dto.getImagingResultId()) ? dto.getImagingResultId() : createImagingResultId());
         entity.setImagingExamId(dto.getImagingExamId());
@@ -54,19 +63,20 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setReadingDetail(dto.getReadingDetail());
         entity.setStatus(normalizeStatus(dto.getStatus()));
         entity.setCreatedAt(LocalDateTime.now());
-        return toImagingResultDTO(imagingResultRepository.save(entity));
+        ImagingResultEntity savedEntity = imagingResultRepository.save(entity);
+        return getImagingResultResponse(savedEntity.getImagingResultId());
     }
 
     @Override
     @Transactional
-    public ImagingResultDTO modifyImagingResult(String id, ImagingResultDTO dto) {
+    public ImagingResultDTO modifyImagingResult(String id, ImagingResultUpdateReqDTO dto) {
         ImagingResultEntity entity = imagingResultRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Imaging result not found. id=" + id));
-        entity.setImagingExamId(dto.getImagingExamId());
         entity.setReadingSummary(dto.getReadingSummary());
         entity.setReadingDetail(dto.getReadingDetail());
         entity.setStatus(normalizeStatus(dto.getStatus()));
-        return toImagingResultDTO(imagingResultRepository.save(entity));
+        ImagingResultEntity savedEntity = imagingResultRepository.save(entity);
+        return getImagingResultResponse(savedEntity.getImagingResultId());
     }
 
     @Override
@@ -80,18 +90,17 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
 
     @Override
     public List<EndoscopyResultDTO> findEndoscopyResultList() {
-        return endoscopyResultRepository.findAll().stream().map(this::toEndoscopyResultDTO).toList();
+        return endoscopyResultRepository.findEndoscopyResultResponseList();
     }
 
     @Override
     public EndoscopyResultDTO findEndoscopyResultDetail(String id) {
-        return toEndoscopyResultDTO(endoscopyResultRepository.findById(id)
-                .orElseThrow(() -> new DiagnosticResultNotFoundException("Endoscopy result not found. id=" + id)));
+        return getEndoscopyResultResponse(id);
     }
 
     @Override
     @Transactional
-    public EndoscopyResultDTO registerEndoscopyResult(EndoscopyResultDTO dto) {
+    public EndoscopyResultDTO registerEndoscopyResult(EndoscopyResultCreateReqDTO dto) {
         EndoscopyResultEntity entity = new EndoscopyResultEntity();
         entity.setEndoscopyResultId(hasText(dto.getEndoscopyResultId()) ? dto.getEndoscopyResultId() : createEndoscopyResultId());
         entity.setEndoscopyExamId(dto.getEndoscopyExamId());
@@ -101,21 +110,22 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setReaderId(dto.getReaderId());
         entity.setStatus(normalizeStatus(dto.getStatus()));
         entity.setCreatedAt(LocalDateTime.now());
-        return toEndoscopyResultDTO(endoscopyResultRepository.save(entity));
+        EndoscopyResultEntity savedEntity = endoscopyResultRepository.save(entity);
+        return getEndoscopyResultResponse(savedEntity.getEndoscopyResultId());
     }
 
     @Override
     @Transactional
-    public EndoscopyResultDTO modifyEndoscopyResult(String id, EndoscopyResultDTO dto) {
+    public EndoscopyResultDTO modifyEndoscopyResult(String id, EndoscopyResultUpdateReqDTO dto) {
         EndoscopyResultEntity entity = endoscopyResultRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Endoscopy result not found. id=" + id));
-        entity.setEndoscopyExamId(dto.getEndoscopyExamId());
         entity.setFinding(dto.getFinding());
         entity.setBiopsyYn(normalizeYnFlag(dto.getBiopsyYn()));
         entity.setConfirmedAt(dto.getConfirmedAt());
         entity.setReaderId(dto.getReaderId());
         entity.setStatus(normalizeStatus(dto.getStatus()));
-        return toEndoscopyResultDTO(endoscopyResultRepository.save(entity));
+        EndoscopyResultEntity savedEntity = endoscopyResultRepository.save(entity);
+        return getEndoscopyResultResponse(savedEntity.getEndoscopyResultId());
     }
 
     @Override
@@ -129,18 +139,17 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
 
     @Override
     public List<PathologyResultDTO> findPathologyResultList() {
-        return pathologyResultRepository.findAll().stream().map(this::toPathologyResultDTO).toList();
+        return pathologyResultRepository.findPathologyResultResponseList();
     }
 
     @Override
     public PathologyResultDTO findPathologyResultDetail(String id) {
-        return toPathologyResultDTO(pathologyResultRepository.findById(id)
-                .orElseThrow(() -> new DiagnosticResultNotFoundException("Pathology result not found. id=" + id)));
+        return getPathologyResultResponse(id);
     }
 
     @Override
     @Transactional
-    public PathologyResultDTO registerPathologyResult(PathologyResultDTO dto) {
+    public PathologyResultDTO registerPathologyResult(PathologyResultCreateReqDTO dto) {
         PathologyResultEntity entity = new PathologyResultEntity();
         entity.setPathologyExamResultId(hasText(dto.getPathologyExamResultId()) ? dto.getPathologyExamResultId() : createPathologyResultId());
         entity.setPathologyExamId(dto.getPathologyExamId());
@@ -151,22 +160,23 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setDiagnosisName(dto.getDiagnosisName());
         entity.setStatus(normalizeStatus(dto.getStatus()));
         entity.setCreatedAt(LocalDateTime.now());
-        return toPathologyResultDTO(pathologyResultRepository.save(entity));
+        PathologyResultEntity savedEntity = pathologyResultRepository.save(entity);
+        return getPathologyResultResponse(savedEntity.getPathologyExamResultId());
     }
 
     @Override
     @Transactional
-    public PathologyResultDTO modifyPathologyResult(String id, PathologyResultDTO dto) {
+    public PathologyResultDTO modifyPathologyResult(String id, PathologyResultUpdateReqDTO dto) {
         PathologyResultEntity entity = pathologyResultRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Pathology result not found. id=" + id));
-        entity.setPathologyExamId(dto.getPathologyExamId());
         entity.setResultSummary(dto.getResultSummary());
         entity.setJudgedAt(dto.getJudgedAt());
         entity.setConfirmedAt(dto.getConfirmedAt());
         entity.setReaderId(dto.getReaderId());
         entity.setDiagnosisName(dto.getDiagnosisName());
         entity.setStatus(normalizeStatus(dto.getStatus()));
-        return toPathologyResultDTO(pathologyResultRepository.save(entity));
+        PathologyResultEntity savedEntity = pathologyResultRepository.save(entity);
+        return getPathologyResultResponse(savedEntity.getPathologyExamResultId());
     }
 
     @Override
@@ -180,18 +190,17 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
 
     @Override
     public List<PhysiologicalResultDTO> findPhysiologicalResultList() {
-        return physiologicalResultRepository.findAll().stream().map(this::toPhysiologicalResultDTO).toList();
+        return physiologicalResultRepository.findPhysiologicalResultResponseList();
     }
 
     @Override
     public PhysiologicalResultDTO findPhysiologicalResultDetail(String id) {
-        return toPhysiologicalResultDTO(physiologicalResultRepository.findById(id)
-                .orElseThrow(() -> new DiagnosticResultNotFoundException("Physiological result not found. id=" + id)));
+        return getPhysiologicalResultResponse(id);
     }
 
     @Override
     @Transactional
-    public PhysiologicalResultDTO registerPhysiologicalResult(PhysiologicalResultDTO dto) {
+    public PhysiologicalResultDTO registerPhysiologicalResult(PhysiologicalResultCreateReqDTO dto) {
         PhysiologicalResultEntity entity = new PhysiologicalResultEntity();
         entity.setPhysiologicalExamResultId(hasText(dto.getPhysiologicalExamResultId()) ? dto.getPhysiologicalExamResultId() : createPhysiologicalResultId());
         entity.setPhysiologicalExamId(dto.getPhysiologicalExamId());
@@ -200,20 +209,21 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setMeasuredItemCode(dto.getMeasuredItemCode());
         entity.setStatus(normalizeStatus(dto.getStatus()));
         entity.setCreatedAt(LocalDateTime.now());
-        return toPhysiologicalResultDTO(physiologicalResultRepository.save(entity));
+        PhysiologicalResultEntity savedEntity = physiologicalResultRepository.save(entity);
+        return getPhysiologicalResultResponse(savedEntity.getPhysiologicalExamResultId());
     }
 
     @Override
     @Transactional
-    public PhysiologicalResultDTO modifyPhysiologicalResult(String id, PhysiologicalResultDTO dto) {
+    public PhysiologicalResultDTO modifyPhysiologicalResult(String id, PhysiologicalResultUpdateReqDTO dto) {
         PhysiologicalResultEntity entity = physiologicalResultRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Physiological result not found. id=" + id));
-        entity.setPhysiologicalExamId(dto.getPhysiologicalExamId());
         entity.setResultValue(dto.getResultValue());
         entity.setReport(dto.getReport());
         entity.setMeasuredItemCode(dto.getMeasuredItemCode());
         entity.setStatus(normalizeStatus(dto.getStatus()));
-        return toPhysiologicalResultDTO(physiologicalResultRepository.save(entity));
+        PhysiologicalResultEntity savedEntity = physiologicalResultRepository.save(entity);
+        return getPhysiologicalResultResponse(savedEntity.getPhysiologicalExamResultId());
     }
 
     @Override
@@ -227,18 +237,17 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
 
     @Override
     public List<SpecimenTestResultDTO> findSpecimenResultList() {
-        return specimenTestResultRepository.findAll().stream().map(this::toSpecimenResultDTO).toList();
+        return specimenTestResultRepository.findSpecimenResultResponseList();
     }
 
     @Override
     public SpecimenTestResultDTO findSpecimenResultDetail(String id) {
-        return toSpecimenResultDTO(specimenTestResultRepository.findById(id)
-                .orElseThrow(() -> new DiagnosticResultNotFoundException("Specimen result not found. id=" + id)));
+        return getSpecimenResultResponse(id);
     }
 
     @Override
     @Transactional
-    public SpecimenTestResultDTO registerSpecimenResult(SpecimenTestResultDTO dto) {
+    public SpecimenTestResultDTO registerSpecimenResult(SpecimenTestResultCreateReqDTO dto) {
         SpecimenTestResultEntity entity = new SpecimenTestResultEntity();
         entity.setSpecimenExamResultId(hasText(dto.getSpecimenExamResultId()) ? dto.getSpecimenExamResultId() : createSpecimenResultId());
         entity.setSpecimenExamId(dto.getSpecimenExamId());
@@ -249,22 +258,23 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setJudgement(dto.getJudgement());
         entity.setStatus(normalizeStatus(dto.getStatus()));
         entity.setCreatedAt(LocalDateTime.now());
-        return toSpecimenResultDTO(specimenTestResultRepository.save(entity));
+        SpecimenTestResultEntity savedEntity = specimenTestResultRepository.save(entity);
+        return getSpecimenResultResponse(savedEntity.getSpecimenExamResultId());
     }
 
     @Override
     @Transactional
-    public SpecimenTestResultDTO modifySpecimenResult(String id, SpecimenTestResultDTO dto) {
+    public SpecimenTestResultDTO modifySpecimenResult(String id, SpecimenTestResultUpdateReqDTO dto) {
         SpecimenTestResultEntity entity = specimenTestResultRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Specimen result not found. id=" + id));
-        entity.setSpecimenExamId(dto.getSpecimenExamId());
         entity.setResultItemCode(dto.getResultItemCode());
         entity.setResultValue(dto.getResultValue());
         entity.setUnit(dto.getUnit());
         entity.setReferenceRange(dto.getReferenceRange());
         entity.setJudgement(dto.getJudgement());
         entity.setStatus(normalizeStatus(dto.getStatus()));
-        return toSpecimenResultDTO(specimenTestResultRepository.save(entity));
+        SpecimenTestResultEntity savedEntity = specimenTestResultRepository.save(entity);
+        return getSpecimenResultResponse(savedEntity.getSpecimenExamResultId());
     }
 
     @Override
@@ -276,68 +286,29 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         specimenTestResultRepository.save(entity);
     }
 
-    private ImagingResultDTO toImagingResultDTO(ImagingResultEntity entity) {
-        ImagingResultDTO dto = new ImagingResultDTO();
-        dto.setImagingResultId(entity.getImagingResultId());
-        dto.setImagingExamId(entity.getImagingExamId());
-        dto.setReadingSummary(entity.getReadingSummary());
-        dto.setReadingDetail(entity.getReadingDetail());
-        dto.setStatus(entity.getStatus());
-        dto.setCreatedAt(entity.getCreatedAt());
-        return dto;
+    private ImagingResultDTO getImagingResultResponse(String id) {
+        return imagingResultRepository.findImagingResultResponseDetail(id)
+                .orElseThrow(() -> new DiagnosticResultNotFoundException("Imaging result not found. id=" + id));
     }
 
-    private EndoscopyResultDTO toEndoscopyResultDTO(EndoscopyResultEntity entity) {
-        EndoscopyResultDTO dto = new EndoscopyResultDTO();
-        dto.setEndoscopyResultId(entity.getEndoscopyResultId());
-        dto.setEndoscopyExamId(entity.getEndoscopyExamId());
-        dto.setFinding(entity.getFinding());
-        dto.setBiopsyYn(entity.getBiopsyYn());
-        dto.setConfirmedAt(entity.getConfirmedAt());
-        dto.setReaderId(entity.getReaderId());
-        dto.setStatus(entity.getStatus());
-        dto.setCreatedAt(entity.getCreatedAt());
-        return dto;
+    private EndoscopyResultDTO getEndoscopyResultResponse(String id) {
+        return endoscopyResultRepository.findEndoscopyResultResponseDetail(id)
+                .orElseThrow(() -> new DiagnosticResultNotFoundException("Endoscopy result not found. id=" + id));
     }
 
-    private PathologyResultDTO toPathologyResultDTO(PathologyResultEntity entity) {
-        PathologyResultDTO dto = new PathologyResultDTO();
-        dto.setPathologyExamResultId(entity.getPathologyExamResultId());
-        dto.setPathologyExamId(entity.getPathologyExamId());
-        dto.setResultSummary(entity.getResultSummary());
-        dto.setJudgedAt(entity.getJudgedAt());
-        dto.setConfirmedAt(entity.getConfirmedAt());
-        dto.setReaderId(entity.getReaderId());
-        dto.setDiagnosisName(entity.getDiagnosisName());
-        dto.setStatus(entity.getStatus());
-        dto.setCreatedAt(entity.getCreatedAt());
-        return dto;
+    private PathologyResultDTO getPathologyResultResponse(String id) {
+        return pathologyResultRepository.findPathologyResultResponseDetail(id)
+                .orElseThrow(() -> new DiagnosticResultNotFoundException("Pathology result not found. id=" + id));
     }
 
-    private PhysiologicalResultDTO toPhysiologicalResultDTO(PhysiologicalResultEntity entity) {
-        PhysiologicalResultDTO dto = new PhysiologicalResultDTO();
-        dto.setPhysiologicalExamResultId(entity.getPhysiologicalExamResultId());
-        dto.setPhysiologicalExamId(entity.getPhysiologicalExamId());
-        dto.setResultValue(entity.getResultValue());
-        dto.setReport(entity.getReport());
-        dto.setMeasuredItemCode(entity.getMeasuredItemCode());
-        dto.setStatus(entity.getStatus());
-        dto.setCreatedAt(entity.getCreatedAt());
-        return dto;
+    private PhysiologicalResultDTO getPhysiologicalResultResponse(String id) {
+        return physiologicalResultRepository.findPhysiologicalResultResponseDetail(id)
+                .orElseThrow(() -> new DiagnosticResultNotFoundException("Physiological result not found. id=" + id));
     }
 
-    private SpecimenTestResultDTO toSpecimenResultDTO(SpecimenTestResultEntity entity) {
-        SpecimenTestResultDTO dto = new SpecimenTestResultDTO();
-        dto.setSpecimenExamResultId(entity.getSpecimenExamResultId());
-        dto.setSpecimenExamId(entity.getSpecimenExamId());
-        dto.setResultItemCode(entity.getResultItemCode());
-        dto.setResultValue(entity.getResultValue());
-        dto.setUnit(entity.getUnit());
-        dto.setReferenceRange(entity.getReferenceRange());
-        dto.setJudgement(entity.getJudgement());
-        dto.setStatus(entity.getStatus());
-        dto.setCreatedAt(entity.getCreatedAt());
-        return dto;
+    private SpecimenTestResultDTO getSpecimenResultResponse(String id) {
+        return specimenTestResultRepository.findSpecimenResultResponseDetail(id)
+                .orElseThrow(() -> new DiagnosticResultNotFoundException("Specimen result not found. id=" + id));
     }
 
     private boolean hasText(String value) {

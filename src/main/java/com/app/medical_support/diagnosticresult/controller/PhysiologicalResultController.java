@@ -1,7 +1,9 @@
 package com.app.medical_support.diagnosticresult.controller;
 
 import com.app.medical_support.common.ApiResponse;
+import com.app.medical_support.diagnosticresult.dto.PhysiologicalResultCreateReqDTO;
 import com.app.medical_support.diagnosticresult.dto.PhysiologicalResultDTO;
+import com.app.medical_support.diagnosticresult.dto.PhysiologicalResultUpdateReqDTO;
 import com.app.medical_support.diagnosticresult.service.DiagnosticResultService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,13 +42,13 @@ public class PhysiologicalResultController {
 
     @Operation(summary = "생리 기능 검사 결과 등록")
     @PostMapping
-    public ResponseEntity<ApiResponse<PhysiologicalResultDTO>> register(@RequestBody PhysiologicalResultDTO dto) {
+    public ResponseEntity<ApiResponse<PhysiologicalResultDTO>> register(@RequestBody PhysiologicalResultCreateReqDTO dto) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Physiological result created.", diagnosticResultService.registerPhysiologicalResult(dto)));
     }
 
     @Operation(summary = "생리 기능 검사 결과 수정")
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<PhysiologicalResultDTO>> modify(@PathVariable String id, @RequestBody PhysiologicalResultDTO dto) {
+    public ResponseEntity<ApiResponse<PhysiologicalResultDTO>> modify(@PathVariable String id, @RequestBody PhysiologicalResultUpdateReqDTO dto) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Physiological result updated.", diagnosticResultService.modifyPhysiologicalResult(id, dto)));
     }
 

@@ -30,7 +30,7 @@ public class SpecimenController {
 
     private final DiagnosticExecutionService specimenService;
 
-    @Operation(summary = "검체 검사 검색", description = "검사수행아이디, 검체종류, 검체상태로 검색합니다.")
+    @Operation(summary = "검체 검사 검색", description = "searchType과 searchValue로 검체 검사를 검색합니다.")
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<List<SpecimenDTO>>> searchSpecimens(
             @Parameter(description = "testExecutionId, specimenType, specimenStatus")
