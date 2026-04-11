@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -28,31 +29,47 @@ public class TreatmentResultController {
 
     private final NursingTreatmentService nursingTreatmentService;
 
-    @Operation(summary = "처치 결과 목록 조회")
+    @Operation(summary = "Treatment result list")
     @GetMapping
     public ResponseEntity<ApiResponse<List<TreatmentResultDTO>>> findList() {
         return ResponseEntity.ok(new ApiResponse<>(true, "Treatment result list loaded.", nursingTreatmentService.findTreatmentResultList()));
     }
 
-    @Operation(summary = "처치 결과 단건 조회")
+    @Operation(summary = "Treatment result search")
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<List<TreatmentResultDTO>>> search(
+            @RequestParam(value = "patientName", required = false) String patientName,
+            @RequestParam(value = "departmentName", required = false) String departmentName,
+            @RequestParam(value = "progressStatus", required = false) String progressStatus,
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @RequestParam(value = "endDate", required = false) String endDate
+    ) {
+        return ResponseEntity.ok(new ApiResponse<>(
+                true,
+                "Treatment result search completed.",
+                nursingTreatmentService.searchTreatmentResult(patientName, departmentName, progressStatus, startDate, endDate)
+        ));
+    }
+
+    @Operation(summary = "Treatment result detail")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<TreatmentResultDTO>> findDetail(@PathVariable String id) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Treatment result detail loaded.", nursingTreatmentService.findTreatmentResultDetail(id)));
     }
 
-    @Operation(summary = "처치 결과 등록")
+    @Operation(summary = "Create treatment result")
     @PostMapping
     public ResponseEntity<ApiResponse<TreatmentResultDTO>> register(@RequestBody TreatmentResultReqDTO dto) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Treatment result created.", nursingTreatmentService.registerTreatmentResult(dto)));
     }
 
-    @Operation(summary = "처치 결과 수정")
+    @Operation(summary = "Update treatment result")
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<TreatmentResultDTO>> modify(@PathVariable String id, @RequestBody TreatmentResultReqDTO dto) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Treatment result updated.", nursingTreatmentService.modifyTreatmentResult(id, dto)));
     }
 
-    @Operation(summary = "처치 결과 상태 변경")
+    @Operation(summary = "Update treatment result status")
     @PatchMapping("/{id}/status")
     public ResponseEntity<ApiResponse<TreatmentResultDTO>> updateStatus(@PathVariable String id, @RequestBody RecordStatusRequest request) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Treatment result status updated.", nursingTreatmentService.updateTreatmentResultStatus(id, request.getStatus())));

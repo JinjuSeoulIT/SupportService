@@ -7,7 +7,9 @@ import com.app.medical_support.nursingtreatment.entity.MedicationRecordEntity;
 import com.app.medical_support.nursingtreatment.entity.RecordEntity;
 import com.app.medical_support.nursingtreatment.entity.TreatmentResultEntity;
 import com.app.medical_support.nursingtreatment.exception.*;
+import com.app.medical_support.nursingtreatment.mapper.MedicationRecordMapper;
 import com.app.medical_support.nursingtreatment.mapper.RecordMapper;
+import com.app.medical_support.nursingtreatment.mapper.TreatmentResultMapper;
 import com.app.medical_support.nursingtreatment.mapstruct.RecordReqMapStruct;
 import com.app.medical_support.nursingtreatment.mapstruct.RecordResMapStruct;
 import com.app.medical_support.nursingtreatment.repository.MedicationRecordRepository;
@@ -35,6 +37,8 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     private final RecordReqMapStruct recordReqMapStruct;
     private final RecordResMapStruct recordResMapStruct;
     private final RecordMapper recordMapper;
+    private final MedicationRecordMapper medicationRecordMapper;
+    private final TreatmentResultMapper treatmentResultMapper;
     private final MedicationRecordRepository medicationRecordRepository;
     private final TreatmentResultRepository treatmentResultRepository;
     private final ReceptionIntegrationService receptionIntegrationService;
@@ -130,6 +134,11 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     }
 
     @Override
+    public List<MedicationRecordDTO> searchMedicationRecord(String patientName, String departmentName, String progressStatus, String startDate, String endDate) {
+        return medicationRecordMapper.searchMedicationRecord(patientName, departmentName, progressStatus, startDate, endDate);
+    }
+
+    @Override
     public MedicationRecordDTO findMedicationRecordDetail(String id) {
         return toMedicationRecordDTO(medicationRecordRepository.findById(id)
                 .orElseThrow(() -> new MedicationRecordNotFoundException(id)));
@@ -188,6 +197,11 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     @Override
     public List<TreatmentResultDTO> findTreatmentResultList() {
         return treatmentResultRepository.findAll().stream().map(this::toTreatmentResultDTO).toList();
+    }
+
+    @Override
+    public List<TreatmentResultDTO> searchTreatmentResult(String patientName, String departmentName, String progressStatus, String startDate, String endDate) {
+        return treatmentResultMapper.searchTreatmentResult(patientName, departmentName, progressStatus, startDate, endDate);
     }
 
     @Override
