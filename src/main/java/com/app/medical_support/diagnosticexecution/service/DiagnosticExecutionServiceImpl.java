@@ -102,7 +102,9 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
                 .orElseThrow(() -> new DiagnosticExecutionNotFoundException("Imaging exam not found. id=" + id));
         String previousProgressStatus = entity.getProgressStatus();
         entity.setTestExecutionId(imagingDTO.getTestExecutionId());
-        entity.setImagingType(imagingDTO.getImagingType());
+        if (hasText(imagingDTO.getImagingType())) {          // ← 이 부분만 추가
+            entity.setImagingType(imagingDTO.getImagingType());
+        }
         entity.setDetailCode(imagingDTO.getDetailCode());
         entity.setPatientId(imagingDTO.getPatientId());
         entity.setPatientName(imagingDTO.getPatientName());

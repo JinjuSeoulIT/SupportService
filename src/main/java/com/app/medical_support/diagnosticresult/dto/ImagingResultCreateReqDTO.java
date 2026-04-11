@@ -17,4 +17,5 @@ public class ImagingResultCreateReqDTO {
     private String readingDetail;
     private LocalDateTime confirmedAt;
     private String status;
+    private String imagingType;
 }

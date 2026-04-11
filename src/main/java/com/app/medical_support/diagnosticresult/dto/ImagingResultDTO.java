@@ -16,6 +16,7 @@ public class ImagingResultDTO {
     private String testExecutionId;
     private String detailCode;
     private Long patientId;
+
     private String patientName;
     private String departmentName;
     private String performerId;

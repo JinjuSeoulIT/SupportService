@@ -57,15 +57,29 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     @Transactional
     public ImagingResultDTO registerImagingResult(ImagingResultCreateReqDTO dto) {
         ImagingResultEntity entity = new ImagingResultEntity();
-        entity.setImagingResultId(hasText(dto.getImagingResultId()) ? dto.getImagingResultId() : createImagingResultId());
+
+        entity.setImagingResultId(
+                hasText(dto.getImagingResultId())
+                        ? dto.getImagingResultId()
+                        : createImagingResultId()
+        );
+
         entity.setImagingExamId(dto.getImagingExamId());
+
+
+        entity.setImagingType(dto.getImagingType());
+
         entity.setReadingSummary(dto.getReadingSummary());
         entity.setReadingDetail(dto.getReadingDetail());
         entity.setConfirmedAt(dto.getConfirmedAt());
         entity.setStatus(normalizeStatus(dto.getStatus()));
         entity.setCreatedAt(LocalDateTime.now());
+
         ImagingResultEntity savedEntity = imagingResultRepository.save(entity);
+
         return getImagingResultResponse(savedEntity.getImagingResultId());
+
+
     }
 
     @Override

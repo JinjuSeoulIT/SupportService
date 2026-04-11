@@ -1,6 +1,7 @@
 package com.app.medical_support.diagnosticresult.controller;
 
 import com.app.medical_support.common.ApiResponse;
+import com.app.medical_support.diagnosticresult.dto.TestResultDetailDTO;
 import com.app.medical_support.diagnosticresult.dto.TestResultListDTO;
 import com.app.medical_support.diagnosticresult.dto.TestResultSearchCondition;
 import com.app.medical_support.diagnosticresult.service.TestResultFacadeService;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,6 +32,19 @@ public class TestResultController {
                 true,
                 "Integrated test result list loaded.",
                 testResultFacadeService.findTestResultList(condition)
+        ));
+    }
+
+    @Operation(summary = "Integrated test result detail")
+    @GetMapping("/{resultType}/{resultId}")
+    public ResponseEntity<ApiResponse<TestResultDetailDTO>> findDetail(
+            @PathVariable String resultType,
+            @PathVariable String resultId
+    ) {
+        return ResponseEntity.ok(new ApiResponse<>(
+                true,
+                "Integrated test result detail loaded.",
+                testResultFacadeService.findTestResultDetail(resultType, resultId)
         ));
     }
 }

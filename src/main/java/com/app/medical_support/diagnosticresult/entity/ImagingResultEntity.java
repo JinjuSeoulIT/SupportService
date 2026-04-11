@@ -25,6 +25,10 @@ public class ImagingResultEntity {
     @Column(name = "IMAGING_EXAM_ID")
     private String imagingExamId;
 
+    @Column(name = "IMAGING_TYPE")
+    private String imagingType;
+
+
     @Column(name = "READING_SUMMARY")
     private String readingSummary;
 
