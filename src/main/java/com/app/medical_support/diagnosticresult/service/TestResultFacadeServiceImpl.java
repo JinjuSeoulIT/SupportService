@@ -1,13 +1,20 @@
 package com.app.medical_support.diagnosticresult.service;
 
 import com.app.medical_support.diagnosticresult.dto.EndoscopyResultDTO;
+import com.app.medical_support.diagnosticresult.dto.EndoscopyResultUpdateReqDTO;
 import com.app.medical_support.diagnosticresult.dto.ImagingResultDTO;
+import com.app.medical_support.diagnosticresult.dto.ImagingResultUpdateReqDTO;
 import com.app.medical_support.diagnosticresult.dto.PathologyResultDTO;
+import com.app.medical_support.diagnosticresult.dto.PathologyResultUpdateReqDTO;
 import com.app.medical_support.diagnosticresult.dto.PhysiologicalResultDTO;
+import com.app.medical_support.diagnosticresult.dto.PhysiologicalResultUpdateReqDTO;
 import com.app.medical_support.diagnosticresult.dto.SpecimenTestResultDTO;
+import com.app.medical_support.diagnosticresult.dto.SpecimenTestResultUpdateReqDTO;
 import com.app.medical_support.diagnosticresult.dto.TestResultDetailDTO;
 import com.app.medical_support.diagnosticresult.dto.TestResultListDTO;
 import com.app.medical_support.diagnosticresult.dto.TestResultSearchCondition;
+import com.app.medical_support.diagnosticresult.dto.TestResultUpdateDetailDTO;
+import com.app.medical_support.diagnosticresult.dto.TestResultUpdateReqDTO;
 import com.app.medical_support.diagnosticresult.exception.DiagnosticResultNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -69,6 +76,32 @@ public class TestResultFacadeServiceImpl implements TestResultFacadeService {
             case TYPE_PATHOLOGY -> mapPathologyDetail(diagnosticResultService.findPathologyResultDetail(resultId));
             case TYPE_ENDOSCOPY -> mapEndoscopyDetail(diagnosticResultService.findEndoscopyResultDetail(resultId));
             case TYPE_PHYSIOLOGICAL -> mapPhysiologicalDetail(diagnosticResultService.findPhysiologicalResultDetail(resultId));
+            default -> throw new DiagnosticResultNotFoundException("Unsupported result type. resultType=" + resultType);
+        };
+    }
+
+    @Override
+    public TestResultDetailDTO modifyTestResult(String resultType, String resultId, TestResultUpdateReqDTO dto) {
+        String normalizedType = normalizeResultType(resultType);
+        TestResultUpdateReqDTO request = dto != null ? dto : new TestResultUpdateReqDTO();
+        TestResultUpdateDetailDTO detail = request.getDetail() != null ? request.getDetail() : new TestResultUpdateDetailDTO();
+
+        return switch (normalizedType) {
+            case TYPE_IMAGING -> mapImagingDetail(
+                    diagnosticResultService.modifyImagingResult(resultId, toImagingUpdateReq(request, detail))
+            );
+            case TYPE_SPECIMEN -> mapSpecimenDetail(
+                    diagnosticResultService.modifySpecimenResult(resultId, toSpecimenUpdateReq(request, detail))
+            );
+            case TYPE_PATHOLOGY -> mapPathologyDetail(
+                    diagnosticResultService.modifyPathologyResult(resultId, toPathologyUpdateReq(request, detail))
+            );
+            case TYPE_ENDOSCOPY -> mapEndoscopyDetail(
+                    diagnosticResultService.modifyEndoscopyResult(resultId, toEndoscopyUpdateReq(request, detail))
+            );
+            case TYPE_PHYSIOLOGICAL -> mapPhysiologicalDetail(
+                    diagnosticResultService.modifyPhysiologicalResult(resultId, toPhysiologicalUpdateReq(request, detail))
+            );
             default -> throw new DiagnosticResultNotFoundException("Unsupported result type. resultType=" + resultType);
         };
     }
@@ -282,6 +315,58 @@ public class TestResultFacadeServiceImpl implements TestResultFacadeService {
         result.setResultId(resultId);
         result.setExamId(examId);
         return result;
+    }
+
+    private ImagingResultUpdateReqDTO toImagingUpdateReq(TestResultUpdateReqDTO request, TestResultUpdateDetailDTO detail) {
+        ImagingResultUpdateReqDTO dto = new ImagingResultUpdateReqDTO();
+        dto.setReadingSummary(detail.getReadingSummary());
+        dto.setReadingDetail(detail.getReadingDetail());
+        dto.setConfirmedAt(request.getConfirmedAt());
+        dto.setStatus(request.getStatus());
+        return dto;
+    }
+
+    private SpecimenTestResultUpdateReqDTO toSpecimenUpdateReq(TestResultUpdateReqDTO request, TestResultUpdateDetailDTO detail) {
+        SpecimenTestResultUpdateReqDTO dto = new SpecimenTestResultUpdateReqDTO();
+        dto.setResultItemCode(detail.getResultItemCode());
+        dto.setResultValue(detail.getResultValue());
+        dto.setUnit(detail.getUnit());
+        dto.setReferenceRange(detail.getReferenceRange());
+        dto.setJudgement(detail.getJudgement());
+        dto.setConfirmedAt(request.getConfirmedAt());
+        dto.setStatus(request.getStatus());
+        return dto;
+    }
+
+    private PathologyResultUpdateReqDTO toPathologyUpdateReq(TestResultUpdateReqDTO request, TestResultUpdateDetailDTO detail) {
+        PathologyResultUpdateReqDTO dto = new PathologyResultUpdateReqDTO();
+        dto.setResultSummary(detail.getResultSummary());
+        dto.setJudgedAt(detail.getJudgedAt());
+        dto.setConfirmedAt(request.getConfirmedAt());
+        dto.setReaderId(detail.getReaderId());
+        dto.setDiagnosisName(detail.getDiagnosisName());
+        dto.setStatus(request.getStatus());
+        return dto;
+    }
+
+    private EndoscopyResultUpdateReqDTO toEndoscopyUpdateReq(TestResultUpdateReqDTO request, TestResultUpdateDetailDTO detail) {
+        EndoscopyResultUpdateReqDTO dto = new EndoscopyResultUpdateReqDTO();
+        dto.setFinding(detail.getFinding());
+        dto.setBiopsyYn(detail.getBiopsyYn());
+        dto.setConfirmedAt(request.getConfirmedAt());
+        dto.setReaderId(detail.getReaderId());
+        dto.setStatus(request.getStatus());
+        return dto;
+    }
+
+    private PhysiologicalResultUpdateReqDTO toPhysiologicalUpdateReq(TestResultUpdateReqDTO request, TestResultUpdateDetailDTO detail) {
+        PhysiologicalResultUpdateReqDTO dto = new PhysiologicalResultUpdateReqDTO();
+        dto.setResultValue(detail.getResultValue());
+        dto.setReport(detail.getReport());
+        dto.setMeasuredItemCode(detail.getMeasuredItemCode());
+        dto.setConfirmedAt(request.getConfirmedAt());
+        dto.setStatus(request.getStatus());
+        return dto;
     }
 
     private TestResultDetailDTO createCommonDetail(String resultType, String resultId, String examId) {

@@ -87,10 +87,18 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     public ImagingResultDTO modifyImagingResult(String id, ImagingResultUpdateReqDTO dto) {
         ImagingResultEntity entity = imagingResultRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Imaging result not found. id=" + id));
-        entity.setReadingSummary(dto.getReadingSummary());
-        entity.setReadingDetail(dto.getReadingDetail());
-        entity.setConfirmedAt(dto.getConfirmedAt());
-        entity.setStatus(normalizeStatus(dto.getStatus()));
+        if (dto.getReadingSummary() != null) {
+            entity.setReadingSummary(dto.getReadingSummary());
+        }
+        if (dto.getReadingDetail() != null) {
+            entity.setReadingDetail(dto.getReadingDetail());
+        }
+        if (dto.getConfirmedAt() != null) {
+            entity.setConfirmedAt(dto.getConfirmedAt());
+        }
+        if (hasText(dto.getStatus())) {
+            entity.setStatus(normalizeStatus(dto.getStatus()));
+        }
         ImagingResultEntity savedEntity = imagingResultRepository.save(entity);
         return getImagingResultResponse(savedEntity.getImagingResultId());
     }
@@ -135,11 +143,21 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     public EndoscopyResultDTO modifyEndoscopyResult(String id, EndoscopyResultUpdateReqDTO dto) {
         EndoscopyResultEntity entity = endoscopyResultRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Endoscopy result not found. id=" + id));
-        entity.setFinding(dto.getFinding());
-        entity.setBiopsyYn(normalizeYnFlag(dto.getBiopsyYn()));
-        entity.setConfirmedAt(dto.getConfirmedAt());
-        entity.setReaderId(dto.getReaderId());
-        entity.setStatus(normalizeStatus(dto.getStatus()));
+        if (dto.getFinding() != null) {
+            entity.setFinding(dto.getFinding());
+        }
+        if (hasText(dto.getBiopsyYn())) {
+            entity.setBiopsyYn(normalizeYnFlag(dto.getBiopsyYn()));
+        }
+        if (dto.getConfirmedAt() != null) {
+            entity.setConfirmedAt(dto.getConfirmedAt());
+        }
+        if (dto.getReaderId() != null) {
+            entity.setReaderId(dto.getReaderId());
+        }
+        if (hasText(dto.getStatus())) {
+            entity.setStatus(normalizeStatus(dto.getStatus()));
+        }
         EndoscopyResultEntity savedEntity = endoscopyResultRepository.save(entity);
         return getEndoscopyResultResponse(savedEntity.getEndoscopyResultId());
     }
@@ -185,12 +203,24 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     public PathologyResultDTO modifyPathologyResult(String id, PathologyResultUpdateReqDTO dto) {
         PathologyResultEntity entity = pathologyResultRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Pathology result not found. id=" + id));
-        entity.setResultSummary(dto.getResultSummary());
-        entity.setJudgedAt(dto.getJudgedAt());
-        entity.setConfirmedAt(dto.getConfirmedAt());
-        entity.setReaderId(dto.getReaderId());
-        entity.setDiagnosisName(dto.getDiagnosisName());
-        entity.setStatus(normalizeStatus(dto.getStatus()));
+        if (dto.getResultSummary() != null) {
+            entity.setResultSummary(dto.getResultSummary());
+        }
+        if (dto.getJudgedAt() != null) {
+            entity.setJudgedAt(dto.getJudgedAt());
+        }
+        if (dto.getConfirmedAt() != null) {
+            entity.setConfirmedAt(dto.getConfirmedAt());
+        }
+        if (dto.getReaderId() != null) {
+            entity.setReaderId(dto.getReaderId());
+        }
+        if (dto.getDiagnosisName() != null) {
+            entity.setDiagnosisName(dto.getDiagnosisName());
+        }
+        if (hasText(dto.getStatus())) {
+            entity.setStatus(normalizeStatus(dto.getStatus()));
+        }
         PathologyResultEntity savedEntity = pathologyResultRepository.save(entity);
         return getPathologyResultResponse(savedEntity.getPathologyExamResultId());
     }
@@ -235,11 +265,21 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     public PhysiologicalResultDTO modifyPhysiologicalResult(String id, PhysiologicalResultUpdateReqDTO dto) {
         PhysiologicalResultEntity entity = physiologicalResultRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Physiological result not found. id=" + id));
-        entity.setResultValue(dto.getResultValue());
-        entity.setReport(dto.getReport());
-        entity.setMeasuredItemCode(dto.getMeasuredItemCode());
-        entity.setConfirmedAt(dto.getConfirmedAt());
-        entity.setStatus(normalizeStatus(dto.getStatus()));
+        if (dto.getResultValue() != null) {
+            entity.setResultValue(dto.getResultValue());
+        }
+        if (dto.getReport() != null) {
+            entity.setReport(dto.getReport());
+        }
+        if (dto.getMeasuredItemCode() != null) {
+            entity.setMeasuredItemCode(dto.getMeasuredItemCode());
+        }
+        if (dto.getConfirmedAt() != null) {
+            entity.setConfirmedAt(dto.getConfirmedAt());
+        }
+        if (hasText(dto.getStatus())) {
+            entity.setStatus(normalizeStatus(dto.getStatus()));
+        }
         PhysiologicalResultEntity savedEntity = physiologicalResultRepository.save(entity);
         return getPhysiologicalResultResponse(savedEntity.getPhysiologicalExamResultId());
     }
@@ -286,13 +326,27 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     public SpecimenTestResultDTO modifySpecimenResult(String id, SpecimenTestResultUpdateReqDTO dto) {
         SpecimenTestResultEntity entity = specimenTestResultRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Specimen result not found. id=" + id));
-        entity.setResultItemCode(dto.getResultItemCode());
-        entity.setResultValue(dto.getResultValue());
-        entity.setUnit(dto.getUnit());
-        entity.setReferenceRange(dto.getReferenceRange());
-        entity.setJudgement(dto.getJudgement());
-        entity.setConfirmedAt(dto.getConfirmedAt());
-        entity.setStatus(normalizeStatus(dto.getStatus()));
+        if (dto.getResultItemCode() != null) {
+            entity.setResultItemCode(dto.getResultItemCode());
+        }
+        if (dto.getResultValue() != null) {
+            entity.setResultValue(dto.getResultValue());
+        }
+        if (dto.getUnit() != null) {
+            entity.setUnit(dto.getUnit());
+        }
+        if (dto.getReferenceRange() != null) {
+            entity.setReferenceRange(dto.getReferenceRange());
+        }
+        if (dto.getJudgement() != null) {
+            entity.setJudgement(dto.getJudgement());
+        }
+        if (dto.getConfirmedAt() != null) {
+            entity.setConfirmedAt(dto.getConfirmedAt());
+        }
+        if (hasText(dto.getStatus())) {
+            entity.setStatus(normalizeStatus(dto.getStatus()));
+        }
         SpecimenTestResultEntity savedEntity = specimenTestResultRepository.save(entity);
         return getSpecimenResultResponse(savedEntity.getSpecimenExamResultId());
     }
