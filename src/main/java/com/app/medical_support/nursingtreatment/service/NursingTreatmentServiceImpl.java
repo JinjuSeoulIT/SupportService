@@ -171,17 +171,37 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     public MedicationRecordDTO modifyMedicationRecord(String id, MedicationRecordUpdateDTO medicationRecordDTO) {
         MedicationRecordEntity entity = medicationRecordRepository.findById(id)
                 .orElseThrow(() -> new MedicationRecordNotFoundException(id));
-        entity.setAdministeredAt(medicationRecordDTO.getAdministeredAt());
-        entity.setDoseNumber(medicationRecordDTO.getDoseNumber());
-        entity.setDoseUnit(medicationRecordDTO.getDoseUnit());
-        entity.setDoseKind(medicationRecordDTO.getDoseKind());
-        entity.setNursingId(medicationRecordDTO.getNursingId());
-        entity.setNurseName(medicationRecordDTO.getNurseName());
-        entity.setStatus(normalizeStatus(medicationRecordDTO.getStatus()));
+        if (medicationRecordDTO.getAdministeredAt() != null) {
+            entity.setAdministeredAt(medicationRecordDTO.getAdministeredAt());
+        }
+        if (medicationRecordDTO.getDoseNumber() != null) {
+            entity.setDoseNumber(medicationRecordDTO.getDoseNumber());
+        }
+        if (medicationRecordDTO.getDoseUnit() != null) {
+            entity.setDoseUnit(medicationRecordDTO.getDoseUnit());
+        }
+        if (medicationRecordDTO.getDoseKind() != null) {
+            entity.setDoseKind(medicationRecordDTO.getDoseKind());
+        }
+        if (medicationRecordDTO.getNursingId() != null) {
+            entity.setNursingId(medicationRecordDTO.getNursingId());
+        }
+        if (medicationRecordDTO.getNurseName() != null) {
+            entity.setNurseName(medicationRecordDTO.getNurseName());
+        }
+        if (hasText(medicationRecordDTO.getStatus())) {
+            entity.setStatus(normalizeStatus(medicationRecordDTO.getStatus()));
+        }
         entity.setProgressStatus(resolveProgressStatus(medicationRecordDTO.getProgressStatus(), entity.getProgressStatus()));
-        entity.setPatientId(medicationRecordDTO.getPatientId());
-        entity.setPatientName(medicationRecordDTO.getPatientName());
-        entity.setDepartmentName(medicationRecordDTO.getDepartmentName());
+        if (medicationRecordDTO.getPatientId() != null) {
+            entity.setPatientId(medicationRecordDTO.getPatientId());
+        }
+        if (medicationRecordDTO.getPatientName() != null) {
+            entity.setPatientName(medicationRecordDTO.getPatientName());
+        }
+        if (medicationRecordDTO.getDepartmentName() != null) {
+            entity.setDepartmentName(medicationRecordDTO.getDepartmentName());
+        }
         return toMedicationRecordDTO(medicationRecordRepository.save(entity));
     }
 
@@ -233,16 +253,34 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     public TreatmentResultDTO modifyTreatmentResult(String id, TreatmentResultReqDTO treatmentResultDTO) {
         TreatmentResultEntity entity = treatmentResultRepository.findById(id)
                 .orElseThrow(() -> new TreatmentResultNotFoundException(id));
-        entity.setProcedureResultId(treatmentResultDTO.getProcedureResultId());
-        entity.setNursingId(treatmentResultDTO.getNursingId());
-        entity.setNurseName(treatmentResultDTO.getNurseName());
-        entity.setDetail(treatmentResultDTO.getDetail());
-        entity.setStatus(normalizeStatus(treatmentResultDTO.getStatus()));
+        if (treatmentResultDTO.getProcedureResultId() != null) {
+            entity.setProcedureResultId(treatmentResultDTO.getProcedureResultId());
+        }
+        if (treatmentResultDTO.getNursingId() != null) {
+            entity.setNursingId(treatmentResultDTO.getNursingId());
+        }
+        if (treatmentResultDTO.getNurseName() != null) {
+            entity.setNurseName(treatmentResultDTO.getNurseName());
+        }
+        if (treatmentResultDTO.getDetail() != null) {
+            entity.setDetail(treatmentResultDTO.getDetail());
+        }
+        if (hasText(treatmentResultDTO.getStatus())) {
+            entity.setStatus(normalizeStatus(treatmentResultDTO.getStatus()));
+        }
         entity.setProgressStatus(resolveProgressStatus(treatmentResultDTO.getProgressStatus(), entity.getProgressStatus()));
-        entity.setTreatmentAt(treatmentResultDTO.getTreatmentAt());
-        entity.setPatientId(treatmentResultDTO.getPatientId());
-        entity.setPatientName(treatmentResultDTO.getPatientName());
-        entity.setDepartmentName(treatmentResultDTO.getDepartmentName());
+        if (treatmentResultDTO.getTreatmentAt() != null) {
+            entity.setTreatmentAt(treatmentResultDTO.getTreatmentAt());
+        }
+        if (treatmentResultDTO.getPatientId() != null) {
+            entity.setPatientId(treatmentResultDTO.getPatientId());
+        }
+        if (treatmentResultDTO.getPatientName() != null) {
+            entity.setPatientName(treatmentResultDTO.getPatientName());
+        }
+        if (treatmentResultDTO.getDepartmentName() != null) {
+            entity.setDepartmentName(treatmentResultDTO.getDepartmentName());
+        }
         return toTreatmentResultDTO(treatmentResultRepository.save(entity));
     }
 
