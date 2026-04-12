@@ -15,5 +15,7 @@ public class TestResultUpdateReqDTO {
 
     private String status;
     private LocalDateTime confirmedAt;
+    private String resultManagerId;
+    private String resultManagerName;
     private TestResultUpdateDetailDTO detail;
 }

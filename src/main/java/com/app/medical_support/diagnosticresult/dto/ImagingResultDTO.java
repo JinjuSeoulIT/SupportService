@@ -21,6 +21,8 @@ public class ImagingResultDTO {
     private String departmentName;
     private String performerId;
     private String performerName;
+    private String resultManagerId;
+    private String resultManagerName;
     private String readingSummary;
     private String readingDetail;
     private LocalDateTime confirmedAt;
@@ -37,6 +39,8 @@ public class ImagingResultDTO {
             String departmentName,
             String performerId,
             String performerName,
+            String resultManagerId,
+            String resultManagerName,
             String readingSummary,
             String readingDetail,
             LocalDateTime confirmedAt,
@@ -52,6 +56,8 @@ public class ImagingResultDTO {
         this.departmentName = departmentName;
         this.performerId = performerId;
         this.performerName = performerName;
+        this.resultManagerId = resultManagerId;
+        this.resultManagerName = resultManagerName;
         this.readingSummary = readingSummary;
         this.readingDetail = readingDetail;
         this.confirmedAt = confirmedAt;

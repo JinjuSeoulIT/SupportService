@@ -22,6 +22,8 @@ public class TestResultListDTO {
     private String departmentName;
     private String performerId;
     private String performerName;
+    private String resultManagerId;
+    private String resultManagerName;
     private String summary;
     private LocalDateTime resultAt;
     private String status;

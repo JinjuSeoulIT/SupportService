@@ -20,6 +20,8 @@ public class PathologyResultDTO {
     private String departmentName;
     private String performerId;
     private String performerName;
+    private String resultManagerId;
+    private String resultManagerName;
     private String resultSummary;
     private LocalDateTime judgedAt;
     private LocalDateTime confirmedAt;
@@ -38,6 +40,8 @@ public class PathologyResultDTO {
             String departmentName,
             String performerId,
             String performerName,
+            String resultManagerId,
+            String resultManagerName,
             String resultSummary,
             LocalDateTime judgedAt,
             LocalDateTime confirmedAt,
@@ -55,6 +59,8 @@ public class PathologyResultDTO {
         this.departmentName = departmentName;
         this.performerId = performerId;
         this.performerName = performerName;
+        this.resultManagerId = resultManagerId;
+        this.resultManagerName = resultManagerName;
         this.resultSummary = resultSummary;
         this.judgedAt = judgedAt;
         this.confirmedAt = confirmedAt;

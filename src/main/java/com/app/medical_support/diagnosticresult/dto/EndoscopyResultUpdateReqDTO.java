@@ -14,6 +14,8 @@ public class EndoscopyResultUpdateReqDTO {
     private String finding;
     private String biopsyYn;
     private LocalDateTime confirmedAt;
+    private String resultManagerId;
+    private String resultManagerName;
     private String readerId;
     private String status;
 }

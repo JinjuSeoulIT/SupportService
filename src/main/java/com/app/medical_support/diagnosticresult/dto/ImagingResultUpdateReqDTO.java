@@ -14,5 +14,7 @@ public class ImagingResultUpdateReqDTO {
     private String readingSummary;
     private String readingDetail;
     private LocalDateTime confirmedAt;
+    private String resultManagerId;
+    private String resultManagerName;
     private String status;
 }

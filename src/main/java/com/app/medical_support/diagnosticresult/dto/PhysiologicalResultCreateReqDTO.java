@@ -17,5 +17,7 @@ public class PhysiologicalResultCreateReqDTO {
     private String report;
     private String measuredItemCode;
     private LocalDateTime confirmedAt;
+    private String resultManagerId;
+    private String resultManagerName;
     private String status;
 }

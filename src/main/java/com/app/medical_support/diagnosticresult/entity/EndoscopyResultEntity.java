@@ -33,6 +33,12 @@ public class EndoscopyResultEntity {
     @Column(name = "CONFIRMED_AT")
     private LocalDateTime confirmedAt;
 
+    @Column(name = "RESULT_MANAGER_ID")
+    private String resultManagerId;
+
+    @Column(name = "RESULT_MANAGER_NAME")
+    private String resultManagerName;
+
     @Column(name = "READER_ID")
     private String readerId;
 

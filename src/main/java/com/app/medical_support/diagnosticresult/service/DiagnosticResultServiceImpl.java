@@ -72,6 +72,8 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setReadingSummary(dto.getReadingSummary());
         entity.setReadingDetail(dto.getReadingDetail());
         entity.setConfirmedAt(dto.getConfirmedAt());
+        entity.setResultManagerId(dto.getResultManagerId());
+        entity.setResultManagerName(dto.getResultManagerName());
         entity.setStatus(normalizeStatus(dto.getStatus()));
         entity.setCreatedAt(LocalDateTime.now());
 
@@ -95,6 +97,12 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         }
         if (dto.getConfirmedAt() != null) {
             entity.setConfirmedAt(dto.getConfirmedAt());
+        }
+        if (dto.getResultManagerId() != null) {
+            entity.setResultManagerId(dto.getResultManagerId());
+        }
+        if (dto.getResultManagerName() != null) {
+            entity.setResultManagerName(dto.getResultManagerName());
         }
         if (hasText(dto.getStatus())) {
             entity.setStatus(normalizeStatus(dto.getStatus()));
@@ -131,6 +139,8 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setFinding(dto.getFinding());
         entity.setBiopsyYn(normalizeYnFlag(dto.getBiopsyYn()));
         entity.setConfirmedAt(dto.getConfirmedAt());
+        entity.setResultManagerId(dto.getResultManagerId());
+        entity.setResultManagerName(dto.getResultManagerName());
         entity.setReaderId(dto.getReaderId());
         entity.setStatus(normalizeStatus(dto.getStatus()));
         entity.setCreatedAt(LocalDateTime.now());
@@ -151,6 +161,12 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         }
         if (dto.getConfirmedAt() != null) {
             entity.setConfirmedAt(dto.getConfirmedAt());
+        }
+        if (dto.getResultManagerId() != null) {
+            entity.setResultManagerId(dto.getResultManagerId());
+        }
+        if (dto.getResultManagerName() != null) {
+            entity.setResultManagerName(dto.getResultManagerName());
         }
         if (dto.getReaderId() != null) {
             entity.setReaderId(dto.getReaderId());
@@ -190,6 +206,8 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setResultSummary(dto.getResultSummary());
         entity.setJudgedAt(dto.getJudgedAt());
         entity.setConfirmedAt(dto.getConfirmedAt());
+        entity.setResultManagerId(dto.getResultManagerId());
+        entity.setResultManagerName(dto.getResultManagerName());
         entity.setReaderId(dto.getReaderId());
         entity.setDiagnosisName(dto.getDiagnosisName());
         entity.setStatus(normalizeStatus(dto.getStatus()));
@@ -211,6 +229,12 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         }
         if (dto.getConfirmedAt() != null) {
             entity.setConfirmedAt(dto.getConfirmedAt());
+        }
+        if (dto.getResultManagerId() != null) {
+            entity.setResultManagerId(dto.getResultManagerId());
+        }
+        if (dto.getResultManagerName() != null) {
+            entity.setResultManagerName(dto.getResultManagerName());
         }
         if (dto.getReaderId() != null) {
             entity.setReaderId(dto.getReaderId());
@@ -254,6 +278,8 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setReport(dto.getReport());
         entity.setMeasuredItemCode(dto.getMeasuredItemCode());
         entity.setConfirmedAt(dto.getConfirmedAt());
+        entity.setResultManagerId(dto.getResultManagerId());
+        entity.setResultManagerName(dto.getResultManagerName());
         entity.setStatus(normalizeStatus(dto.getStatus()));
         entity.setCreatedAt(LocalDateTime.now());
         PhysiologicalResultEntity savedEntity = physiologicalResultRepository.save(entity);
@@ -276,6 +302,12 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         }
         if (dto.getConfirmedAt() != null) {
             entity.setConfirmedAt(dto.getConfirmedAt());
+        }
+        if (dto.getResultManagerId() != null) {
+            entity.setResultManagerId(dto.getResultManagerId());
+        }
+        if (dto.getResultManagerName() != null) {
+            entity.setResultManagerName(dto.getResultManagerName());
         }
         if (hasText(dto.getStatus())) {
             entity.setStatus(normalizeStatus(dto.getStatus()));
@@ -315,6 +347,8 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setReferenceRange(dto.getReferenceRange());
         entity.setJudgement(dto.getJudgement());
         entity.setConfirmedAt(dto.getConfirmedAt());
+        entity.setResultManagerId(dto.getResultManagerId());
+        entity.setResultManagerName(dto.getResultManagerName());
         entity.setStatus(normalizeStatus(dto.getStatus()));
         entity.setCreatedAt(LocalDateTime.now());
         SpecimenTestResultEntity savedEntity = specimenTestResultRepository.save(entity);
@@ -343,6 +377,12 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         }
         if (dto.getConfirmedAt() != null) {
             entity.setConfirmedAt(dto.getConfirmedAt());
+        }
+        if (dto.getResultManagerId() != null) {
+            entity.setResultManagerId(dto.getResultManagerId());
+        }
+        if (dto.getResultManagerName() != null) {
+            entity.setResultManagerName(dto.getResultManagerName());
         }
         if (hasText(dto.getStatus())) {
             entity.setStatus(normalizeStatus(dto.getStatus()));

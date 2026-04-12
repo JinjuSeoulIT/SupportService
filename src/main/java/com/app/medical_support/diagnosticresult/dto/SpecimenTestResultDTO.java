@@ -20,6 +20,8 @@ public class SpecimenTestResultDTO {
     private String departmentName;
     private String performerId;
     private String performerName;
+    private String resultManagerId;
+    private String resultManagerName;
     private String resultItemCode;
     private String resultValue;
     private String unit;
@@ -39,6 +41,8 @@ public class SpecimenTestResultDTO {
             String departmentName,
             String performerId,
             String performerName,
+            String resultManagerId,
+            String resultManagerName,
             String resultItemCode,
             String resultValue,
             String unit,
@@ -57,6 +61,8 @@ public class SpecimenTestResultDTO {
         this.departmentName = departmentName;
         this.performerId = performerId;
         this.performerName = performerName;
+        this.resultManagerId = resultManagerId;
+        this.resultManagerName = resultManagerName;
         this.resultItemCode = resultItemCode;
         this.resultValue = resultValue;
         this.unit = unit;

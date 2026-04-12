@@ -17,5 +17,7 @@ public class SpecimenTestResultUpdateReqDTO {
     private String referenceRange;
     private String judgement;
     private LocalDateTime confirmedAt;
+    private String resultManagerId;
+    private String resultManagerName;
     private String status;
 }

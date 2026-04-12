@@ -20,6 +20,8 @@ public class EndoscopyResultDTO {
     private String departmentName;
     private String performerId;
     private String performerName;
+    private String resultManagerId;
+    private String resultManagerName;
     private String finding;
     private String biopsyYn;
     private LocalDateTime confirmedAt;
@@ -37,6 +39,8 @@ public class EndoscopyResultDTO {
             String departmentName,
             String performerId,
             String performerName,
+            String resultManagerId,
+            String resultManagerName,
             String finding,
             String biopsyYn,
             LocalDateTime confirmedAt,
@@ -53,6 +57,8 @@ public class EndoscopyResultDTO {
         this.departmentName = departmentName;
         this.performerId = performerId;
         this.performerName = performerName;
+        this.resultManagerId = resultManagerId;
+        this.resultManagerName = resultManagerName;
         this.finding = finding;
         this.biopsyYn = biopsyYn;
         this.confirmedAt = confirmedAt;

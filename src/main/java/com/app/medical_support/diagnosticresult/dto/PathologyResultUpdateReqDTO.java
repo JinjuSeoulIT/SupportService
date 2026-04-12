@@ -14,6 +14,8 @@ public class PathologyResultUpdateReqDTO {
     private String resultSummary;
     private LocalDateTime judgedAt;
     private LocalDateTime confirmedAt;
+    private String resultManagerId;
+    private String resultManagerName;
     private String readerId;
     private String diagnosisName;
     private String status;

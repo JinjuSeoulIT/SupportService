@@ -20,6 +20,8 @@ public class PhysiologicalResultDTO {
     private String departmentName;
     private String performerId;
     private String performerName;
+    private String resultManagerId;
+    private String resultManagerName;
     private String resultValue;
     private String report;
     private String measuredItemCode;
@@ -37,6 +39,8 @@ public class PhysiologicalResultDTO {
             String departmentName,
             String performerId,
             String performerName,
+            String resultManagerId,
+            String resultManagerName,
             String resultValue,
             String report,
             String measuredItemCode,
@@ -53,6 +57,8 @@ public class PhysiologicalResultDTO {
         this.departmentName = departmentName;
         this.performerId = performerId;
         this.performerName = performerName;
+        this.resultManagerId = resultManagerId;
+        this.resultManagerName = resultManagerName;
         this.resultValue = resultValue;
         this.report = report;
         this.measuredItemCode = measuredItemCode;

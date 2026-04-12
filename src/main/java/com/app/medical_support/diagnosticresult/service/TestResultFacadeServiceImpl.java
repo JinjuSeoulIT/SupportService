@@ -116,6 +116,8 @@ public class TestResultFacadeServiceImpl implements TestResultFacadeService {
             result.setDepartmentName(dto.getDepartmentName());
             result.setPerformerId(dto.getPerformerId());
             result.setPerformerName(dto.getPerformerName());
+            result.setResultManagerId(dto.getResultManagerId());
+            result.setResultManagerName(dto.getResultManagerName());
             result.setSummary(dto.getReadingSummary());
             result.setResultAt(dto.getConfirmedAt());
             result.setStatus(dto.getStatus());
@@ -134,6 +136,8 @@ public class TestResultFacadeServiceImpl implements TestResultFacadeService {
             result.setDepartmentName(dto.getDepartmentName());
             result.setPerformerId(dto.getPerformerId());
             result.setPerformerName(dto.getPerformerName());
+            result.setResultManagerId(dto.getResultManagerId());
+            result.setResultManagerName(dto.getResultManagerName());
             result.setSummary(dto.getResultValue());
             result.setResultAt(dto.getConfirmedAt());
             result.setStatus(dto.getStatus());
@@ -152,6 +156,8 @@ public class TestResultFacadeServiceImpl implements TestResultFacadeService {
             result.setDepartmentName(dto.getDepartmentName());
             result.setPerformerId(dto.getPerformerId());
             result.setPerformerName(dto.getPerformerName());
+            result.setResultManagerId(dto.getResultManagerId());
+            result.setResultManagerName(dto.getResultManagerName());
             result.setSummary(dto.getResultSummary());
             result.setResultAt(dto.getConfirmedAt());
             result.setStatus(dto.getStatus());
@@ -170,6 +176,8 @@ public class TestResultFacadeServiceImpl implements TestResultFacadeService {
             result.setDepartmentName(dto.getDepartmentName());
             result.setPerformerId(dto.getPerformerId());
             result.setPerformerName(dto.getPerformerName());
+            result.setResultManagerId(dto.getResultManagerId());
+            result.setResultManagerName(dto.getResultManagerName());
             result.setSummary(dto.getFinding());
             result.setResultAt(dto.getConfirmedAt());
             result.setStatus(dto.getStatus());
@@ -188,6 +196,8 @@ public class TestResultFacadeServiceImpl implements TestResultFacadeService {
             result.setDepartmentName(dto.getDepartmentName());
             result.setPerformerId(dto.getPerformerId());
             result.setPerformerName(dto.getPerformerName());
+            result.setResultManagerId(dto.getResultManagerId());
+            result.setResultManagerName(dto.getResultManagerName());
             result.setSummary(dto.getResultValue());
             result.setResultAt(dto.getConfirmedAt());
             result.setStatus(dto.getStatus());
@@ -205,6 +215,8 @@ public class TestResultFacadeServiceImpl implements TestResultFacadeService {
         result.setDepartmentName(dto.getDepartmentName());
         result.setPerformerId(dto.getPerformerId());
         result.setPerformerName(dto.getPerformerName());
+        result.setResultManagerId(dto.getResultManagerId());
+        result.setResultManagerName(dto.getResultManagerName());
         result.setSummary(dto.getReadingSummary());
         result.setResultAt(dto.getConfirmedAt());
         result.setStatus(dto.getStatus());
@@ -226,6 +238,8 @@ public class TestResultFacadeServiceImpl implements TestResultFacadeService {
         result.setDepartmentName(dto.getDepartmentName());
         result.setPerformerId(dto.getPerformerId());
         result.setPerformerName(dto.getPerformerName());
+        result.setResultManagerId(dto.getResultManagerId());
+        result.setResultManagerName(dto.getResultManagerName());
         result.setSummary(dto.getResultValue());
         result.setResultAt(dto.getConfirmedAt());
         result.setStatus(dto.getStatus());
@@ -250,6 +264,8 @@ public class TestResultFacadeServiceImpl implements TestResultFacadeService {
         result.setDepartmentName(dto.getDepartmentName());
         result.setPerformerId(dto.getPerformerId());
         result.setPerformerName(dto.getPerformerName());
+        result.setResultManagerId(dto.getResultManagerId());
+        result.setResultManagerName(dto.getResultManagerName());
         result.setSummary(dto.getResultSummary());
         result.setResultAt(dto.getConfirmedAt());
         result.setStatus(dto.getStatus());
@@ -273,6 +289,8 @@ public class TestResultFacadeServiceImpl implements TestResultFacadeService {
         result.setDepartmentName(dto.getDepartmentName());
         result.setPerformerId(dto.getPerformerId());
         result.setPerformerName(dto.getPerformerName());
+        result.setResultManagerId(dto.getResultManagerId());
+        result.setResultManagerName(dto.getResultManagerName());
         result.setSummary(dto.getFinding());
         result.setResultAt(dto.getConfirmedAt());
         result.setStatus(dto.getStatus());
@@ -295,6 +313,8 @@ public class TestResultFacadeServiceImpl implements TestResultFacadeService {
         result.setDepartmentName(dto.getDepartmentName());
         result.setPerformerId(dto.getPerformerId());
         result.setPerformerName(dto.getPerformerName());
+        result.setResultManagerId(dto.getResultManagerId());
+        result.setResultManagerName(dto.getResultManagerName());
         result.setSummary(dto.getResultValue());
         result.setResultAt(dto.getConfirmedAt());
         result.setStatus(dto.getStatus());
@@ -322,6 +342,8 @@ public class TestResultFacadeServiceImpl implements TestResultFacadeService {
         dto.setReadingSummary(detail.getReadingSummary());
         dto.setReadingDetail(detail.getReadingDetail());
         dto.setConfirmedAt(request.getConfirmedAt());
+        dto.setResultManagerId(request.getResultManagerId());
+        dto.setResultManagerName(request.getResultManagerName());
         dto.setStatus(request.getStatus());
         return dto;
     }
@@ -334,6 +356,8 @@ public class TestResultFacadeServiceImpl implements TestResultFacadeService {
         dto.setReferenceRange(detail.getReferenceRange());
         dto.setJudgement(detail.getJudgement());
         dto.setConfirmedAt(request.getConfirmedAt());
+        dto.setResultManagerId(request.getResultManagerId());
+        dto.setResultManagerName(request.getResultManagerName());
         dto.setStatus(request.getStatus());
         return dto;
     }
@@ -343,6 +367,8 @@ public class TestResultFacadeServiceImpl implements TestResultFacadeService {
         dto.setResultSummary(detail.getResultSummary());
         dto.setJudgedAt(detail.getJudgedAt());
         dto.setConfirmedAt(request.getConfirmedAt());
+        dto.setResultManagerId(request.getResultManagerId());
+        dto.setResultManagerName(request.getResultManagerName());
         dto.setReaderId(detail.getReaderId());
         dto.setDiagnosisName(detail.getDiagnosisName());
         dto.setStatus(request.getStatus());
@@ -354,6 +380,8 @@ public class TestResultFacadeServiceImpl implements TestResultFacadeService {
         dto.setFinding(detail.getFinding());
         dto.setBiopsyYn(detail.getBiopsyYn());
         dto.setConfirmedAt(request.getConfirmedAt());
+        dto.setResultManagerId(request.getResultManagerId());
+        dto.setResultManagerName(request.getResultManagerName());
         dto.setReaderId(detail.getReaderId());
         dto.setStatus(request.getStatus());
         return dto;
@@ -365,6 +393,8 @@ public class TestResultFacadeServiceImpl implements TestResultFacadeService {
         dto.setReport(detail.getReport());
         dto.setMeasuredItemCode(detail.getMeasuredItemCode());
         dto.setConfirmedAt(request.getConfirmedAt());
+        dto.setResultManagerId(request.getResultManagerId());
+        dto.setResultManagerName(request.getResultManagerName());
         dto.setStatus(request.getStatus());
         return dto;
     }
@@ -431,11 +461,11 @@ public class TestResultFacadeServiceImpl implements TestResultFacadeService {
 
     private String toResultTypeName(String resultType) {
         return switch (resultType) {
-            case TYPE_IMAGING -> "영상검사";
-            case TYPE_SPECIMEN -> "검체검사";
-            case TYPE_PATHOLOGY -> "병리검사";
-            case TYPE_ENDOSCOPY -> "내시경검사";
-            case TYPE_PHYSIOLOGICAL -> "생리기능검사";
+            case TYPE_IMAGING -> "Imaging";
+            case TYPE_SPECIMEN -> "Specimen";
+            case TYPE_PATHOLOGY -> "Pathology";
+            case TYPE_ENDOSCOPY -> "Endoscopy";
+            case TYPE_PHYSIOLOGICAL -> "Physiological";
             default -> resultType;
         };
     }
