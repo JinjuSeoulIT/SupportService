@@ -151,12 +151,9 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         entity.setMedicationRecordId(createMedicationRecordId());
 
         entity.setMedicationId(medicationRecordDTO.getMedicationId());
-        entity.setAdministeredAt(medicationRecordDTO.getAdministeredAt());
         entity.setDoseNumber(medicationRecordDTO.getDoseNumber());
         entity.setDoseUnit(medicationRecordDTO.getDoseUnit());
         entity.setDoseKind(medicationRecordDTO.getDoseKind());
-        entity.setNursingId(medicationRecordDTO.getNursingId());
-        entity.setNurseName(medicationRecordDTO.getNurseName());
         entity.setStatus(normalizeStatus(medicationRecordDTO.getStatus()));
         entity.setProgressStatus(normalizeProgressStatus(medicationRecordDTO.getProgressStatus()));
         entity.setCreatedAt(LocalDateTime.now().format(CHAR_DATE_TIME_FORMATTER));
@@ -232,16 +229,13 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
 
     @Override
     @Transactional
-    public TreatmentResultDTO registerTreatmentResult(TreatmentResultReqDTO treatmentResultDTO) {
+    public TreatmentResultDTO registerTreatmentResult(TreatmentResultCreateDTO treatmentResultDTO) {
         TreatmentResultEntity entity = new TreatmentResultEntity();
         entity.setTreatmentResultId(createTreatmentResultId());
         entity.setProcedureResultId(treatmentResultDTO.getProcedureResultId());
-        entity.setNursingId(treatmentResultDTO.getNursingId());
-        entity.setNurseName(treatmentResultDTO.getNurseName());
         entity.setDetail(treatmentResultDTO.getDetail());
         entity.setStatus(normalizeStatus(treatmentResultDTO.getStatus()));
         entity.setProgressStatus(normalizeProgressStatus(treatmentResultDTO.getProgressStatus()));
-        entity.setTreatmentAt(treatmentResultDTO.getTreatmentAt());
         entity.setPatientId(treatmentResultDTO.getPatientId());
         entity.setPatientName(treatmentResultDTO.getPatientName());
         entity.setDepartmentName(treatmentResultDTO.getDepartmentName());
@@ -250,7 +244,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
 
     @Override
     @Transactional
-    public TreatmentResultDTO modifyTreatmentResult(String id, TreatmentResultReqDTO treatmentResultDTO) {
+    public TreatmentResultDTO modifyTreatmentResult(String id, TreatmentResultUpdateDTO treatmentResultDTO) {
         TreatmentResultEntity entity = treatmentResultRepository.findById(id)
                 .orElseThrow(() -> new TreatmentResultNotFoundException(id));
         if (treatmentResultDTO.getProcedureResultId() != null) {

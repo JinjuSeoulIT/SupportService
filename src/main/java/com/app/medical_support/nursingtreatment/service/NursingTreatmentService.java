@@ -22,7 +22,7 @@ public interface NursingTreatmentService {
     List<TreatmentResultDTO> findTreatmentResultList();
     List<TreatmentResultDTO> searchTreatmentResult(String patientName, String departmentName, String progressStatus, String startDate, String endDate);
     TreatmentResultDTO findTreatmentResultDetail(String id);
-    TreatmentResultDTO registerTreatmentResult(TreatmentResultReqDTO treatmentResultDTO);
-    TreatmentResultDTO modifyTreatmentResult(String id, TreatmentResultReqDTO treatmentResultDTO);
+    TreatmentResultDTO registerTreatmentResult(TreatmentResultCreateDTO treatmentResultDTO);
+    TreatmentResultDTO modifyTreatmentResult(String id, TreatmentResultUpdateDTO treatmentResultDTO);
     TreatmentResultDTO updateTreatmentResultStatus(String id, String status);
 }

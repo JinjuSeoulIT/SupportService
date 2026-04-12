@@ -1,7 +1,7 @@
 package com.app.medical_support.nursingtreatment.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,15 +12,17 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class TreatmentResultReqDTO {
-
+public class TreatmentResultUpdateDTO {
 
     private String status;
+
     @JsonProperty("progress_status")
     @JsonAlias("progressStatus")
     private String progressStatus;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime treatmentAt;
+
     private String nursingId;
     private String detail;
     private Long patientId;
@@ -28,5 +30,4 @@ public class TreatmentResultReqDTO {
     private String departmentName;
     private String procedureResultId;
     private String nurseName;
-
 }

@@ -9,18 +9,17 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class MedicationRecordReqDTO {
+public class TreatmentResultCreateDTO {
 
-    private Double doseNumber;
-    private String doseUnit;
-    private String doseKind;
     private String status;
+
     @JsonProperty("progress_status")
     @JsonAlias("progressStatus")
     private String progressStatus;
+
+    private String detail;
     private Long patientId;
     private String patientName;
     private String departmentName;
-    private String medicationId;
-
+    private String procedureResultId;
 }

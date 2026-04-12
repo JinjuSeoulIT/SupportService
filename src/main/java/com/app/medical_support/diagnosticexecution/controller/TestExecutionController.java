@@ -2,6 +2,7 @@ package com.app.medical_support.diagnosticexecution.controller;
 
 import com.app.medical_support.common.ApiResponse;
 import com.app.medical_support.diagnosticexecution.dto.TestExecutionDTO;
+import com.app.medical_support.diagnosticexecution.dto.TestExecutionReqDTO;
 import com.app.medical_support.diagnosticexecution.dto.TestExecutionUpdateDTO;
 import com.app.medical_support.diagnosticexecution.service.DiagnosticExecutionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,7 +55,7 @@ public class TestExecutionController {
     @PostMapping
     public ResponseEntity<ApiResponse<TestExecutionDTO>> registerTestExecution(
             @Parameter(description = "Test execution request body")
-            @RequestBody TestExecutionDTO testExecutionDTO
+            @RequestBody TestExecutionReqDTO testExecutionDTO
     ) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Test execution created.", testExecutionService.registerTestExecution(testExecutionDTO)));
     }

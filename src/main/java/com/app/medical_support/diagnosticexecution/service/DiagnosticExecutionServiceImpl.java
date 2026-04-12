@@ -6,6 +6,7 @@ import com.app.medical_support.diagnosticexecution.dto.PathologyDTO;
 import com.app.medical_support.diagnosticexecution.dto.PhysiologicalDTO;
 import com.app.medical_support.diagnosticexecution.dto.SpecimenDTO;
 import com.app.medical_support.diagnosticexecution.dto.TestExecutionDTO;
+import com.app.medical_support.diagnosticexecution.dto.TestExecutionReqDTO;
 import com.app.medical_support.diagnosticexecution.dto.TestExecutionUpdateDTO;
 import com.app.medical_support.diagnosticexecution.entity.EndoscopyEntity;
 import com.app.medical_support.diagnosticexecution.entity.ImagingEntity;
@@ -454,16 +455,14 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
 
     @Override
     @Transactional
-    public TestExecutionDTO registerTestExecution(TestExecutionDTO testExecutionDTO) {
+    public TestExecutionDTO registerTestExecution(TestExecutionReqDTO testExecutionDTO) {
         TestExecutionEntity entity = testExecutionReqMapStruct.toEntity(testExecutionDTO);
         entity.setDetailCode(testExecutionDTO.getDetailCode());
-        entity.setPerformerId(normalizeOptionalValue(testExecutionDTO.getPerformerId()));
-        entity.setPerformerName(normalizeOptionalValue(testExecutionDTO.getPerformerName()));
 
         if (!hasText(entity.getTestExecutionId())) {
             entity.setTestExecutionId(createTestExecutionId());
         }
-        entity.setStatus(normalizeStatus(testExecutionDTO.getStatus()));
+        entity.setStatus(normalizeStatus(null));
         entity.setCreatedAt(LocalDateTime.now());
         if (!hasText(entity.getProgressStatus())) {
             entity.setProgressStatus("WAITING");

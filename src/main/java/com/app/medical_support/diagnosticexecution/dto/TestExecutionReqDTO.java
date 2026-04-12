@@ -14,9 +14,6 @@ public class TestExecutionReqDTO {
     @Schema(description = "Progress status")
     private String progressStatus;
 
-    @Schema(description = "Retry count")
-    private Integer retryNo;
-
     @Schema(description = "Detail Code")
     private String detailCode;
 
@@ -34,8 +31,4 @@ public class TestExecutionReqDTO {
 
     @Schema(description = "Execution type")
     private String executionType;
-
-    @Schema(description = "Performer ID")
-    private String performerId;
-
 }
