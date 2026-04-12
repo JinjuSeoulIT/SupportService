@@ -388,7 +388,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         if (!hasText(entity.getSpecimenExamId())) {
             entity.setSpecimenExamId(createSpecimenId());
         }
-        entity.setSpecimenStatus(hasText(entity.getSpecimenStatus()) ? entity.getSpecimenStatus().trim().toUpperCase() : "COLLECTED");
+        entity.setSpecimenStatus(hasText(entity.getSpecimenStatus()) ? entity.getSpecimenStatus().trim().toUpperCase() : null);
         entity.setRecollectionYn(normalizeYnFlag(entity.getRecollectionYn()));
         entity.setPerformerId(normalizeOptionalValue(entity.getPerformerId()));
         entity.setPerformerName(normalizeOptionalValue(entity.getPerformerName()));
@@ -741,14 +741,12 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         SpecimenEntity specimenEntity = new SpecimenEntity();
         specimenEntity.setSpecimenExamId(createSpecimenId());
         specimenEntity.setTestExecutionId(entity.getTestExecutionId());
-        specimenEntity.setSpecimenType(normalizeExecutionType(entity.getExecutionType()));
         specimenEntity.setDetailCode(entity.getDetailCode());
         specimenEntity.setPatientId(entity.getPatientId());
         specimenEntity.setPatientName(entity.getPatientName());
         specimenEntity.setDepartmentName(entity.getDepartmentName());
         specimenEntity.setPerformerId(normalizeOptionalValue(entity.getPerformerId()));
         specimenEntity.setPerformerName(normalizeOptionalValue(entity.getPerformerName()));
-        specimenEntity.setSpecimenStatus("COLLECTED");
         specimenEntity.setRecollectionYn("N");
         specimenEntity.setStatus("ACTIVE");
         specimenEntity.setProgressStatus("WAITING");

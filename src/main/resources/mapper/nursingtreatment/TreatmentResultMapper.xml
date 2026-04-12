@@ -8,7 +8,6 @@
     <select id="searchTreatmentResult" resultType="com.app.medical_support.nursingtreatment.dto.TreatmentResultDTO">
         SELECT
             tr.treatment_result_id,
-            tr.procedure_result_id,
             tr.status,
             tr.progress_status,
             tr.treatment_at,

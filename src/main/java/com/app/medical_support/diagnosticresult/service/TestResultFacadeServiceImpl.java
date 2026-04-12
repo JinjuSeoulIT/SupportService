@@ -223,7 +223,6 @@ public class TestResultFacadeServiceImpl implements TestResultFacadeService {
         result.setCreatedAt(dto.getCreatedAt());
 
         Map<String, Object> detail = new LinkedHashMap<>();
-        detail.put("readingSummary", dto.getReadingSummary());
         detail.put("readingDetail", dto.getReadingDetail());
         result.setDetail(detail);
         return result;
@@ -247,7 +246,6 @@ public class TestResultFacadeServiceImpl implements TestResultFacadeService {
 
         Map<String, Object> detail = new LinkedHashMap<>();
         detail.put("resultItemCode", dto.getResultItemCode());
-        detail.put("resultValue", dto.getResultValue());
         detail.put("unit", dto.getUnit());
         detail.put("referenceRange", dto.getReferenceRange());
         detail.put("judgement", dto.getJudgement());
@@ -272,7 +270,6 @@ public class TestResultFacadeServiceImpl implements TestResultFacadeService {
         result.setCreatedAt(dto.getCreatedAt());
 
         Map<String, Object> detail = new LinkedHashMap<>();
-        detail.put("resultSummary", dto.getResultSummary());
         detail.put("judgedAt", dto.getJudgedAt());
         detail.put("readerId", dto.getReaderId());
         detail.put("diagnosisName", dto.getDiagnosisName());
@@ -297,7 +294,6 @@ public class TestResultFacadeServiceImpl implements TestResultFacadeService {
         result.setCreatedAt(dto.getCreatedAt());
 
         Map<String, Object> detail = new LinkedHashMap<>();
-        detail.put("finding", dto.getFinding());
         detail.put("biopsyYn", dto.getBiopsyYn());
         detail.put("readerId", dto.getReaderId());
         result.setDetail(detail);
@@ -321,7 +317,6 @@ public class TestResultFacadeServiceImpl implements TestResultFacadeService {
         result.setCreatedAt(dto.getCreatedAt());
 
         Map<String, Object> detail = new LinkedHashMap<>();
-        detail.put("resultValue", dto.getResultValue());
         detail.put("report", dto.getReport());
         detail.put("measuredItemCode", dto.getMeasuredItemCode());
         result.setDetail(detail);

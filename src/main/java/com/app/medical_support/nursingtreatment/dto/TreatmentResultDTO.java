@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 public class TreatmentResultDTO {
 
     private String treatmentResultId;
-    private String procedureResultId;
     private String status;
     @JsonProperty("progress_status")
     @JsonAlias("progressStatus")
