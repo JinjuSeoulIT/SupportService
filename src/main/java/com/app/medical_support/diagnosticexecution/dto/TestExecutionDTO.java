@@ -1,5 +1,6 @@
 package com.app.medical_support.diagnosticexecution.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -53,8 +54,10 @@ public class TestExecutionDTO {
     private String departmentName;
 
     @Schema(description = "Created at")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
     @Schema(description = "Updated at")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
 }
