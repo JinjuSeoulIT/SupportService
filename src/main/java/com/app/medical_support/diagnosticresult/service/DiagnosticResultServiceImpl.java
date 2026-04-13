@@ -2,21 +2,7 @@ package com.app.medical_support.diagnosticresult.service;
 
 import com.app.medical_support.common.sequence.SequenceIdService;
 import com.app.medical_support.common.sequence.SequenceIdType;
-import com.app.medical_support.diagnosticresult.dto.EndoscopyResultCreateReqDTO;
-import com.app.medical_support.diagnosticresult.dto.EndoscopyResultDTO;
-import com.app.medical_support.diagnosticresult.dto.EndoscopyResultUpdateReqDTO;
-import com.app.medical_support.diagnosticresult.dto.ImagingResultCreateReqDTO;
-import com.app.medical_support.diagnosticresult.dto.ImagingResultDTO;
-import com.app.medical_support.diagnosticresult.dto.ImagingResultUpdateReqDTO;
-import com.app.medical_support.diagnosticresult.dto.PathologyResultCreateReqDTO;
-import com.app.medical_support.diagnosticresult.dto.PathologyResultDTO;
-import com.app.medical_support.diagnosticresult.dto.PathologyResultUpdateReqDTO;
-import com.app.medical_support.diagnosticresult.dto.PhysiologicalResultCreateReqDTO;
-import com.app.medical_support.diagnosticresult.dto.PhysiologicalResultDTO;
-import com.app.medical_support.diagnosticresult.dto.PhysiologicalResultUpdateReqDTO;
-import com.app.medical_support.diagnosticresult.dto.SpecimenTestResultCreateReqDTO;
-import com.app.medical_support.diagnosticresult.dto.SpecimenTestResultDTO;
-import com.app.medical_support.diagnosticresult.dto.SpecimenTestResultUpdateReqDTO;
+import com.app.medical_support.diagnosticresult.dto.*;
 import com.app.medical_support.diagnosticresult.entity.EndoscopyResultEntity;
 import com.app.medical_support.diagnosticresult.entity.ImagingResultEntity;
 import com.app.medical_support.diagnosticresult.entity.PathologyResultEntity;
@@ -33,7 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.time.LocalTime;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +32,15 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     private final PhysiologicalResultRepository physiologicalResultRepository;
     private final SpecimenTestResultRepository specimenTestResultRepository;
     private final SequenceIdService sequenceIdService;
+
+    private static final String TYPE_IMAGING = "IMAGING";
+    private static final String TYPE_SPECIMEN = "SPECIMEN";
+    private static final String TYPE_PATHOLOGY = "PATHOLOGY";
+    private static final String TYPE_ENDOSCOPY = "ENDOSCOPY";
+    private static final String TYPE_PHYSIOLOGICAL = "PHYSIOLOGICAL";
+    private static final String STATUS_INACTIVE = "INACTIVE";
+
+    // 검사별 CRUD
 
     @Override
     public List<ImagingResultDTO> findImagingResultList() {
@@ -110,7 +106,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     public void deleteImagingResult(String id) {
         ImagingResultEntity entity = imagingResultRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Imaging result not found. id=" + id));
-        entity.setStatus("INACTIVE");
+        entity.setStatus(STATUS_INACTIVE);
         imagingResultRepository.save(entity);
     }
 
@@ -177,7 +173,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     public void deleteEndoscopyResult(String id) {
         EndoscopyResultEntity entity = endoscopyResultRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Endoscopy result not found. id=" + id));
-        entity.setStatus("INACTIVE");
+        entity.setStatus(STATUS_INACTIVE);
         endoscopyResultRepository.save(entity);
     }
 
@@ -248,7 +244,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     public void deletePathologyResult(String id) {
         PathologyResultEntity entity = pathologyResultRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Pathology result not found. id=" + id));
-        entity.setStatus("INACTIVE");
+        entity.setStatus(STATUS_INACTIVE);
         pathologyResultRepository.save(entity);
     }
 
@@ -315,7 +311,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     public void deletePhysiologicalResult(String id) {
         PhysiologicalResultEntity entity = physiologicalResultRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Physiological result not found. id=" + id));
-        entity.setStatus("INACTIVE");
+        entity.setStatus(STATUS_INACTIVE);
         physiologicalResultRepository.save(entity);
     }
 
@@ -390,9 +386,381 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     public void deleteSpecimenResult(String id) {
         SpecimenTestResultEntity entity = specimenTestResultRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Specimen result not found. id=" + id));
-        entity.setStatus("INACTIVE");
+        entity.setStatus(STATUS_INACTIVE);
         specimenTestResultRepository.save(entity);
     }
+
+    // 통합 조회
+
+    @Override
+    public List<TestResultListDTO> findTestResultList(TestResultSearchCondition condition) {
+        TestResultSearchCondition searchCondition = condition != null ? condition : new TestResultSearchCondition();
+
+        List<TestResultListDTO> mergedResults = new ArrayList<>();
+        mergedResults.addAll(mapImagingResults(findImagingResultList()));
+        mergedResults.addAll(mapSpecimenResults(findSpecimenResultList()));
+        mergedResults.addAll(mapPathologyResults(findPathologyResultList()));
+        mergedResults.addAll(mapEndoscopyResults(findEndoscopyResultList()));
+        mergedResults.addAll(mapPhysiologicalResults(findPhysiologicalResultList()));
+
+        return mergedResults.stream()
+                .filter(result -> matchesIncludeInactive(result, searchCondition))
+                .filter(result -> matchesEquals(result.getResultType(), searchCondition.getResultType()))
+                .filter(result -> matchesContains(result.getPatientName(), searchCondition.getPatientName()))
+                .filter(result -> matchesContains(result.getDetailCode(), searchCondition.getDetailCode()))
+                .filter(result -> matchesContains(result.getDepartmentName(), searchCondition.getDepartmentName()))
+                .filter(result -> matchesEquals(result.getStatus(), searchCondition.getStatus()))
+                .filter(result -> matchesDateRange(result.getResultAt(), searchCondition))
+                .sorted(Comparator
+                        .comparing(TestResultListDTO::getResultAt, Comparator.nullsLast(Comparator.reverseOrder()))
+                        .thenComparing(TestResultListDTO::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder()))
+                        .thenComparing(TestResultListDTO::getResultId, Comparator.nullsLast(Comparator.reverseOrder())))
+                .toList();
+    }
+
+    @Override
+    public TestResultDetailDTO findTestResultDetail(String resultType, String resultId) {
+        String normalizedType = normalizeResultType(resultType);
+
+        return switch (normalizedType) {
+            case TYPE_IMAGING -> mapImagingDetail(findImagingResultDetail(resultId));
+            case TYPE_SPECIMEN -> mapSpecimenDetail(findSpecimenResultDetail(resultId));
+            case TYPE_PATHOLOGY -> mapPathologyDetail(findPathologyResultDetail(resultId));
+            case TYPE_ENDOSCOPY -> mapEndoscopyDetail(findEndoscopyResultDetail(resultId));
+            case TYPE_PHYSIOLOGICAL -> mapPhysiologicalDetail(findPhysiologicalResultDetail(resultId));
+            default -> throw new DiagnosticResultNotFoundException("Unsupported result type. resultType=" + resultType);
+        };
+    }
+
+    // 통합 수정
+
+    @Override
+    @Transactional
+    public TestResultDetailDTO modifyTestResult(String resultType, String resultId, TestResultUpdateReqDTO dto) {
+        String normalizedType = normalizeResultType(resultType);
+        TestResultUpdateReqDTO request = dto != null ? dto : new TestResultUpdateReqDTO();
+        TestResultUpdateDetailDTO detail = request.getDetail() != null ? request.getDetail() : new TestResultUpdateDetailDTO();
+
+        return switch (normalizedType) {
+            case TYPE_IMAGING -> mapImagingDetail(
+                    modifyImagingResult(resultId, toImagingUpdateReq(request, detail))
+            );
+            case TYPE_SPECIMEN -> mapSpecimenDetail(
+                    modifySpecimenResult(resultId, toSpecimenUpdateReq(request, detail))
+            );
+            case TYPE_PATHOLOGY -> mapPathologyDetail(
+                    modifyPathologyResult(resultId, toPathologyUpdateReq(request, detail))
+            );
+            case TYPE_ENDOSCOPY -> mapEndoscopyDetail(
+                    modifyEndoscopyResult(resultId, toEndoscopyUpdateReq(request, detail))
+            );
+            case TYPE_PHYSIOLOGICAL -> mapPhysiologicalDetail(
+                    modifyPhysiologicalResult(resultId, toPhysiologicalUpdateReq(request, detail))
+            );
+            default -> throw new DiagnosticResultNotFoundException("Unsupported result type. resultType=" + resultType);
+        };
+    }
+
+    // 매핑
+
+    private List<TestResultListDTO> mapImagingResults(List<ImagingResultDTO> source) {
+        return source.stream().map(dto -> {
+            TestResultListDTO result = createCommonResult(TYPE_IMAGING, dto.getImagingResultId(), dto.getImagingExamId());
+            result.setTestExecutionId(dto.getTestExecutionId());
+            result.setDetailCode(dto.getDetailCode());
+            result.setPatientId(dto.getPatientId());
+            result.setPatientName(dto.getPatientName());
+            result.setDepartmentName(dto.getDepartmentName());
+            result.setPerformerId(dto.getPerformerId());
+            result.setPerformerName(dto.getPerformerName());
+            result.setResultManagerId(dto.getResultManagerId());
+            result.setResultManagerName(dto.getResultManagerName());
+            result.setSummary(dto.getResultSummary());
+            result.setResultAt(dto.getConfirmedAt());
+            result.setStatus(dto.getStatus());
+            result.setCreatedAt(dto.getCreatedAt());
+            return result;
+        }).toList();
+    }
+
+    private List<TestResultListDTO> mapSpecimenResults(List<SpecimenTestResultDTO> source) {
+        return source.stream().map(dto -> {
+            TestResultListDTO result = createCommonResult(TYPE_SPECIMEN, dto.getSpecimenExamResultId(), dto.getSpecimenExamId());
+            result.setTestExecutionId(dto.getTestExecutionId());
+            result.setDetailCode(dto.getDetailCode());
+            result.setPatientId(dto.getPatientId());
+            result.setPatientName(dto.getPatientName());
+            result.setDepartmentName(dto.getDepartmentName());
+            result.setPerformerId(dto.getPerformerId());
+            result.setPerformerName(dto.getPerformerName());
+            result.setResultManagerId(dto.getResultManagerId());
+            result.setResultManagerName(dto.getResultManagerName());
+            result.setSummary(dto.getResultSummary());
+            result.setResultAt(dto.getConfirmedAt());
+            result.setStatus(dto.getStatus());
+            result.setCreatedAt(dto.getCreatedAt());
+            return result;
+        }).toList();
+    }
+
+    private List<TestResultListDTO> mapPathologyResults(List<PathologyResultDTO> source) {
+        return source.stream().map(dto -> {
+            TestResultListDTO result = createCommonResult(TYPE_PATHOLOGY, dto.getPathologyExamResultId(), dto.getPathologyExamId());
+            result.setTestExecutionId(dto.getTestExecutionId());
+            result.setDetailCode(dto.getDetailCode());
+            result.setPatientId(dto.getPatientId());
+            result.setPatientName(dto.getPatientName());
+            result.setDepartmentName(dto.getDepartmentName());
+            result.setPerformerId(dto.getPerformerId());
+            result.setPerformerName(dto.getPerformerName());
+            result.setResultManagerId(dto.getResultManagerId());
+            result.setResultManagerName(dto.getResultManagerName());
+            result.setSummary(dto.getResultSummary());
+            result.setResultAt(dto.getConfirmedAt());
+            result.setStatus(dto.getStatus());
+            result.setCreatedAt(dto.getCreatedAt());
+            return result;
+        }).toList();
+    }
+
+    private List<TestResultListDTO> mapEndoscopyResults(List<EndoscopyResultDTO> source) {
+        return source.stream().map(dto -> {
+            TestResultListDTO result = createCommonResult(TYPE_ENDOSCOPY, dto.getEndoscopyResultId(), dto.getEndoscopyExamId());
+            result.setTestExecutionId(dto.getTestExecutionId());
+            result.setDetailCode(dto.getDetailCode());
+            result.setPatientId(dto.getPatientId());
+            result.setPatientName(dto.getPatientName());
+            result.setDepartmentName(dto.getDepartmentName());
+            result.setPerformerId(dto.getPerformerId());
+            result.setPerformerName(dto.getPerformerName());
+            result.setResultManagerId(dto.getResultManagerId());
+            result.setResultManagerName(dto.getResultManagerName());
+            result.setSummary(dto.getResultSummary());
+            result.setResultAt(dto.getConfirmedAt());
+            result.setStatus(dto.getStatus());
+            result.setCreatedAt(dto.getCreatedAt());
+            return result;
+        }).toList();
+    }
+
+    private List<TestResultListDTO> mapPhysiologicalResults(List<PhysiologicalResultDTO> source) {
+        return source.stream().map(dto -> {
+            TestResultListDTO result = createCommonResult(TYPE_PHYSIOLOGICAL, dto.getPhysiologicalExamResultId(), dto.getPhysiologicalExamId());
+            result.setTestExecutionId(dto.getTestExecutionId());
+            result.setDetailCode(dto.getDetailCode());
+            result.setPatientId(dto.getPatientId());
+            result.setPatientName(dto.getPatientName());
+            result.setDepartmentName(dto.getDepartmentName());
+            result.setPerformerId(dto.getPerformerId());
+            result.setPerformerName(dto.getPerformerName());
+            result.setResultManagerId(dto.getResultManagerId());
+            result.setResultManagerName(dto.getResultManagerName());
+            result.setSummary(dto.getResultSummary());
+            result.setResultAt(dto.getConfirmedAt());
+            result.setStatus(dto.getStatus());
+            result.setCreatedAt(dto.getCreatedAt());
+            return result;
+        }).toList();
+    }
+
+    private TestResultDetailDTO mapImagingDetail(ImagingResultDTO dto) {
+        TestResultDetailDTO result = createCommonDetail(TYPE_IMAGING, dto.getImagingResultId(), dto.getImagingExamId());
+        result.setTestExecutionId(dto.getTestExecutionId());
+        result.setDetailCode(dto.getDetailCode());
+        result.setPatientId(dto.getPatientId());
+        result.setPatientName(dto.getPatientName());
+        result.setDepartmentName(dto.getDepartmentName());
+        result.setPerformerId(dto.getPerformerId());
+        result.setPerformerName(dto.getPerformerName());
+        result.setResultManagerId(dto.getResultManagerId());
+        result.setResultManagerName(dto.getResultManagerName());
+        result.setSummary(dto.getResultSummary());
+        result.setResultAt(dto.getConfirmedAt());
+        result.setStatus(dto.getStatus());
+        result.setCreatedAt(dto.getCreatedAt());
+
+        Map<String, Object> detail = new LinkedHashMap<>();
+        detail.put("readingDetail", dto.getReadingDetail());
+        result.setDetail(detail);
+        return result;
+    }
+
+    private TestResultDetailDTO mapSpecimenDetail(SpecimenTestResultDTO dto) {
+        TestResultDetailDTO result = createCommonDetail(TYPE_SPECIMEN, dto.getSpecimenExamResultId(), dto.getSpecimenExamId());
+        result.setTestExecutionId(dto.getTestExecutionId());
+        result.setDetailCode(dto.getDetailCode());
+        result.setPatientId(dto.getPatientId());
+        result.setPatientName(dto.getPatientName());
+        result.setDepartmentName(dto.getDepartmentName());
+        result.setPerformerId(dto.getPerformerId());
+        result.setPerformerName(dto.getPerformerName());
+        result.setResultManagerId(dto.getResultManagerId());
+        result.setResultManagerName(dto.getResultManagerName());
+        result.setSummary(dto.getResultSummary());
+        result.setResultAt(dto.getConfirmedAt());
+        result.setStatus(dto.getStatus());
+        result.setCreatedAt(dto.getCreatedAt());
+
+        Map<String, Object> detail = new LinkedHashMap<>();
+        detail.put("resultItemCode", dto.getResultItemCode());
+        detail.put("unit", dto.getUnit());
+        detail.put("referenceRange", dto.getReferenceRange());
+        detail.put("judgement", dto.getJudgement());
+        result.setDetail(detail);
+        return result;
+    }
+
+    private TestResultDetailDTO mapPathologyDetail(PathologyResultDTO dto) {
+        TestResultDetailDTO result = createCommonDetail(TYPE_PATHOLOGY, dto.getPathologyExamResultId(), dto.getPathologyExamId());
+        result.setTestExecutionId(dto.getTestExecutionId());
+        result.setDetailCode(dto.getDetailCode());
+        result.setPatientId(dto.getPatientId());
+        result.setPatientName(dto.getPatientName());
+        result.setDepartmentName(dto.getDepartmentName());
+        result.setPerformerId(dto.getPerformerId());
+        result.setPerformerName(dto.getPerformerName());
+        result.setResultManagerId(dto.getResultManagerId());
+        result.setResultManagerName(dto.getResultManagerName());
+        result.setSummary(dto.getResultSummary());
+        result.setResultAt(dto.getConfirmedAt());
+        result.setStatus(dto.getStatus());
+        result.setCreatedAt(dto.getCreatedAt());
+
+        Map<String, Object> detail = new LinkedHashMap<>();
+        detail.put("judgedAt", dto.getJudgedAt());
+        detail.put("readerId", dto.getReaderId());
+        detail.put("diagnosisName", dto.getDiagnosisName());
+        result.setDetail(detail);
+        return result;
+    }
+
+    private TestResultDetailDTO mapEndoscopyDetail(EndoscopyResultDTO dto) {
+        TestResultDetailDTO result = createCommonDetail(TYPE_ENDOSCOPY, dto.getEndoscopyResultId(), dto.getEndoscopyExamId());
+        result.setTestExecutionId(dto.getTestExecutionId());
+        result.setDetailCode(dto.getDetailCode());
+        result.setPatientId(dto.getPatientId());
+        result.setPatientName(dto.getPatientName());
+        result.setDepartmentName(dto.getDepartmentName());
+        result.setPerformerId(dto.getPerformerId());
+        result.setPerformerName(dto.getPerformerName());
+        result.setResultManagerId(dto.getResultManagerId());
+        result.setResultManagerName(dto.getResultManagerName());
+        result.setSummary(dto.getResultSummary());
+        result.setResultAt(dto.getConfirmedAt());
+        result.setStatus(dto.getStatus());
+        result.setCreatedAt(dto.getCreatedAt());
+
+        Map<String, Object> detail = new LinkedHashMap<>();
+        detail.put("biopsyYn", dto.getBiopsyYn());
+        detail.put("readerId", dto.getReaderId());
+        result.setDetail(detail);
+        return result;
+    }
+
+    private TestResultDetailDTO mapPhysiologicalDetail(PhysiologicalResultDTO dto) {
+        TestResultDetailDTO result = createCommonDetail(TYPE_PHYSIOLOGICAL, dto.getPhysiologicalExamResultId(), dto.getPhysiologicalExamId());
+        result.setTestExecutionId(dto.getTestExecutionId());
+        result.setDetailCode(dto.getDetailCode());
+        result.setPatientId(dto.getPatientId());
+        result.setPatientName(dto.getPatientName());
+        result.setDepartmentName(dto.getDepartmentName());
+        result.setPerformerId(dto.getPerformerId());
+        result.setPerformerName(dto.getPerformerName());
+        result.setResultManagerId(dto.getResultManagerId());
+        result.setResultManagerName(dto.getResultManagerName());
+        result.setSummary(dto.getResultSummary());
+        result.setResultAt(dto.getConfirmedAt());
+        result.setStatus(dto.getStatus());
+        result.setCreatedAt(dto.getCreatedAt());
+
+        Map<String, Object> detail = new LinkedHashMap<>();
+        detail.put("report", dto.getReport());
+        detail.put("measuredItemCode", dto.getMeasuredItemCode());
+        result.setDetail(detail);
+        return result;
+    }
+
+    private TestResultListDTO createCommonResult(String resultType, String resultId, String examId) {
+        TestResultListDTO result = new TestResultListDTO();
+        result.setResultType(resultType);
+        result.setResultTypeName(toResultTypeName(resultType));
+        result.setResultId(resultId);
+        result.setExamId(examId);
+        return result;
+    }
+
+    private ImagingResultUpdateReqDTO toImagingUpdateReq(TestResultUpdateReqDTO request, TestResultUpdateDetailDTO detail) {
+        ImagingResultUpdateReqDTO dto = new ImagingResultUpdateReqDTO();
+        dto.setResultSummary(detail.getResultSummary());
+        dto.setReadingDetail(detail.getReadingDetail());
+        dto.setConfirmedAt(request.getConfirmedAt());
+        dto.setResultManagerId(request.getResultManagerId());
+        dto.setResultManagerName(request.getResultManagerName());
+        dto.setStatus(request.getStatus());
+        return dto;
+    }
+
+    private SpecimenTestResultUpdateReqDTO toSpecimenUpdateReq(TestResultUpdateReqDTO request, TestResultUpdateDetailDTO detail) {
+        SpecimenTestResultUpdateReqDTO dto = new SpecimenTestResultUpdateReqDTO();
+        dto.setResultItemCode(detail.getResultItemCode());
+        dto.setResultSummary(detail.getResultSummary());
+        dto.setUnit(detail.getUnit());
+        dto.setReferenceRange(detail.getReferenceRange());
+        dto.setJudgement(detail.getJudgement());
+        dto.setConfirmedAt(request.getConfirmedAt());
+        dto.setResultManagerId(request.getResultManagerId());
+        dto.setResultManagerName(request.getResultManagerName());
+        dto.setStatus(request.getStatus());
+        return dto;
+    }
+
+    private PathologyResultUpdateReqDTO toPathologyUpdateReq(TestResultUpdateReqDTO request, TestResultUpdateDetailDTO detail) {
+        PathologyResultUpdateReqDTO dto = new PathologyResultUpdateReqDTO();
+        dto.setResultSummary(detail.getResultSummary());
+        dto.setJudgedAt(detail.getJudgedAt());
+        dto.setConfirmedAt(request.getConfirmedAt());
+        dto.setResultManagerId(request.getResultManagerId());
+        dto.setResultManagerName(request.getResultManagerName());
+        dto.setReaderId(detail.getReaderId());
+        dto.setDiagnosisName(detail.getDiagnosisName());
+        dto.setStatus(request.getStatus());
+        return dto;
+    }
+
+    private EndoscopyResultUpdateReqDTO toEndoscopyUpdateReq(TestResultUpdateReqDTO request, TestResultUpdateDetailDTO detail) {
+        EndoscopyResultUpdateReqDTO dto = new EndoscopyResultUpdateReqDTO();
+        dto.setResultSummary(detail.getResultSummary());
+        dto.setBiopsyYn(detail.getBiopsyYn());
+        dto.setConfirmedAt(request.getConfirmedAt());
+        dto.setResultManagerId(request.getResultManagerId());
+        dto.setResultManagerName(request.getResultManagerName());
+        dto.setReaderId(detail.getReaderId());
+        dto.setStatus(request.getStatus());
+        return dto;
+    }
+
+    private PhysiologicalResultUpdateReqDTO toPhysiologicalUpdateReq(TestResultUpdateReqDTO request, TestResultUpdateDetailDTO detail) {
+        PhysiologicalResultUpdateReqDTO dto = new PhysiologicalResultUpdateReqDTO();
+        dto.setResultSummary(detail.getResultSummary());
+        dto.setReport(detail.getReport());
+        dto.setMeasuredItemCode(detail.getMeasuredItemCode());
+        dto.setConfirmedAt(request.getConfirmedAt());
+        dto.setResultManagerId(request.getResultManagerId());
+        dto.setResultManagerName(request.getResultManagerName());
+        dto.setStatus(request.getStatus());
+        return dto;
+    }
+
+    private TestResultDetailDTO createCommonDetail(String resultType, String resultId, String examId) {
+        TestResultDetailDTO result = new TestResultDetailDTO();
+        result.setResultType(resultType);
+        result.setResultTypeName(toResultTypeName(resultType));
+        result.setResultId(resultId);
+        result.setExamId(examId);
+        return result;
+    }
+
+    // helper / 유틸
 
     private ImagingResultDTO getImagingResultResponse(String id) {
         return imagingResultRepository.findImagingResultResponseDetail(id)
@@ -417,10 +785,6 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     private SpecimenTestResultDTO getSpecimenResultResponse(String id) {
         return specimenTestResultRepository.findSpecimenResultResponseDetail(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Specimen result not found. id=" + id));
-    }
-
-    private boolean hasText(String value) {
-        return value != null && !value.trim().isEmpty();
     }
 
     private String normalizeStatus(String status) {
@@ -450,6 +814,68 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         }
 
         return "N";
+    }
+
+    private boolean matchesIncludeInactive(TestResultListDTO result, TestResultSearchCondition condition) {
+        boolean includeInactive = Boolean.TRUE.equals(condition.getIncludeInactive());
+        return includeInactive || !STATUS_INACTIVE.equalsIgnoreCase(trimToEmpty(result.getStatus()));
+    }
+
+    private boolean matchesEquals(String source, String keyword) {
+        if (!hasText(keyword)) {
+            return true;
+        }
+        return trimToEmpty(source).equalsIgnoreCase(keyword.trim());
+    }
+
+    private boolean matchesContains(String source, String keyword) {
+        if (!hasText(keyword)) {
+            return true;
+        }
+        return trimToEmpty(source).toLowerCase().contains(keyword.trim().toLowerCase());
+    }
+
+    private boolean matchesDateRange(LocalDateTime resultAt, TestResultSearchCondition condition) {
+        if (condition.getStartDate() == null && condition.getEndDate() == null) {
+            return true;
+        }
+        if (resultAt == null) {
+            return false;
+        }
+
+        LocalDateTime startDateTime = condition.getStartDate() != null ? condition.getStartDate().atStartOfDay() : null;
+        LocalDateTime endDateTime = condition.getEndDate() != null ? condition.getEndDate().atTime(LocalTime.MAX) : null;
+
+        if (startDateTime != null && resultAt.isBefore(startDateTime)) {
+            return false;
+        }
+        if (endDateTime != null && resultAt.isAfter(endDateTime)) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
+
+    private String trimToEmpty(String value) {
+        return value == null ? "" : value.trim();
+    }
+
+    private String normalizeResultType(String value) {
+        return hasText(value) ? value.trim().toUpperCase() : "";
+    }
+
+    private String toResultTypeName(String resultType) {
+        return switch (resultType) {
+            case TYPE_IMAGING -> "영상검사";
+            case TYPE_SPECIMEN -> "검체검사";
+            case TYPE_PATHOLOGY -> "병리검사";
+            case TYPE_ENDOSCOPY -> "내시경검사";
+            case TYPE_PHYSIOLOGICAL -> "생리기능검사";
+            default -> resultType;
+        };
     }
 
 }

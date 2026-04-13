@@ -22,9 +22,20 @@ import com.app.medical_support.diagnosticexecution.entity.PathologyEntity;
 import com.app.medical_support.diagnosticexecution.entity.PhysiologicalEntity;
 import com.app.medical_support.diagnosticexecution.entity.SpecimenEntity;
 import com.app.medical_support.diagnosticexecution.entity.TestExecutionEntity;
-import com.app.medical_support.diagnosticexecution.exception.DiagnosticExecutionNotFoundException;
+import com.app.medical_support.diagnosticexecution.exception.EndoscopyNotFoundException;
+import com.app.medical_support.diagnosticexecution.exception.ImagingNotFoundException;
+import com.app.medical_support.diagnosticexecution.exception.PathologyNotFoundException;
+import com.app.medical_support.diagnosticexecution.exception.PhysiologicalNotFoundException;
 import com.app.medical_support.diagnosticexecution.exception.SpecimenNotFoundException;
 import com.app.medical_support.diagnosticexecution.exception.TestExecutionNotFoundExecution;
+import com.app.medical_support.diagnosticexecution.mapstruct.EndoscopyReqMapStruct;
+import com.app.medical_support.diagnosticexecution.mapstruct.EndoscopyResMapStruct;
+import com.app.medical_support.diagnosticexecution.mapstruct.ImagingReqMapstruct;
+import com.app.medical_support.diagnosticexecution.mapstruct.ImagingResMapstruct;
+import com.app.medical_support.diagnosticexecution.mapstruct.PathologyReqMapStruct;
+import com.app.medical_support.diagnosticexecution.mapstruct.PathologyResMapStruct;
+import com.app.medical_support.diagnosticexecution.mapstruct.PhysiologicalReqMapStruct;
+import com.app.medical_support.diagnosticexecution.mapstruct.PhysiologicalResMapStruct;
 import com.app.medical_support.diagnosticexecution.mapstruct.SpecimenReqMapStruct;
 import com.app.medical_support.diagnosticexecution.mapstruct.SpecimenResMapStruct;
 import com.app.medical_support.diagnosticexecution.mapstruct.TestExecutionReqMapStruct;
@@ -68,41 +79,39 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     private final PhysiologicalResultRepository physiologicalResultRepository;
     private final SpecimenRepository specimenRepository;
     private final SpecimenTestResultRepository specimenTestResultRepository;
+    private final EndoscopyReqMapStruct endoscopyReqMapStruct;
+    private final EndoscopyResMapStruct endoscopyResMapStruct;
+    private final PathologyReqMapStruct pathologyReqMapStruct;
+    private final PathologyResMapStruct pathologyResMapStruct;
+    private final PhysiologicalReqMapStruct physiologicalReqMapStruct;
+    private final PhysiologicalResMapStruct physiologicalResMapStruct;
     private final SpecimenReqMapStruct specimenReqMapStruct;
     private final SpecimenResMapStruct specimenResMapStruct;
     private final TestExecutionRepository testExecutionRepository;
     private final TestExecutionReqMapStruct testExecutionReqMapStruct;
     private final TestExecutionResMapStruct testExecutionResMapStruct;
     private final SequenceIdService sequenceIdService;
+    private final ImagingReqMapstruct imagingReqMapstruct;
+    private final ImagingResMapstruct imagingResMapstruct;
 
     @Override
     public List<ImagingDTO> findImagingList() {
-        return imagingRepository.findAll().stream().map(this::toImagingDTO).toList();
+        return imagingResMapstruct.toDTOList(imagingRepository.findAll());
     }
 
     @Override
     public ImagingDTO findImagingDetail(String id) {
-        return toImagingDTO(imagingRepository.findById(id)
-                .orElseThrow(() -> new DiagnosticExecutionNotFoundException("Imaging exam not found. id=" + id)));
+        return imagingResMapstruct.toDTO(imagingRepository.findById(id)
+                .orElseThrow(() -> new ImagingNotFoundException("Imaging exam not found. id=" + id)));
     }
 
     @Override
     @Transactional
     public ImagingDTO registerImaging(ImagingCreateReqDTO imagingDTO) {
-        ImagingEntity entity = new ImagingEntity();
+        ImagingEntity entity = imagingReqMapstruct.toEntity(imagingDTO);
         entity.setImagingExamId(sequenceIdService.nextId(SequenceIdType.IMAGING_EXAM_ID));
-        entity.setTestExecutionId(imagingDTO.getTestExecutionId());
-        entity.setImagingType(imagingDTO.getImagingType());
-        entity.setDetailCode(imagingDTO.getDetailCode());
-        entity.setPatientId(imagingDTO.getPatientId());
-        entity.setPatientName(imagingDTO.getPatientName());
-        entity.setDepartmentName(imagingDTO.getDepartmentName());
-        entity.setStatus(normalizeStatus(imagingDTO.getStatus()));
-        entity.setProgressStatus(normalizeProgressStatus(imagingDTO.getProgressStatus()));
-        entity.setPerformerId(normalizeOptionalValue(imagingDTO.getPerformerId()));
-        entity.setPerformerName(normalizeOptionalValue(imagingDTO.getPerformerName()));
         entity.setCreatedAt(LocalDateTime.now());
-        return toImagingDTO(imagingRepository.save(entity));
+        return imagingResMapstruct.toDTO(imagingRepository.save(entity));
     }
 
     @Override
@@ -110,19 +119,13 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     public ImagingDTO modifyImaging(String id, ImagingDTO imagingDTO) {
         validateBodyIdAbsent("imagingExamId", imagingDTO.getImagingExamId());
         ImagingEntity entity = imagingRepository.findById(id)
-                .orElseThrow(() -> new DiagnosticExecutionNotFoundException("Imaging exam not found. id=" + id));
+                .orElseThrow(() -> new ImagingNotFoundException("Imaging exam not found. id=" + id));
         String previousProgressStatus = entity.getProgressStatus();
         entity.setTestExecutionId(imagingDTO.getTestExecutionId());
-        if (hasText(imagingDTO.getImagingType())) {          // ← 이 부분만 추가
+        if (hasText(imagingDTO.getImagingType())) {
             entity.setImagingType(imagingDTO.getImagingType());
         }
-        entity.setDetailCode(imagingDTO.getDetailCode());
-        entity.setPatientId(imagingDTO.getPatientId());
-        entity.setPatientName(imagingDTO.getPatientName());
-        entity.setDepartmentName(imagingDTO.getDepartmentName());
-        entity.setProgressStatus(resolveProgressStatus(imagingDTO.getProgressStatus(), entity.getProgressStatus()));
-        entity.setPerformerId(normalizeOptionalValue(imagingDTO.getPerformerId()));
-        entity.setPerformerName(normalizeOptionalValue(imagingDTO.getPerformerName()));
+
         entity.setUpdatedAt(LocalDateTime.now());
         ImagingEntity savedEntity = imagingRepository.save(entity);
 
@@ -130,14 +133,14 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
             ensureImagingResultExists(savedEntity);
         }
 
-        return toImagingDTO(savedEntity);
+        return imagingResMapstruct.toDTO(savedEntity);
     }
 
     @Override
     @Transactional
     public void deleteImaging(String id) {
         ImagingEntity entity = imagingRepository.findById(id)
-                .orElseThrow(() -> new DiagnosticExecutionNotFoundException("Imaging exam not found. id=" + id));
+                .orElseThrow(() -> new ImagingNotFoundException("Imaging exam not found. id=" + id));
         entity.setStatus("INACTIVE");
         entity.setUpdatedAt(LocalDateTime.now());
         imagingRepository.save(entity);
@@ -145,35 +148,27 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
 
     @Override
     public List<EndoscopyDTO> findEndoscopyList() {
-        return endoscopyRepository.findAll().stream().map(this::toEndoscopyDTO).toList();
+        return endoscopyResMapStruct.toDTOList(endoscopyRepository.findAll());
     }
 
     @Override
     public EndoscopyDTO findEndoscopyDetail(String id) {
-        return toEndoscopyDTO(endoscopyRepository.findById(id)
-                .orElseThrow(() -> new DiagnosticExecutionNotFoundException("Endoscopy exam not found. id=" + id)));
+        return endoscopyResMapStruct.toDTO(endoscopyRepository.findById(id)
+                .orElseThrow(() -> new EndoscopyNotFoundException("Endoscopy exam not found. id=" + id)));
     }
 
     @Override
     @Transactional
     public EndoscopyDTO registerEndoscopy(EndoscopyCreateReqDTO endoscopyDTO) {
-        EndoscopyEntity entity = new EndoscopyEntity();
+        EndoscopyEntity entity = endoscopyReqMapStruct.toEntity(endoscopyDTO);
         entity.setEndoscopyExamId(sequenceIdService.nextId(SequenceIdType.ENDOSCOPY_EXAM_ID));
-        entity.setTestExecutionId(endoscopyDTO.getTestExecutionId());
-        entity.setDetailCode(endoscopyDTO.getDetailCode());
-        entity.setPatientId(endoscopyDTO.getPatientId());
-        entity.setPatientName(endoscopyDTO.getPatientName());
-        entity.setDepartmentName(endoscopyDTO.getDepartmentName());
-        entity.setProcedureRoom(endoscopyDTO.getProcedureRoom());
-        entity.setEquipment(endoscopyDTO.getEquipment());
-        entity.setSedationYn(normalizeYnFlag(endoscopyDTO.getSedationYn()));
-        entity.setPerformerId(normalizeOptionalValue(endoscopyDTO.getPerformerId()));
-        entity.setPerformerName(normalizeOptionalValue(endoscopyDTO.getPerformerName()));
-        entity.setProcedureAt(endoscopyDTO.getProcedureAt());
-        entity.setStatus(normalizeStatus(endoscopyDTO.getStatus()));
-        entity.setProgressStatus(normalizeProgressStatus(endoscopyDTO.getProgressStatus()));
+        entity.setSedationYn(normalizeYnFlag(entity.getSedationYn()));
+        entity.setPerformerId(normalizeOptionalValue(entity.getPerformerId()));
+        entity.setPerformerName(normalizeOptionalValue(entity.getPerformerName()));
+        entity.setStatus(normalizeStatus(entity.getStatus()));
+        entity.setProgressStatus(normalizeProgressStatus(entity.getProgressStatus()));
         entity.setCreatedAt(LocalDateTime.now());
-        return toEndoscopyDTO(endoscopyRepository.save(entity));
+        return endoscopyResMapStruct.toDTO(endoscopyRepository.save(entity));
     }
 
     @Override
@@ -181,19 +176,12 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     public EndoscopyDTO modifyEndoscopy(String id, EndoscopyDTO endoscopyDTO) {
         validateBodyIdAbsent("endoscopyExamId", endoscopyDTO.getEndoscopyExamId());
         EndoscopyEntity entity = endoscopyRepository.findById(id)
-                .orElseThrow(() -> new DiagnosticExecutionNotFoundException("Endoscopy exam not found. id=" + id));
+                .orElseThrow(() -> new EndoscopyNotFoundException("Endoscopy exam not found. id=" + id));
         String previousProgressStatus = entity.getProgressStatus();
-        entity.setTestExecutionId(endoscopyDTO.getTestExecutionId());
-        entity.setDetailCode(endoscopyDTO.getDetailCode());
-        entity.setPatientId(endoscopyDTO.getPatientId());
-        entity.setPatientName(endoscopyDTO.getPatientName());
-        entity.setDepartmentName(endoscopyDTO.getDepartmentName());
-        entity.setProcedureRoom(endoscopyDTO.getProcedureRoom());
-        entity.setEquipment(endoscopyDTO.getEquipment());
+        endoscopyReqMapStruct.updateEntityFromDto(endoscopyDTO, entity);
         entity.setSedationYn(normalizeYnFlag(endoscopyDTO.getSedationYn()));
         entity.setPerformerId(normalizeOptionalValue(endoscopyDTO.getPerformerId()));
         entity.setPerformerName(normalizeOptionalValue(endoscopyDTO.getPerformerName()));
-        entity.setProcedureAt(endoscopyDTO.getProcedureAt());
         entity.setProgressStatus(resolveProgressStatus(endoscopyDTO.getProgressStatus(), entity.getProgressStatus()));
         entity.setUpdatedAt(LocalDateTime.now());
         EndoscopyEntity savedEntity = endoscopyRepository.save(entity);
@@ -202,14 +190,14 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
             ensureEndoscopyResultExists(savedEntity);
         }
 
-        return toEndoscopyDTO(savedEntity);
+        return endoscopyResMapStruct.toDTO(savedEntity);
     }
 
     @Override
     @Transactional
     public void deleteEndoscopy(String id) {
         EndoscopyEntity entity = endoscopyRepository.findById(id)
-                .orElseThrow(() -> new DiagnosticExecutionNotFoundException("Endoscopy exam not found. id=" + id));
+                .orElseThrow(() -> new EndoscopyNotFoundException("Endoscopy exam not found. id=" + id));
         entity.setStatus("INACTIVE");
         entity.setUpdatedAt(LocalDateTime.now());
         endoscopyRepository.save(entity);
@@ -217,37 +205,27 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
 
     @Override
     public List<PathologyDTO> findPathologyList() {
-        return pathologyRepository.findAll().stream().map(this::toPathologyDTO).toList();
+        return pathologyResMapStruct.toDTOList(pathologyRepository.findAll());
     }
 
     @Override
     public PathologyDTO findPathologyDetail(String id) {
-        return toPathologyDTO(pathologyRepository.findById(id)
-                .orElseThrow(() -> new DiagnosticExecutionNotFoundException("Pathology exam not found. id=" + id)));
+        return pathologyResMapStruct.toDTO(pathologyRepository.findById(id)
+                .orElseThrow(() -> new PathologyNotFoundException("Pathology exam not found. id=" + id)));
     }
 
     @Override
     @Transactional
     public PathologyDTO registerPathology(PathologyCreateReqDTO pathologyDTO) {
-        PathologyEntity entity = new PathologyEntity();
+        PathologyEntity entity = pathologyReqMapStruct.toEntity(pathologyDTO);
         entity.setPathologyExamId(sequenceIdService.nextId(SequenceIdType.PATHOLOGY_EXAM_ID));
-        entity.setTestExecutionId(pathologyDTO.getTestExecutionId());
-        entity.setDetailCode(pathologyDTO.getDetailCode());
-        entity.setPatientId(pathologyDTO.getPatientId());
-        entity.setPatientName(pathologyDTO.getPatientName());
-        entity.setDepartmentName(pathologyDTO.getDepartmentName());
-        entity.setTissueStatus(pathologyDTO.getTissueStatus());
-        entity.setCollectionMethod(pathologyDTO.getCollectionMethod());
-        entity.setTissueSite(pathologyDTO.getTissueSite());
-        entity.setTissueType(pathologyDTO.getTissueType());
-        entity.setCollectedAt(pathologyDTO.getCollectedAt());
-        entity.setPerformerId(normalizeOptionalValue(pathologyDTO.getPerformerId()));
-        entity.setPerformerName(normalizeOptionalValue(pathologyDTO.getPerformerName()));
-        entity.setReexamYn(normalizeYnFlag(pathologyDTO.getReexamYn()));
-        entity.setStatus(normalizeStatus(pathologyDTO.getStatus()));
-        entity.setProgressStatus(normalizeProgressStatus(pathologyDTO.getProgressStatus()));
+        entity.setPerformerId(normalizeOptionalValue(entity.getPerformerId()));
+        entity.setPerformerName(normalizeOptionalValue(entity.getPerformerName()));
+        entity.setReexamYn(normalizeYnFlag(entity.getReexamYn()));
+        entity.setStatus(normalizeStatus(entity.getStatus()));
+        entity.setProgressStatus(normalizeProgressStatus(entity.getProgressStatus()));
         entity.setCreatedAt(LocalDateTime.now());
-        return toPathologyDTO(pathologyRepository.save(entity));
+        return pathologyResMapStruct.toDTO(pathologyRepository.save(entity));
     }
 
     @Override
@@ -255,18 +233,9 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     public PathologyDTO modifyPathology(String id, PathologyDTO pathologyDTO) {
         validateBodyIdAbsent("pathologyExamId", pathologyDTO.getPathologyExamId());
         PathologyEntity entity = pathologyRepository.findById(id)
-                .orElseThrow(() -> new DiagnosticExecutionNotFoundException("Pathology exam not found. id=" + id));
+                .orElseThrow(() -> new PathologyNotFoundException("Pathology exam not found. id=" + id));
         String previousProgressStatus = entity.getProgressStatus();
-        entity.setTestExecutionId(pathologyDTO.getTestExecutionId());
-        entity.setDetailCode(pathologyDTO.getDetailCode());
-        entity.setPatientId(pathologyDTO.getPatientId());
-        entity.setPatientName(pathologyDTO.getPatientName());
-        entity.setDepartmentName(pathologyDTO.getDepartmentName());
-        entity.setTissueStatus(pathologyDTO.getTissueStatus());
-        entity.setCollectionMethod(pathologyDTO.getCollectionMethod());
-        entity.setTissueSite(pathologyDTO.getTissueSite());
-        entity.setTissueType(pathologyDTO.getTissueType());
-        entity.setCollectedAt(pathologyDTO.getCollectedAt());
+        pathologyReqMapStruct.updateEntityFromDto(pathologyDTO, entity);
         entity.setPerformerId(normalizeOptionalValue(pathologyDTO.getPerformerId()));
         entity.setPerformerName(normalizeOptionalValue(pathologyDTO.getPerformerName()));
         entity.setReexamYn(normalizeYnFlag(pathologyDTO.getReexamYn()));
@@ -278,14 +247,14 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
             ensurePathologyResultExists(savedEntity);
         }
 
-        return toPathologyDTO(savedEntity);
+        return pathologyResMapStruct.toDTO(savedEntity);
     }
 
     @Override
     @Transactional
     public void deletePathology(String id) {
         PathologyEntity entity = pathologyRepository.findById(id)
-                .orElseThrow(() -> new DiagnosticExecutionNotFoundException("Pathology exam not found. id=" + id));
+                .orElseThrow(() -> new PathologyNotFoundException("Pathology exam not found. id=" + id));
         entity.setStatus("INACTIVE");
         entity.setUpdatedAt(LocalDateTime.now());
         pathologyRepository.save(entity);
@@ -293,34 +262,26 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
 
     @Override
     public List<PhysiologicalDTO> findPhysiologicalList() {
-        return physiologicalRepository.findAll().stream().map(this::toPhysiologicalDTO).toList();
+        return physiologicalResMapStruct.toDTOList(physiologicalRepository.findAll());
     }
 
     @Override
     public PhysiologicalDTO findPhysiologicalDetail(String id) {
-        return toPhysiologicalDTO(physiologicalRepository.findById(id)
-                .orElseThrow(() -> new DiagnosticExecutionNotFoundException("Physiological exam not found. id=" + id)));
+        return physiologicalResMapStruct.toDTO(physiologicalRepository.findById(id)
+                .orElseThrow(() -> new PhysiologicalNotFoundException("Physiological exam not found. id=" + id)));
     }
 
     @Override
     @Transactional
     public PhysiologicalDTO registerPhysiological(PhysiologicalCreateReqDTO physiologicalDTO) {
-        PhysiologicalEntity entity = new PhysiologicalEntity();
+        PhysiologicalEntity entity = physiologicalReqMapStruct.toEntity(physiologicalDTO);
         entity.setPhysiologicalExamId(sequenceIdService.nextId(SequenceIdType.PHYSIOLOGICAL_EXAM_ID));
-        entity.setTestExecutionId(physiologicalDTO.getTestExecutionId());
-        entity.setDetailCode(physiologicalDTO.getDetailCode());
-        entity.setPatientId(physiologicalDTO.getPatientId());
-        entity.setPatientName(physiologicalDTO.getPatientName());
-        entity.setDepartmentName(physiologicalDTO.getDepartmentName());
-        entity.setExamEquipmentId(physiologicalDTO.getExamEquipmentId());
-        entity.setRawData(physiologicalDTO.getRawData());
-        entity.setReportDocId(physiologicalDTO.getReportDocId());
-        entity.setPerformerId(normalizeOptionalValue(physiologicalDTO.getPerformerId()));
-        entity.setPerformerName(normalizeOptionalValue(physiologicalDTO.getPerformerName()));
-        entity.setStatus(normalizeStatus(physiologicalDTO.getStatus()));
-        entity.setProgressStatus(normalizeProgressStatus(physiologicalDTO.getProgressStatus()));
+        entity.setPerformerId(normalizeOptionalValue(entity.getPerformerId()));
+        entity.setPerformerName(normalizeOptionalValue(entity.getPerformerName()));
+        entity.setStatus(normalizeStatus(entity.getStatus()));
+        entity.setProgressStatus(normalizeProgressStatus(entity.getProgressStatus()));
         entity.setCreatedAt(LocalDateTime.now());
-        return toPhysiologicalDTO(physiologicalRepository.save(entity));
+        return physiologicalResMapStruct.toDTO(physiologicalRepository.save(entity));
     }
 
     @Override
@@ -328,16 +289,9 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     public PhysiologicalDTO modifyPhysiological(String id, PhysiologicalDTO physiologicalDTO) {
         validateBodyIdAbsent("physiologicalExamId", physiologicalDTO.getPhysiologicalExamId());
         PhysiologicalEntity entity = physiologicalRepository.findById(id)
-                .orElseThrow(() -> new DiagnosticExecutionNotFoundException("Physiological exam not found. id=" + id));
+                .orElseThrow(() -> new PhysiologicalNotFoundException("Physiological exam not found. id=" + id));
         String previousProgressStatus = entity.getProgressStatus();
-        entity.setTestExecutionId(physiologicalDTO.getTestExecutionId());
-        entity.setDetailCode(physiologicalDTO.getDetailCode());
-        entity.setPatientId(physiologicalDTO.getPatientId());
-        entity.setPatientName(physiologicalDTO.getPatientName());
-        entity.setDepartmentName(physiologicalDTO.getDepartmentName());
-        entity.setExamEquipmentId(physiologicalDTO.getExamEquipmentId());
-        entity.setRawData(physiologicalDTO.getRawData());
-        entity.setReportDocId(physiologicalDTO.getReportDocId());
+        physiologicalReqMapStruct.updateEntityFromDto(physiologicalDTO, entity);
         entity.setPerformerId(normalizeOptionalValue(physiologicalDTO.getPerformerId()));
         entity.setPerformerName(normalizeOptionalValue(physiologicalDTO.getPerformerName()));
         entity.setProgressStatus(resolveProgressStatus(physiologicalDTO.getProgressStatus(), entity.getProgressStatus()));
@@ -348,14 +302,14 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
             ensurePhysiologicalResultExists(savedEntity);
         }
 
-        return toPhysiologicalDTO(savedEntity);
+        return physiologicalResMapStruct.toDTO(savedEntity);
     }
 
     @Override
     @Transactional
     public void deletePhysiological(String id) {
         PhysiologicalEntity entity = physiologicalRepository.findById(id)
-                .orElseThrow(() -> new DiagnosticExecutionNotFoundException("Physiological exam not found. id=" + id));
+                .orElseThrow(() -> new PhysiologicalNotFoundException("Physiological exam not found. id=" + id));
         entity.setStatus("INACTIVE");
         entity.setUpdatedAt(LocalDateTime.now());
         physiologicalRepository.save(entity);
@@ -510,89 +464,6 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
 
         return testExecutionResMapStruct.toDTO(testExecutionRepository.save(entity));
     }
-
-    private ImagingDTO toImagingDTO(ImagingEntity entity) {
-        ImagingDTO dto = new ImagingDTO();
-        dto.setImagingExamId(entity.getImagingExamId());
-        dto.setTestExecutionId(entity.getTestExecutionId());
-        dto.setImagingType(entity.getImagingType());
-        dto.setDetailCode(entity.getDetailCode());
-        dto.setPatientId(entity.getPatientId());
-        dto.setPatientName(entity.getPatientName());
-        dto.setDepartmentName(entity.getDepartmentName());
-        dto.setStatus(entity.getStatus());
-        dto.setProgressStatus(entity.getProgressStatus());
-        dto.setPerformerId(entity.getPerformerId());
-        dto.setPerformerName(entity.getPerformerName());
-        dto.setCreatedAt(entity.getCreatedAt());
-        dto.setUpdatedAt(entity.getUpdatedAt());
-        return dto;
-    }
-
-    private EndoscopyDTO toEndoscopyDTO(EndoscopyEntity entity) {
-        EndoscopyDTO dto = new EndoscopyDTO();
-        dto.setEndoscopyExamId(entity.getEndoscopyExamId());
-        dto.setTestExecutionId(entity.getTestExecutionId());
-        dto.setDetailCode(entity.getDetailCode());
-        dto.setPatientId(entity.getPatientId());
-        dto.setPatientName(entity.getPatientName());
-        dto.setDepartmentName(entity.getDepartmentName());
-        dto.setProcedureRoom(entity.getProcedureRoom());
-        dto.setEquipment(entity.getEquipment());
-        dto.setSedationYn(entity.getSedationYn());
-        dto.setPerformerId(entity.getPerformerId());
-        dto.setPerformerName(entity.getPerformerName());
-        dto.setProcedureAt(entity.getProcedureAt());
-        dto.setStatus(entity.getStatus());
-        dto.setProgressStatus(entity.getProgressStatus());
-        dto.setCreatedAt(entity.getCreatedAt());
-        dto.setUpdatedAt(entity.getUpdatedAt());
-        return dto;
-    }
-
-    private PathologyDTO toPathologyDTO(PathologyEntity entity) {
-        PathologyDTO dto = new PathologyDTO();
-        dto.setPathologyExamId(entity.getPathologyExamId());
-        dto.setTestExecutionId(entity.getTestExecutionId());
-        dto.setDetailCode(entity.getDetailCode());
-        dto.setPatientId(entity.getPatientId());
-        dto.setPatientName(entity.getPatientName());
-        dto.setDepartmentName(entity.getDepartmentName());
-        dto.setTissueStatus(entity.getTissueStatus());
-        dto.setCollectionMethod(entity.getCollectionMethod());
-        dto.setTissueSite(entity.getTissueSite());
-        dto.setTissueType(entity.getTissueType());
-        dto.setCollectedAt(entity.getCollectedAt());
-        dto.setPerformerId(entity.getPerformerId());
-        dto.setPerformerName(entity.getPerformerName());
-        dto.setReexamYn(entity.getReexamYn());
-        dto.setStatus(entity.getStatus());
-        dto.setProgressStatus(entity.getProgressStatus());
-        dto.setCreatedAt(entity.getCreatedAt());
-        dto.setUpdatedAt(entity.getUpdatedAt());
-        return dto;
-    }
-
-    private PhysiologicalDTO toPhysiologicalDTO(PhysiologicalEntity entity) {
-        PhysiologicalDTO dto = new PhysiologicalDTO();
-        dto.setPhysiologicalExamId(entity.getPhysiologicalExamId());
-        dto.setTestExecutionId(entity.getTestExecutionId());
-        dto.setDetailCode(entity.getDetailCode());
-        dto.setPatientId(entity.getPatientId());
-        dto.setPatientName(entity.getPatientName());
-        dto.setDepartmentName(entity.getDepartmentName());
-        dto.setExamEquipmentId(entity.getExamEquipmentId());
-        dto.setRawData(entity.getRawData());
-        dto.setReportDocId(entity.getReportDocId());
-        dto.setPerformerId(entity.getPerformerId());
-        dto.setPerformerName(entity.getPerformerName());
-        dto.setStatus(entity.getStatus());
-        dto.setProgressStatus(entity.getProgressStatus());
-        dto.setCreatedAt(entity.getCreatedAt());
-        dto.setUpdatedAt(entity.getUpdatedAt());
-        return dto;
-    }
-
     private void ensureExamRecordExists(TestExecutionEntity entity) {
         String executionType = normalizeExecutionType(entity.getExecutionType());
 
@@ -632,12 +503,13 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         if (imagingResultRepository.existsByImagingExamId(entity.getImagingExamId())) {
             return;
         }
-
+        LocalDateTime now = LocalDateTime.now();
         ImagingResultEntity resultEntity = new ImagingResultEntity();
         resultEntity.setImagingResultId(sequenceIdService.nextId(SequenceIdType.IMAGING_RESULT_ID));
         resultEntity.setImagingExamId(entity.getImagingExamId());
         resultEntity.setStatus("ACTIVE");
-        resultEntity.setCreatedAt(LocalDateTime.now());
+        resultEntity.setCreatedAt(now);
+        resultEntity.setConfirmedAt(now);
         imagingResultRepository.save(resultEntity);
     }
 
@@ -645,12 +517,13 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         if (endoscopyResultRepository.existsByEndoscopyExamId(entity.getEndoscopyExamId())) {
             return;
         }
-
+        LocalDateTime now = LocalDateTime.now();
         EndoscopyResultEntity resultEntity = new EndoscopyResultEntity();
         resultEntity.setEndoscopyResultId(sequenceIdService.nextId(SequenceIdType.ENDOSCOPY_RESULT_ID));
         resultEntity.setEndoscopyExamId(entity.getEndoscopyExamId());
         resultEntity.setStatus("ACTIVE");
-        resultEntity.setCreatedAt(LocalDateTime.now());
+        resultEntity.setCreatedAt(now);
+        resultEntity.setConfirmedAt(now);
         endoscopyResultRepository.save(resultEntity);
     }
 
@@ -658,7 +531,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         if (endoscopyRepository.existsByTestExecutionId(entity.getTestExecutionId())) {
             return;
         }
-
+        LocalDateTime now = LocalDateTime.now();
         EndoscopyEntity endoscopyEntity = new EndoscopyEntity();
         endoscopyEntity.setEndoscopyExamId(sequenceIdService.nextId(SequenceIdType.ENDOSCOPY_EXAM_ID));
         endoscopyEntity.setTestExecutionId(entity.getTestExecutionId());
@@ -671,7 +544,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         endoscopyEntity.setSedationYn("N");
         endoscopyEntity.setStatus("ACTIVE");
         endoscopyEntity.setProgressStatus("WAITING");
-        endoscopyEntity.setCreatedAt(LocalDateTime.now());
+        endoscopyEntity.setCreatedAt(now);
         endoscopyRepository.save(endoscopyEntity);
     }
 
@@ -700,12 +573,13 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         if (pathologyResultRepository.existsByPathologyExamId(entity.getPathologyExamId())) {
             return;
         }
-
+        LocalDateTime now = LocalDateTime.now();
         PathologyResultEntity resultEntity = new PathologyResultEntity();
         resultEntity.setPathologyExamResultId(sequenceIdService.nextId(SequenceIdType.PATHOLOGY_EXAM_RESULT_ID));
         resultEntity.setPathologyExamId(entity.getPathologyExamId());
         resultEntity.setStatus("ACTIVE");
-        resultEntity.setCreatedAt(LocalDateTime.now());
+        resultEntity.setCreatedAt(now);
+        resultEntity.setConfirmedAt(now);
         pathologyResultRepository.save(resultEntity);
     }
 
@@ -733,12 +607,13 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         if (physiologicalResultRepository.existsByPhysiologicalExamId(entity.getPhysiologicalExamId())) {
             return;
         }
-
+        LocalDateTime now = LocalDateTime.now();
         PhysiologicalResultEntity resultEntity = new PhysiologicalResultEntity();
         resultEntity.setPhysiologicalExamResultId(sequenceIdService.nextId(SequenceIdType.PHYSIOLOGICAL_EXAM_RESULT_ID));
         resultEntity.setPhysiologicalExamId(entity.getPhysiologicalExamId());
         resultEntity.setStatus("ACTIVE");
-        resultEntity.setCreatedAt(LocalDateTime.now());
+        resultEntity.setCreatedAt(now);
+        resultEntity.setConfirmedAt(now);
         physiologicalResultRepository.save(resultEntity);
     }
 
@@ -767,12 +642,13 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         if (specimenTestResultRepository.existsBySpecimenExamId(entity.getSpecimenExamId())) {
             return;
         }
-
+        LocalDateTime now = LocalDateTime.now();
         SpecimenTestResultEntity resultEntity = new SpecimenTestResultEntity();
         resultEntity.setSpecimenExamResultId(sequenceIdService.nextId(SequenceIdType.SPECIMEN_EXAM_RESULT_ID));
         resultEntity.setSpecimenExamId(entity.getSpecimenExamId());
         resultEntity.setStatus("ACTIVE");
-        resultEntity.setCreatedAt(LocalDateTime.now());
+        resultEntity.setCreatedAt(now);
+        resultEntity.setConfirmedAt(now);
         specimenTestResultRepository.save(resultEntity);
     }
 

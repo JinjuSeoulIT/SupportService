@@ -5,7 +5,7 @@ import com.app.medical_support.diagnosticresult.dto.TestResultDetailDTO;
 import com.app.medical_support.diagnosticresult.dto.TestResultListDTO;
 import com.app.medical_support.diagnosticresult.dto.TestResultSearchCondition;
 import com.app.medical_support.diagnosticresult.dto.TestResultUpdateReqDTO;
-import com.app.medical_support.diagnosticresult.service.TestResultFacadeService;
+import com.app.medical_support.diagnosticresult.service.DiagnosticResultService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ import java.util.List;
 @Tag(name = "TestResult", description = "Integrated test result API")
 public class TestResultController {
 
-    private final TestResultFacadeService testResultFacadeService;
+    private final DiagnosticResultService diagnosticResultService;
 
     @Operation(summary = "Integrated test result list")
     @GetMapping
@@ -34,7 +34,7 @@ public class TestResultController {
         return ResponseEntity.ok(new ApiResponse<>(
                 true,
                 "Integrated test result list loaded.",
-                testResultFacadeService.findTestResultList(condition)
+                diagnosticResultService.findTestResultList(condition)
         ));
     }
 
@@ -47,7 +47,7 @@ public class TestResultController {
         return ResponseEntity.ok(new ApiResponse<>(
                 true,
                 "Integrated test result detail loaded.",
-                testResultFacadeService.findTestResultDetail(resultType, resultId)
+                diagnosticResultService.findTestResultDetail(resultType, resultId)
         ));
     }
 
@@ -61,7 +61,7 @@ public class TestResultController {
         return ResponseEntity.ok(new ApiResponse<>(
                 true,
                 "Integrated test result updated.",
-                testResultFacadeService.modifyTestResult(resultType, resultId, dto)
+                diagnosticResultService.modifyTestResult(resultType, resultId, dto)
         ));
     }
 }
