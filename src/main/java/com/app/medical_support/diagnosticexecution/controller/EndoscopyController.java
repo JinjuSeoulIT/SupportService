@@ -1,6 +1,7 @@
 package com.app.medical_support.diagnosticexecution.controller;
 
 import com.app.medical_support.common.ApiResponse;
+import com.app.medical_support.diagnosticexecution.dto.EndoscopyCreateReqDTO;
 import com.app.medical_support.diagnosticexecution.dto.EndoscopyDTO;
 import com.app.medical_support.diagnosticexecution.service.DiagnosticExecutionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,7 +41,7 @@ public class EndoscopyController {
 
     @Operation(summary = "내시경 검사 등록")
     @PostMapping
-    public ResponseEntity<ApiResponse<EndoscopyDTO>> register(@RequestBody EndoscopyDTO endoscopyDTO) {
+    public ResponseEntity<ApiResponse<EndoscopyDTO>> register(@RequestBody EndoscopyCreateReqDTO endoscopyDTO) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Endoscopy created.", diagnosticExecutionService.registerEndoscopy(endoscopyDTO)));
     }
 

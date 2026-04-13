@@ -1,5 +1,6 @@
 package com.app.medical_support.diagnosticresult.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,6 +29,7 @@ public class TestResultDetailDTO {
     private String summary;
     private LocalDateTime resultAt;
     private String status;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
     private Map<String, Object> detail;
 }

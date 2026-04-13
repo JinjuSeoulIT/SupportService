@@ -1,5 +1,6 @@
 package com.app.medical_support.diagnosticresult.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,21 +14,19 @@ import java.time.LocalDateTime;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TestResultUpdateDetailDTO {
 
-    private String readingSummary;
     private String readingDetail;
 
     private String resultItemCode;
-    private String resultValue;
     private String unit;
     private String referenceRange;
     private String judgement;
 
+    @JsonAlias({"readingSummary", "resultValue", "finding"})
     private String resultSummary;
     private LocalDateTime judgedAt;
     private String readerId;
     private String diagnosisName;
 
-    private String finding;
     private String biopsyYn;
 
     private String report;

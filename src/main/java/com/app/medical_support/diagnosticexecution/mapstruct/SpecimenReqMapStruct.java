@@ -3,13 +3,13 @@ package com.app.medical_support.diagnosticexecution.mapstruct;
 
 
 import com.app.medical_support.common.mapstruct.ReqMapStruct;
-import com.app.medical_support.diagnosticexecution.dto.SpecimenDTO;
+import com.app.medical_support.diagnosticexecution.dto.SpecimenCreateReqDTO;
 import com.app.medical_support.diagnosticexecution.entity.SpecimenEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface SpecimenReqMapStruct extends ReqMapStruct<SpecimenEntity, SpecimenDTO> {
+public interface SpecimenReqMapStruct extends ReqMapStruct<SpecimenEntity, SpecimenCreateReqDTO> {
 
 
 }

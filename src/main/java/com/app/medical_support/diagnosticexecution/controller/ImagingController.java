@@ -1,6 +1,7 @@
 package com.app.medical_support.diagnosticexecution.controller;
 
 import com.app.medical_support.common.ApiResponse;
+import com.app.medical_support.diagnosticexecution.dto.ImagingCreateReqDTO;
 import com.app.medical_support.diagnosticexecution.dto.ImagingDTO;
 import com.app.medical_support.diagnosticexecution.service.DiagnosticExecutionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,7 +41,7 @@ public class ImagingController {
 
     @Operation(summary = "영상 검사 등록")
     @PostMapping
-    public ResponseEntity<ApiResponse<ImagingDTO>> register(@RequestBody ImagingDTO imagingDTO) {
+    public ResponseEntity<ApiResponse<ImagingDTO>> register(@RequestBody ImagingCreateReqDTO imagingDTO) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Imaging created.", diagnosticExecutionService.registerImaging(imagingDTO)));
     }
 

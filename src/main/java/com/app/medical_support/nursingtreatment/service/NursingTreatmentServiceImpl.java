@@ -2,6 +2,8 @@ package com.app.medical_support.nursingtreatment.service;
 
 import com.app.medical_support.common.integration.reception.dto.OutpatientReceptionDTO;
 import com.app.medical_support.common.integration.reception.service.ReceptionIntegrationService;
+import com.app.medical_support.common.sequence.SequenceIdService;
+import com.app.medical_support.common.sequence.SequenceIdType;
 import com.app.medical_support.nursingtreatment.dto.*;
 import com.app.medical_support.nursingtreatment.entity.MedicationRecordEntity;
 import com.app.medical_support.nursingtreatment.entity.RecordEntity;
@@ -42,6 +44,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     private final MedicationRecordRepository medicationRecordRepository;
     private final TreatmentResultRepository treatmentResultRepository;
     private final ReceptionIntegrationService receptionIntegrationService;
+    private final SequenceIdService sequenceIdService;
 
     @Override
     public List<RecordResponseDTO> search(String searchType, String searchValue, String startDate, String endDate) {
@@ -73,16 +76,12 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
 
     @Override
     @Transactional
-    public RecordDTO registerRecord(RecordRequestDTO recordRequestDTO) {
+    public RecordDTO registerRecord(RecordCreateReqDTO recordRequestDTO) {
         validateReceptionRecordRequest(recordRequestDTO);
 
         RecordEntity entity = recordReqMapStruct.toEntity(recordRequestDTO);
         LocalDateTime now = LocalDateTime.now();
-
-        if (!hasText(entity.getRecordId())) {
-            entity.setRecordId(createRecordId());
-        }
-
+        entity.setRecordId(sequenceIdService.nextId(SequenceIdType.RECORD_ID));
         entity.setStatus("ACTIVE");
         entity.setCreatedAt(now);
         entity.setUpdatedAt(now);
@@ -91,7 +90,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
 
     @Override
     @Transactional
-    public RecordDTO modifyRecord(String id, RecordDTO recordDTO) {
+    public RecordDTO modifyRecord(String id, RecordUpdateDTO recordDTO) {
         RecordEntity saved = recordRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException(id));
 
@@ -148,7 +147,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     @Transactional
     public MedicationRecordDTO registerMedicationRecord(MedicationRecordReqDTO medicationRecordDTO) {
         MedicationRecordEntity entity = new MedicationRecordEntity();
-        entity.setMedicationRecordId(createMedicationRecordId());
+        entity.setMedicationRecordId(sequenceIdService.nextId(SequenceIdType.MEDICATION_RECORD_ID));
 
         entity.setMedicationId(medicationRecordDTO.getMedicationId());
         entity.setDoseNumber(medicationRecordDTO.getDoseNumber());
@@ -231,7 +230,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     @Transactional
     public TreatmentResultDTO registerTreatmentResult(TreatmentResultCreateDTO treatmentResultDTO) {
         TreatmentResultEntity entity = new TreatmentResultEntity();
-        entity.setTreatmentResultId(createTreatmentResultId());
+        entity.setTreatmentResultId(sequenceIdService.nextId(SequenceIdType.TREATMENT_RESULT_ID));
         entity.setProcedureResultId(treatmentResultDTO.getProcedureResultId());
         entity.setDetail(treatmentResultDTO.getDetail());
         entity.setStatus(normalizeStatus(treatmentResultDTO.getStatus()));
@@ -290,6 +289,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     private MedicationRecordDTO toMedicationRecordDTO(MedicationRecordEntity entity) {
         MedicationRecordDTO dto = new MedicationRecordDTO();
         dto.setMedicationRecordId(entity.getMedicationRecordId());
+        dto.setMedicationId(entity.getMedicationId());
         dto.setAdministeredAt(entity.getAdministeredAt());
         dto.setDoseNumber(entity.getDoseNumber());
         dto.setDoseUnit(entity.getDoseUnit());
@@ -308,6 +308,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     private TreatmentResultDTO toTreatmentResultDTO(TreatmentResultEntity entity) {
         TreatmentResultDTO dto = new TreatmentResultDTO();
         dto.setTreatmentResultId(entity.getTreatmentResultId());
+        dto.setProcedureResultId(entity.getProcedureResultId());
         dto.setStatus(entity.getStatus());
         dto.setProgressStatus(entity.getProgressStatus());
         dto.setTreatmentAt(entity.getTreatmentAt());
@@ -356,7 +357,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         return normalizeProgressStatus(newValue);
     }
 
-    private void validateReceptionRecordRequest(RecordRequestDTO recordRequestDTO) {
+    private void validateReceptionRecordRequest(RecordCreateReqDTO recordRequestDTO) {
         Long receptionId = recordRequestDTO.getReceptionId();
         if (receptionId == null) {
             throw new RecordReceptionValidationException("접수 정보 검증 실패: receptionId는 필수입니다.");
@@ -420,15 +421,4 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         return trimToNull(second);
     }
 
-    private String createRecordId() {
-        return "REC_" + System.currentTimeMillis();
-    }
-
-    private String createMedicationRecordId() {
-        return "MED_" + System.currentTimeMillis();
-    }
-
-    private String createTreatmentResultId() {
-        return "PROC_" + System.currentTimeMillis();
-    }
 }

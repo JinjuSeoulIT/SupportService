@@ -1,5 +1,7 @@
 package com.app.medical_support.diagnosticresult.service;
 
+import com.app.medical_support.common.sequence.SequenceIdService;
+import com.app.medical_support.common.sequence.SequenceIdType;
 import com.app.medical_support.diagnosticresult.dto.EndoscopyResultCreateReqDTO;
 import com.app.medical_support.diagnosticresult.dto.EndoscopyResultDTO;
 import com.app.medical_support.diagnosticresult.dto.EndoscopyResultUpdateReqDTO;
@@ -42,6 +44,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     private final PathologyResultRepository pathologyResultRepository;
     private final PhysiologicalResultRepository physiologicalResultRepository;
     private final SpecimenTestResultRepository specimenTestResultRepository;
+    private final SequenceIdService sequenceIdService;
 
     @Override
     public List<ImagingResultDTO> findImagingResultList() {
@@ -57,19 +60,10 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     @Transactional
     public ImagingResultDTO registerImagingResult(ImagingResultCreateReqDTO dto) {
         ImagingResultEntity entity = new ImagingResultEntity();
-
-        entity.setImagingResultId(
-                hasText(dto.getImagingResultId())
-                        ? dto.getImagingResultId()
-                        : createImagingResultId()
-        );
-
+        entity.setImagingResultId(sequenceIdService.nextId(SequenceIdType.IMAGING_RESULT_ID));
         entity.setImagingExamId(dto.getImagingExamId());
-
-
         entity.setImagingType(dto.getImagingType());
-
-        entity.setReadingSummary(dto.getReadingSummary());
+        entity.setResultSummary(dto.getResultSummary());
         entity.setReadingDetail(dto.getReadingDetail());
         entity.setConfirmedAt(dto.getConfirmedAt());
         entity.setResultManagerId(dto.getResultManagerId());
@@ -89,8 +83,8 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     public ImagingResultDTO modifyImagingResult(String id, ImagingResultUpdateReqDTO dto) {
         ImagingResultEntity entity = imagingResultRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Imaging result not found. id=" + id));
-        if (dto.getReadingSummary() != null) {
-            entity.setReadingSummary(dto.getReadingSummary());
+        if (dto.getResultSummary() != null) {
+            entity.setResultSummary(dto.getResultSummary());
         }
         if (dto.getReadingDetail() != null) {
             entity.setReadingDetail(dto.getReadingDetail());
@@ -134,9 +128,9 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     @Transactional
     public EndoscopyResultDTO registerEndoscopyResult(EndoscopyResultCreateReqDTO dto) {
         EndoscopyResultEntity entity = new EndoscopyResultEntity();
-        entity.setEndoscopyResultId(hasText(dto.getEndoscopyResultId()) ? dto.getEndoscopyResultId() : createEndoscopyResultId());
+        entity.setEndoscopyResultId(sequenceIdService.nextId(SequenceIdType.ENDOSCOPY_RESULT_ID));
         entity.setEndoscopyExamId(dto.getEndoscopyExamId());
-        entity.setFinding(dto.getFinding());
+        entity.setResultSummary(dto.getResultSummary());
         entity.setBiopsyYn(normalizeYnFlag(dto.getBiopsyYn()));
         entity.setConfirmedAt(dto.getConfirmedAt());
         entity.setResultManagerId(dto.getResultManagerId());
@@ -153,8 +147,8 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     public EndoscopyResultDTO modifyEndoscopyResult(String id, EndoscopyResultUpdateReqDTO dto) {
         EndoscopyResultEntity entity = endoscopyResultRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Endoscopy result not found. id=" + id));
-        if (dto.getFinding() != null) {
-            entity.setFinding(dto.getFinding());
+        if (dto.getResultSummary() != null) {
+            entity.setResultSummary(dto.getResultSummary());
         }
         if (hasText(dto.getBiopsyYn())) {
             entity.setBiopsyYn(normalizeYnFlag(dto.getBiopsyYn()));
@@ -201,7 +195,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     @Transactional
     public PathologyResultDTO registerPathologyResult(PathologyResultCreateReqDTO dto) {
         PathologyResultEntity entity = new PathologyResultEntity();
-        entity.setPathologyExamResultId(hasText(dto.getPathologyExamResultId()) ? dto.getPathologyExamResultId() : createPathologyResultId());
+        entity.setPathologyExamResultId(sequenceIdService.nextId(SequenceIdType.PATHOLOGY_EXAM_RESULT_ID));
         entity.setPathologyExamId(dto.getPathologyExamId());
         entity.setResultSummary(dto.getResultSummary());
         entity.setJudgedAt(dto.getJudgedAt());
@@ -272,9 +266,9 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     @Transactional
     public PhysiologicalResultDTO registerPhysiologicalResult(PhysiologicalResultCreateReqDTO dto) {
         PhysiologicalResultEntity entity = new PhysiologicalResultEntity();
-        entity.setPhysiologicalExamResultId(hasText(dto.getPhysiologicalExamResultId()) ? dto.getPhysiologicalExamResultId() : createPhysiologicalResultId());
+        entity.setPhysiologicalExamResultId(sequenceIdService.nextId(SequenceIdType.PHYSIOLOGICAL_EXAM_RESULT_ID));
         entity.setPhysiologicalExamId(dto.getPhysiologicalExamId());
-        entity.setResultValue(dto.getResultValue());
+        entity.setResultSummary(dto.getResultSummary());
         entity.setReport(dto.getReport());
         entity.setMeasuredItemCode(dto.getMeasuredItemCode());
         entity.setConfirmedAt(dto.getConfirmedAt());
@@ -291,8 +285,8 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     public PhysiologicalResultDTO modifyPhysiologicalResult(String id, PhysiologicalResultUpdateReqDTO dto) {
         PhysiologicalResultEntity entity = physiologicalResultRepository.findById(id)
                 .orElseThrow(() -> new DiagnosticResultNotFoundException("Physiological result not found. id=" + id));
-        if (dto.getResultValue() != null) {
-            entity.setResultValue(dto.getResultValue());
+        if (dto.getResultSummary() != null) {
+            entity.setResultSummary(dto.getResultSummary());
         }
         if (dto.getReport() != null) {
             entity.setReport(dto.getReport());
@@ -339,10 +333,10 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     @Transactional
     public SpecimenTestResultDTO registerSpecimenResult(SpecimenTestResultCreateReqDTO dto) {
         SpecimenTestResultEntity entity = new SpecimenTestResultEntity();
-        entity.setSpecimenExamResultId(hasText(dto.getSpecimenExamResultId()) ? dto.getSpecimenExamResultId() : createSpecimenResultId());
+        entity.setSpecimenExamResultId(sequenceIdService.nextId(SequenceIdType.SPECIMEN_EXAM_RESULT_ID));
         entity.setSpecimenExamId(dto.getSpecimenExamId());
         entity.setResultItemCode(dto.getResultItemCode());
-        entity.setResultValue(dto.getResultValue());
+        entity.setResultSummary(dto.getResultSummary());
         entity.setUnit(dto.getUnit());
         entity.setReferenceRange(dto.getReferenceRange());
         entity.setJudgement(dto.getJudgement());
@@ -363,8 +357,8 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         if (dto.getResultItemCode() != null) {
             entity.setResultItemCode(dto.getResultItemCode());
         }
-        if (dto.getResultValue() != null) {
-            entity.setResultValue(dto.getResultValue());
+        if (dto.getResultSummary() != null) {
+            entity.setResultSummary(dto.getResultSummary());
         }
         if (dto.getUnit() != null) {
             entity.setUnit(dto.getUnit());
@@ -458,23 +452,4 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         return "N";
     }
 
-    private String createImagingResultId() {
-        return "IMG_RES_" + System.currentTimeMillis();
-    }
-
-    private String createEndoscopyResultId() {
-        return "ENDO_RES_" + System.currentTimeMillis();
-    }
-
-    private String createPathologyResultId() {
-        return "PATH_RES_" + System.currentTimeMillis();
-    }
-
-    private String createPhysiologicalResultId() {
-        return "PHYS_RES_" + System.currentTimeMillis();
-    }
-
-    private String createSpecimenResultId() {
-        return "SPEC_RES_" + System.currentTimeMillis();
-    }
 }

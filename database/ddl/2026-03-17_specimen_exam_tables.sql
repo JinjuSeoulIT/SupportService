@@ -37,7 +37,7 @@ begin
        and column_name = 'SPECIMEN_STATUS';
 
     if v_count = 0 then
-        execute immediate q'[alter table CHJ.SPECIMEN add (SPECIMEN_STATUS varchar2(20) default 'COLLECTED')]';
+        execute immediate q'[alter table CHJ.SPECIMEN add (SPECIMEN_STATUS varchar2(20))]';
     end if;
 
     select count(*)
@@ -132,7 +132,7 @@ alter table chj.specimen modify (
     updated_at timestamp(6),
     visit_id varchar2(30) not null,
     created_by varchar2(30) not null,
-    specimen_status varchar2(20) default 'COLLECTED' not null,
+    specimen_status varchar2(20) not null,
     recollection_yn char(1) default 'N' not null
 );
 

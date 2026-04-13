@@ -1,6 +1,7 @@
 package com.app.medical_support.diagnosticexecution.controller;
 
 import com.app.medical_support.common.ApiResponse;
+import com.app.medical_support.diagnosticexecution.dto.PathologyCreateReqDTO;
 import com.app.medical_support.diagnosticexecution.dto.PathologyDTO;
 import com.app.medical_support.diagnosticexecution.service.DiagnosticExecutionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,7 +41,7 @@ public class PathologyController {
 
     @Operation(summary = "병리 검사 등록")
     @PostMapping
-    public ResponseEntity<ApiResponse<PathologyDTO>> register(@RequestBody PathologyDTO pathologyDTO) {
+    public ResponseEntity<ApiResponse<PathologyDTO>> register(@RequestBody PathologyCreateReqDTO pathologyDTO) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Pathology created.", diagnosticExecutionService.registerPathology(pathologyDTO)));
     }
 

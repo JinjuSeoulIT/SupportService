@@ -27,8 +27,8 @@ public class SpecimenTestResultEntity {
     @Column(name = "RESULT_ITEM_CODE")
     private String resultItemCode;
 
-    @Column(name = "RESULT_VALUE")
-    private String resultValue;
+    @Column(name = "RESULT_SUMMARY")
+    private String resultSummary;
 
     @Column(name = "UNIT")
     private String unit;

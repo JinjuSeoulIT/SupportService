@@ -1,6 +1,7 @@
 package com.app.medical_support.diagnosticexecution.controller;
 
 import com.app.medical_support.common.ApiResponse;
+import com.app.medical_support.diagnosticexecution.dto.SpecimenCreateReqDTO;
 import com.app.medical_support.diagnosticexecution.dto.SpecimenDTO;
 import com.app.medical_support.diagnosticexecution.service.DiagnosticExecutionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,7 +61,7 @@ public class SpecimenController {
     @PostMapping
     public ResponseEntity<ApiResponse<SpecimenDTO>> registerSpecimen(
             @Parameter(description = "Specimen exam request body")
-            @RequestBody SpecimenDTO specimen
+            @RequestBody SpecimenCreateReqDTO specimen
     ) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Specimen created.", specimenService.registerSpecimen(specimen)));
     }

@@ -13,6 +13,7 @@ public class MedicationRecordDTO {
 
 
     private String medicationRecordId;
+    private String medicationId;
     private String administeredAt;
     private Double doseNumber;
     private String doseUnit;

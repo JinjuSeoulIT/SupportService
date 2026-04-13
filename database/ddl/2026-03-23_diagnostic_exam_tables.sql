@@ -45,7 +45,7 @@ begin
             create table CHJ.ENDOSCOPY_EXAM_RESULT (
                 ENDOSCOPY_RESULT_ID varchar2(30) not null,
                 ENDOSCOPY_EXAM_ID   varchar2(30),
-                FINDING             varchar2(1000),
+                RESULT_SUMMARY      varchar2(1000),
                 BIOPSY_YN           char(1),
                 CONFIRMED_AT        timestamp(6),
                 READER_ID           varchar2(30),
@@ -168,7 +168,7 @@ begin
             create table CHJ.PHYSIOLOGICAL_EXAM_RESULT (
                 PHYSIOLOGICAL_EXAM_RESULT_ID varchar2(30) not null,
                 PHYSIOLOGICAL_EXAM_ID        varchar2(30),
-                RESULT_VALUE                 varchar2(200),
+                RESULT_SUMMARY               varchar2(200),
                 REPORT                       varchar2(1000),
                 MEASURED_ITEM_CODE           varchar2(30),
                 STATUS                       varchar2(20) default 'ACTIVE',

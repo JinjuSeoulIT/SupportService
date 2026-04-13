@@ -11,8 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class MedicationRecordUpdateDTO {
 
-
-    private String medicationRecordId;
     private String administeredAt;
     private Double doseNumber;
     private String doseUnit;

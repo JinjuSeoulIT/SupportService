@@ -8,6 +8,7 @@
     <select id="searchMedicationRecord" resultType="com.app.medical_support.nursingtreatment.dto.MedicationRecordDTO">
         SELECT
             mr.medication_record_id,
+            mr.medication_id,
             mr.administered_at,
             mr.dose_number,
             mr.dose_unit,

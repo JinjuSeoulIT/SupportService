@@ -1,10 +1,11 @@
 package com.app.medical_support.nursingtreatment.controller;
 
 import com.app.medical_support.common.ApiResponse;
+import com.app.medical_support.nursingtreatment.dto.RecordCreateReqDTO;
 import com.app.medical_support.nursingtreatment.dto.RecordDTO;
-import com.app.medical_support.nursingtreatment.dto.RecordRequestDTO;
 import com.app.medical_support.nursingtreatment.dto.RecordResponseDTO;
 import com.app.medical_support.nursingtreatment.dto.RecordStatusRequest;
+import com.app.medical_support.nursingtreatment.dto.RecordUpdateDTO;
 import com.app.medical_support.nursingtreatment.service.NursingTreatmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -57,13 +58,13 @@ public class RecordController {
 
     @Operation(summary = "간호 기록 등록")
     @PostMapping
-    public ResponseEntity<ApiResponse<RecordDTO>> registerRecord(@RequestBody RecordRequestDTO record) {
+    public ResponseEntity<ApiResponse<RecordDTO>> registerRecord(@RequestBody RecordCreateReqDTO record) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Record created.", recordService.registerRecord(record)));
     }
 
     @Operation(summary = "간호 기록 수정")
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<RecordDTO>> modifyRecord(@PathVariable String id, @RequestBody RecordDTO recordDTO) {
+    public ResponseEntity<ApiResponse<RecordDTO>> modifyRecord(@PathVariable String id, @RequestBody RecordUpdateDTO recordDTO) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Record updated.", recordService.modifyRecord(id, recordDTO)));
     }
 

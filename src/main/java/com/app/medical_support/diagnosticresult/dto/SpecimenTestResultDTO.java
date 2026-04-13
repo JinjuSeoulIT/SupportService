@@ -1,5 +1,6 @@
 package com.app.medical_support.diagnosticresult.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,12 +24,13 @@ public class SpecimenTestResultDTO {
     private String resultManagerId;
     private String resultManagerName;
     private String resultItemCode;
-    private String resultValue;
+    private String resultSummary;
     private String unit;
     private String referenceRange;
     private String judgement;
     private LocalDateTime confirmedAt;
     private String status;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
     public SpecimenTestResultDTO(
@@ -44,7 +46,7 @@ public class SpecimenTestResultDTO {
             String resultManagerId,
             String resultManagerName,
             String resultItemCode,
-            String resultValue,
+            String resultSummary,
             String unit,
             String referenceRange,
             String judgement,
@@ -64,7 +66,7 @@ public class SpecimenTestResultDTO {
         this.resultManagerId = resultManagerId;
         this.resultManagerName = resultManagerName;
         this.resultItemCode = resultItemCode;
-        this.resultValue = resultValue;
+        this.resultSummary = resultSummary;
         this.unit = unit;
         this.referenceRange = referenceRange;
         this.judgement = judgement;

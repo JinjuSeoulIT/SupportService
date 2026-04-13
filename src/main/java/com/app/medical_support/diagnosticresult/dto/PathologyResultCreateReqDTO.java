@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class PathologyResultCreateReqDTO {
 
-    private String pathologyExamResultId;
     private String pathologyExamId;
     private String resultSummary;
     private LocalDateTime judgedAt;

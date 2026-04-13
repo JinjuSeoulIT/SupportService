@@ -1,5 +1,6 @@
 package com.app.medical_support.diagnosticresult.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,10 +24,11 @@ public class ImagingResultDTO {
     private String performerName;
     private String resultManagerId;
     private String resultManagerName;
-    private String readingSummary;
+    private String resultSummary;
     private String readingDetail;
     private LocalDateTime confirmedAt;
     private String status;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
     public ImagingResultDTO(
@@ -41,7 +43,7 @@ public class ImagingResultDTO {
             String performerName,
             String resultManagerId,
             String resultManagerName,
-            String readingSummary,
+            String resultSummary,
             String readingDetail,
             LocalDateTime confirmedAt,
             String status,
@@ -58,7 +60,7 @@ public class ImagingResultDTO {
         this.performerName = performerName;
         this.resultManagerId = resultManagerId;
         this.resultManagerName = resultManagerName;
-        this.readingSummary = readingSummary;
+        this.resultSummary = resultSummary;
         this.readingDetail = readingDetail;
         this.confirmedAt = confirmedAt;
         this.status = status;

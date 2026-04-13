@@ -1,5 +1,6 @@
 package com.app.medical_support.diagnosticresult.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,11 +23,12 @@ public class PhysiologicalResultDTO {
     private String performerName;
     private String resultManagerId;
     private String resultManagerName;
-    private String resultValue;
+    private String resultSummary;
     private String report;
     private String measuredItemCode;
     private LocalDateTime confirmedAt;
     private String status;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
     public PhysiologicalResultDTO(
@@ -41,7 +43,7 @@ public class PhysiologicalResultDTO {
             String performerName,
             String resultManagerId,
             String resultManagerName,
-            String resultValue,
+            String resultSummary,
             String report,
             String measuredItemCode,
             LocalDateTime confirmedAt,
@@ -59,7 +61,7 @@ public class PhysiologicalResultDTO {
         this.performerName = performerName;
         this.resultManagerId = resultManagerId;
         this.resultManagerName = resultManagerName;
-        this.resultValue = resultValue;
+        this.resultSummary = resultSummary;
         this.report = report;
         this.measuredItemCode = measuredItemCode;
         this.confirmedAt = confirmedAt;

@@ -1,5 +1,6 @@
 package com.app.medical_support.diagnosticresult.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,11 +23,12 @@ public class EndoscopyResultDTO {
     private String performerName;
     private String resultManagerId;
     private String resultManagerName;
-    private String finding;
+    private String resultSummary;
     private String biopsyYn;
     private LocalDateTime confirmedAt;
     private String readerId;
     private String status;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
     public EndoscopyResultDTO(
@@ -41,7 +43,7 @@ public class EndoscopyResultDTO {
             String performerName,
             String resultManagerId,
             String resultManagerName,
-            String finding,
+            String resultSummary,
             String biopsyYn,
             LocalDateTime confirmedAt,
             String readerId,
@@ -59,7 +61,7 @@ public class EndoscopyResultDTO {
         this.performerName = performerName;
         this.resultManagerId = resultManagerId;
         this.resultManagerName = resultManagerName;
-        this.finding = finding;
+        this.resultSummary = resultSummary;
         this.biopsyYn = biopsyYn;
         this.confirmedAt = confirmedAt;
         this.readerId = readerId;

@@ -24,8 +24,8 @@ public class EndoscopyResultEntity {
     @Column(name = "ENDOSCOPY_EXAM_ID")
     private String endoscopyExamId;
 
-    @Column(name = "FINDING")
-    private String finding;
+    @Column(name = "RESULT_SUMMARY")
+    private String resultSummary;
 
     @Column(name = "BIOPSY_YN")
     private String biopsyYn;

@@ -24,8 +24,8 @@ public class PhysiologicalResultEntity {
     @Column(name = "PHYSIOLOGICAL_EXAM_ID")
     private String physiologicalExamId;
 
-    @Column(name = "RESULT_VALUE")
-    private String resultValue;
+    @Column(name = "RESULT_SUMMARY")
+    private String resultSummary;
 
     @Column(name = "REPORT")
     private String report;

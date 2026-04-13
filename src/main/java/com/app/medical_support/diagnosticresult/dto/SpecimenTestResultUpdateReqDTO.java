@@ -1,5 +1,6 @@
 package com.app.medical_support.diagnosticresult.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,7 +13,8 @@ import java.time.LocalDateTime;
 public class SpecimenTestResultUpdateReqDTO {
 
     private String resultItemCode;
-    private String resultValue;
+    @JsonAlias("resultValue")
+    private String resultSummary;
     private String unit;
     private String referenceRange;
     private String judgement;

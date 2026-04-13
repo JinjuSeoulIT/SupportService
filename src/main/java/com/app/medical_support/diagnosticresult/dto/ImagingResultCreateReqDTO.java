@@ -1,5 +1,6 @@
 package com.app.medical_support.diagnosticresult.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,9 +12,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ImagingResultCreateReqDTO {
 
-    private String imagingResultId;
     private String imagingExamId;
-    private String readingSummary;
+    @JsonAlias("readingSummary")
+    private String resultSummary;
     private String readingDetail;
     private LocalDateTime confirmedAt;
     private String resultManagerId;

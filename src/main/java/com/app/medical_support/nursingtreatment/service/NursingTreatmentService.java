@@ -8,8 +8,8 @@ public interface NursingTreatmentService {
     List<RecordResponseDTO> search(String searchType, String searchValue, String startDate, String endDate);
     List<RecordResponseDTO> findRecordList();
     RecordResponseDTO findRecordDetail(String nursingId);
-    RecordDTO registerRecord(RecordRequestDTO recordRequestDTO);
-    RecordDTO modifyRecord(String nursingId, RecordDTO recordDTO);
+    RecordDTO registerRecord(RecordCreateReqDTO recordRequestDTO);
+    RecordDTO modifyRecord(String nursingId, RecordUpdateDTO recordDTO);
     RecordDTO updateRecordStatus(String nursingId, String status);
 
     List<MedicationRecordDTO> findMedicationRecordList();

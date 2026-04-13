@@ -1,5 +1,6 @@
 package com.app.medical_support.diagnosticresult.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,7 +12,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class PhysiologicalResultUpdateReqDTO {
 
-    private String resultValue;
+    @JsonAlias("resultValue")
+    private String resultSummary;
     private String report;
     private String measuredItemCode;
     private LocalDateTime confirmedAt;

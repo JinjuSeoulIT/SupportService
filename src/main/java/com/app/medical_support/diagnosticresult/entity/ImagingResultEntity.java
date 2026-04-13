@@ -29,8 +29,8 @@ public class ImagingResultEntity {
     private String imagingType;
 
 
-    @Column(name = "READING_SUMMARY")
-    private String readingSummary;
+    @Column(name = "RESULT_SUMMARY")
+    private String resultSummary;
 
     @Lob
     @Column(name = "READING_DETAIL")
