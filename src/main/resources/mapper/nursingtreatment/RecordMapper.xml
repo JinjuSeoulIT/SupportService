@@ -21,25 +21,17 @@
             nr.nursing_id,
             nr.initial_assessment,
             nr.past_medical_history,
-            e.name AS nurse_name,
-            NVL(receipt_dept.department_name, nurse_dept.dept_name) AS department_name,
+            nr.nursing_id AS nurse_name,
+            receipt_dept.department_name AS department_name,
             p.name AS patient_name,
             nr.height_cm,
             nr.weight_kg,
             nr.created_at
         FROM CHJ.NURSING_RECORD nr
-        LEFT JOIN JCH.EMPLOYEE_NURSE en
-            ON TRIM(nr.nursing_id) = TO_CHAR(en.staff_id)
-            OR TRIM(nr.nursing_id) = TO_CHAR(en.nurse_id)
-            OR TRIM(nr.nursing_id) = 'NUR_' || LPAD(TO_CHAR(en.nurse_id), 3, '0')
-        LEFT JOIN JCH.EMPLOYEE e
-            ON en.staff_id = e.staff_id
         LEFT JOIN HOSPITAL.RECEPTION rc
             ON nr.reception_id = rc.reception_id
         LEFT JOIN HOSPITAL.DEPARTMENT receipt_dept
             ON rc.department_id = receipt_dept.department_id
-        LEFT JOIN JCH.DEPARTMENT nurse_dept
-            ON e.dept_id = nurse_dept.dept_id
         LEFT JOIN HOSPITAL.PATIENT p
             ON rc.patient_id = p.patient_id
         <where>
@@ -48,13 +40,13 @@
                     nr.record_id = #{searchValue}
                 </when>
                 <when test="searchType != null and searchType.equals('nurseName') and searchValue != null and searchValue != ''">
-                    e.name LIKE '%' || #{searchValue} || '%'
+                    nr.nursing_id LIKE '%' || #{searchValue} || '%'
                 </when>
                 <when test="searchType != null and searchType.equals('patientName') and searchValue != null and searchValue != ''">
                     p.name LIKE '%' || #{searchValue} || '%'
                 </when>
                 <when test="searchType != null and searchType.equals('departmentName') and searchValue != null and searchValue != ''">
-                    NVL(receipt_dept.department_name, nurse_dept.dept_name) LIKE '%' || #{searchValue} || '%'
+                    receipt_dept.department_name LIKE '%' || #{searchValue} || '%'
                 </when>
                 <when test="searchType != null and searchType.equals('createdAt') and startDate != null and endDate != null">
                     nr.created_at BETWEEN
@@ -87,24 +79,16 @@
             nr.nursing_id,
             nr.initial_assessment,
             nr.past_medical_history,
-            e.name AS nurse_name,
-            NVL(receipt_dept.department_name, nurse_dept.dept_name) AS department_name,
+            nr.nursing_id AS nurse_name,
+            receipt_dept.department_name AS department_name,
             p.name AS patient_name,
             nr.height_cm,
             nr.weight_kg
         FROM CHJ.NURSING_RECORD nr
-        LEFT JOIN JCH.EMPLOYEE_NURSE en
-            ON TRIM(nr.nursing_id) = TO_CHAR(en.staff_id)
-            OR TRIM(nr.nursing_id) = TO_CHAR(en.nurse_id)
-            OR TRIM(nr.nursing_id) = 'NUR_' || LPAD(TO_CHAR(en.nurse_id), 3, '0')
-        LEFT JOIN JCH.EMPLOYEE e
-            ON en.staff_id = e.staff_id
         LEFT JOIN HOSPITAL.RECEPTION rc
             ON nr.reception_id = rc.reception_id
         LEFT JOIN HOSPITAL.DEPARTMENT receipt_dept
             ON rc.department_id = receipt_dept.department_id
-        LEFT JOIN JCH.DEPARTMENT nurse_dept
-            ON e.dept_id = nurse_dept.dept_id
         LEFT JOIN HOSPITAL.PATIENT p
             ON rc.patient_id = p.patient_id
         ORDER BY nr.created_at DESC NULLS LAST, nr.record_id DESC
@@ -130,24 +114,16 @@
             TO_CHAR(nr.updated_at, 'YYYY-MM-DD HH24:MI:SS') AS updated_at,
             nr.height_cm,
             nr.weight_kg,
-            e.name AS nurse_name,
-            NVL(receipt_dept.department_name, nurse_dept.dept_name) AS department_name,
+            nr.nursing_id AS nurse_name,
+            receipt_dept.department_name AS department_name,
             rc.patient_id AS patient_id,
             p.name AS patient_name,
             nr.pain_score
         FROM CHJ.NURSING_RECORD nr
-        LEFT JOIN JCH.EMPLOYEE_NURSE en
-            ON TRIM(nr.nursing_id) = TO_CHAR(en.staff_id)
-            OR TRIM(nr.nursing_id) = TO_CHAR(en.nurse_id)
-            OR TRIM(nr.nursing_id) = 'NUR_' || LPAD(TO_CHAR(en.nurse_id), 3, '0')
-        LEFT JOIN JCH.EMPLOYEE e
-            ON en.staff_id = e.staff_id
         LEFT JOIN HOSPITAL.RECEPTION rc
             ON nr.reception_id = rc.reception_id
         LEFT JOIN HOSPITAL.DEPARTMENT receipt_dept
             ON rc.department_id = receipt_dept.department_id
-        LEFT JOIN JCH.DEPARTMENT nurse_dept
-            ON e.dept_id = nurse_dept.dept_id
         LEFT JOIN HOSPITAL.PATIENT p
             ON rc.patient_id = p.patient_id
         WHERE nr.record_id = #{recordId}
