@@ -121,10 +121,34 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         ImagingEntity entity = imagingRepository.findById(id)
                 .orElseThrow(() -> new ImagingNotFoundException("Imaging exam not found. id=" + id));
         String previousProgressStatus = entity.getProgressStatus();
-        entity.setTestExecutionId(imagingDTO.getTestExecutionId());
-        if (hasText(imagingDTO.getImagingType())) {
+        if (imagingDTO.getTestExecutionId() != null) {
+            entity.setTestExecutionId(normalizeOptionalValue(imagingDTO.getTestExecutionId()));
+        }
+        if (imagingDTO.getImagingType() != null) {
             entity.setImagingType(imagingDTO.getImagingType());
         }
+        if (imagingDTO.getDetailCode() != null) {
+            entity.setDetailCode(imagingDTO.getDetailCode());
+        }
+        if (imagingDTO.getPatientId() != null) {
+            entity.setPatientId(imagingDTO.getPatientId());
+        }
+        if (imagingDTO.getPatientName() != null) {
+            entity.setPatientName(imagingDTO.getPatientName());
+        }
+        if (imagingDTO.getDepartmentName() != null) {
+            entity.setDepartmentName(imagingDTO.getDepartmentName());
+        }
+        if (imagingDTO.getPerformerId() != null) {
+            entity.setPerformerId(normalizeOptionalValue(imagingDTO.getPerformerId()));
+        }
+        if (imagingDTO.getPerformerName() != null) {
+            entity.setPerformerName(normalizeOptionalValue(imagingDTO.getPerformerName()));
+        }
+        entity.setStatus(hasText(imagingDTO.getStatus())
+                ? normalizeStatus(imagingDTO.getStatus())
+                : normalizeStatus(entity.getStatus()));
+        entity.setProgressStatus(resolveProgressStatus(imagingDTO.getProgressStatus(), entity.getProgressStatus()));
 
         entity.setUpdatedAt(LocalDateTime.now());
         ImagingEntity savedEntity = imagingRepository.save(entity);
@@ -179,9 +203,18 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
                 .orElseThrow(() -> new EndoscopyNotFoundException("Endoscopy exam not found. id=" + id));
         String previousProgressStatus = entity.getProgressStatus();
         endoscopyReqMapStruct.updateEntityFromDto(endoscopyDTO, entity);
-        entity.setSedationYn(normalizeYnFlag(endoscopyDTO.getSedationYn()));
-        entity.setPerformerId(normalizeOptionalValue(endoscopyDTO.getPerformerId()));
-        entity.setPerformerName(normalizeOptionalValue(endoscopyDTO.getPerformerName()));
+        if (endoscopyDTO.getSedationYn() != null) {
+            entity.setSedationYn(normalizeYnFlag(endoscopyDTO.getSedationYn()));
+        }
+        if (endoscopyDTO.getPerformerId() != null) {
+            entity.setPerformerId(normalizeOptionalValue(endoscopyDTO.getPerformerId()));
+        }
+        if (endoscopyDTO.getPerformerName() != null) {
+            entity.setPerformerName(normalizeOptionalValue(endoscopyDTO.getPerformerName()));
+        }
+        entity.setStatus(hasText(endoscopyDTO.getStatus())
+                ? normalizeStatus(endoscopyDTO.getStatus())
+                : normalizeStatus(entity.getStatus()));
         entity.setProgressStatus(resolveProgressStatus(endoscopyDTO.getProgressStatus(), entity.getProgressStatus()));
         entity.setUpdatedAt(LocalDateTime.now());
         EndoscopyEntity savedEntity = endoscopyRepository.save(entity);
@@ -236,9 +269,18 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
                 .orElseThrow(() -> new PathologyNotFoundException("Pathology exam not found. id=" + id));
         String previousProgressStatus = entity.getProgressStatus();
         pathologyReqMapStruct.updateEntityFromDto(pathologyDTO, entity);
-        entity.setPerformerId(normalizeOptionalValue(pathologyDTO.getPerformerId()));
-        entity.setPerformerName(normalizeOptionalValue(pathologyDTO.getPerformerName()));
-        entity.setReexamYn(normalizeYnFlag(pathologyDTO.getReexamYn()));
+        if (pathologyDTO.getPerformerId() != null) {
+            entity.setPerformerId(normalizeOptionalValue(pathologyDTO.getPerformerId()));
+        }
+        if (pathologyDTO.getPerformerName() != null) {
+            entity.setPerformerName(normalizeOptionalValue(pathologyDTO.getPerformerName()));
+        }
+        if (pathologyDTO.getReexamYn() != null) {
+            entity.setReexamYn(normalizeYnFlag(pathologyDTO.getReexamYn()));
+        }
+        entity.setStatus(hasText(pathologyDTO.getStatus())
+                ? normalizeStatus(pathologyDTO.getStatus())
+                : normalizeStatus(entity.getStatus()));
         entity.setProgressStatus(resolveProgressStatus(pathologyDTO.getProgressStatus(), entity.getProgressStatus()));
         entity.setUpdatedAt(LocalDateTime.now());
         PathologyEntity savedEntity = pathologyRepository.save(entity);
@@ -292,8 +334,15 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
                 .orElseThrow(() -> new PhysiologicalNotFoundException("Physiological exam not found. id=" + id));
         String previousProgressStatus = entity.getProgressStatus();
         physiologicalReqMapStruct.updateEntityFromDto(physiologicalDTO, entity);
-        entity.setPerformerId(normalizeOptionalValue(physiologicalDTO.getPerformerId()));
-        entity.setPerformerName(normalizeOptionalValue(physiologicalDTO.getPerformerName()));
+        if (physiologicalDTO.getPerformerId() != null) {
+            entity.setPerformerId(normalizeOptionalValue(physiologicalDTO.getPerformerId()));
+        }
+        if (physiologicalDTO.getPerformerName() != null) {
+            entity.setPerformerName(normalizeOptionalValue(physiologicalDTO.getPerformerName()));
+        }
+        entity.setStatus(hasText(physiologicalDTO.getStatus())
+                ? normalizeStatus(physiologicalDTO.getStatus())
+                : normalizeStatus(entity.getStatus()));
         entity.setProgressStatus(resolveProgressStatus(physiologicalDTO.getProgressStatus(), entity.getProgressStatus()));
         entity.setUpdatedAt(LocalDateTime.now());
         PhysiologicalEntity savedEntity = physiologicalRepository.save(entity);
@@ -370,18 +419,47 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         SpecimenEntity entity = specimenRepository.findById(id)
                 .orElseThrow(() -> new SpecimenNotFoundException("Specimen exam not found. id=" + id));
         String previousProgressStatus = entity.getProgressStatus();
-        entity.setTestExecutionId(specimenDTO.getTestExecutionId());
-        entity.setDetailCode(specimenDTO.getDetailCode());
-        entity.setPatientId(specimenDTO.getPatientId());
-        entity.setPatientName(specimenDTO.getPatientName());
-        entity.setDepartmentName(specimenDTO.getDepartmentName());
-        entity.setSpecimenType(specimenDTO.getSpecimenType());
-        entity.setSpecimenStatus(hasText(specimenDTO.getSpecimenStatus()) ? specimenDTO.getSpecimenStatus().trim().toUpperCase() : entity.getSpecimenStatus());
-        entity.setCollectedAt(specimenDTO.getCollectedAt());
-        entity.setPerformerId(normalizeOptionalValue(specimenDTO.getPerformerId()));
-        entity.setPerformerName(normalizeOptionalValue(specimenDTO.getPerformerName()));
-        entity.setCollectionSite(specimenDTO.getCollectionSite());
-        entity.setRecollectionYn(normalizeYnFlag(specimenDTO.getRecollectionYn()));
+        if (specimenDTO.getTestExecutionId() != null) {
+            entity.setTestExecutionId(normalizeOptionalValue(specimenDTO.getTestExecutionId()));
+        }
+        if (specimenDTO.getDetailCode() != null) {
+            entity.setDetailCode(specimenDTO.getDetailCode());
+        }
+        if (specimenDTO.getPatientId() != null) {
+            entity.setPatientId(specimenDTO.getPatientId());
+        }
+        if (specimenDTO.getPatientName() != null) {
+            entity.setPatientName(specimenDTO.getPatientName());
+        }
+        if (specimenDTO.getDepartmentName() != null) {
+            entity.setDepartmentName(specimenDTO.getDepartmentName());
+        }
+        if (specimenDTO.getSpecimenType() != null) {
+            entity.setSpecimenType(specimenDTO.getSpecimenType());
+        }
+        if (specimenDTO.getSpecimenStatus() != null) {
+            entity.setSpecimenStatus(hasText(specimenDTO.getSpecimenStatus())
+                    ? specimenDTO.getSpecimenStatus().trim().toUpperCase()
+                    : null);
+        }
+        if (specimenDTO.getCollectedAt() != null) {
+            entity.setCollectedAt(specimenDTO.getCollectedAt());
+        }
+        if (specimenDTO.getPerformerId() != null) {
+            entity.setPerformerId(normalizeOptionalValue(specimenDTO.getPerformerId()));
+        }
+        if (specimenDTO.getPerformerName() != null) {
+            entity.setPerformerName(normalizeOptionalValue(specimenDTO.getPerformerName()));
+        }
+        if (specimenDTO.getCollectionSite() != null) {
+            entity.setCollectionSite(specimenDTO.getCollectionSite());
+        }
+        if (specimenDTO.getRecollectionYn() != null) {
+            entity.setRecollectionYn(normalizeYnFlag(specimenDTO.getRecollectionYn()));
+        }
+        entity.setStatus(hasText(specimenDTO.getStatus())
+                ? normalizeStatus(specimenDTO.getStatus())
+                : normalizeStatus(entity.getStatus()));
         entity.setProgressStatus(resolveProgressStatus(specimenDTO.getProgressStatus(), entity.getProgressStatus()));
         entity.setUpdatedAt(LocalDateTime.now());
         SpecimenEntity savedEntity = specimenRepository.save(entity);
@@ -444,18 +522,40 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
 
 
         String previousProgressStatus = entity.getProgressStatus();
-        entity.setProgressStatus(testExecutionUpdateDTO.getProgressStatus());
+        entity.setProgressStatus(resolveProgressStatus(testExecutionUpdateDTO.getProgressStatus(), entity.getProgressStatus()));
         entity.setStatus(hasText(testExecutionUpdateDTO.getStatus())
                 ? normalizeStatus(testExecutionUpdateDTO.getStatus())
                 : normalizeStatus(entity.getStatus()));
-        entity.setRetryNo(testExecutionUpdateDTO.getRetryNo());
-        entity.setCompletedAt(testExecutionUpdateDTO.getCompletedAt());
-        entity.setDetailCode(testExecutionUpdateDTO.getDetailCode());
-        entity.setPerformerId(normalizeOptionalValue(testExecutionUpdateDTO.getPerformerId()));
-        entity.setPerformerName(normalizeOptionalValue(testExecutionUpdateDTO.getPerformerName()));
-        entity.setPatientId(testExecutionUpdateDTO.getPatientId());
-        entity.setPatientName(testExecutionUpdateDTO.getPatientName());
-        entity.setDepartmentName(testExecutionUpdateDTO.getDepartmentName());
+        if (testExecutionUpdateDTO.getRetryNo() != null) {
+            entity.setRetryNo(testExecutionUpdateDTO.getRetryNo());
+        }
+        if (testExecutionUpdateDTO.getCompletedAt() != null) {
+            entity.setCompletedAt(testExecutionUpdateDTO.getCompletedAt());
+        }
+        if (testExecutionUpdateDTO.getDetailCode() != null) {
+            entity.setDetailCode(testExecutionUpdateDTO.getDetailCode());
+        }
+        if (testExecutionUpdateDTO.getOrderItemId() != null) {
+            entity.setOrderItemId(testExecutionUpdateDTO.getOrderItemId());
+        }
+        if (hasText(testExecutionUpdateDTO.getExecutionType())) {
+            entity.setExecutionType(normalizeExecutionType(testExecutionUpdateDTO.getExecutionType()));
+        }
+        if (testExecutionUpdateDTO.getPerformerId() != null) {
+            entity.setPerformerId(normalizeOptionalValue(testExecutionUpdateDTO.getPerformerId()));
+        }
+        if (testExecutionUpdateDTO.getPerformerName() != null) {
+            entity.setPerformerName(normalizeOptionalValue(testExecutionUpdateDTO.getPerformerName()));
+        }
+        if (testExecutionUpdateDTO.getPatientId() != null) {
+            entity.setPatientId(testExecutionUpdateDTO.getPatientId());
+        }
+        if (testExecutionUpdateDTO.getPatientName() != null) {
+            entity.setPatientName(testExecutionUpdateDTO.getPatientName());
+        }
+        if (testExecutionUpdateDTO.getDepartmentName() != null) {
+            entity.setDepartmentName(testExecutionUpdateDTO.getDepartmentName());
+        }
         entity.setUpdatedAt(LocalDateTime.now());
 
         if (!isInProgress(previousProgressStatus) && isInProgress(entity.getProgressStatus())) {
