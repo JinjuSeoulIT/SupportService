@@ -511,6 +511,12 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
             result.setPatientId(dto.getPatientId());
             result.setPatientName(dto.getPatientName());
             result.setDepartmentName(dto.getDepartmentName());
+            result.setTissueStatus(dto.getTissueStatus());
+            result.setCollectionMethod(dto.getCollectionMethod());
+            result.setTissueSite(dto.getTissueSite());
+            result.setTissueType(dto.getTissueType());
+            result.setCollectedAt(dto.getCollectedAt());
+            result.setReexamYn(dto.getReexamYn());
             result.setPerformerId(dto.getPerformerId());
             result.setPerformerName(dto.getPerformerName());
             result.setResultManagerId(dto.getResultManagerId());
@@ -551,6 +557,9 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
             result.setPatientId(dto.getPatientId());
             result.setPatientName(dto.getPatientName());
             result.setDepartmentName(dto.getDepartmentName());
+            result.setExamEquipmentId(dto.getExamEquipmentId());
+            result.setRawData(dto.getRawData());
+            result.setReportDocId(dto.getReportDocId());
             result.setPerformerId(dto.getPerformerId());
             result.setPerformerName(dto.getPerformerName());
             result.setResultManagerId(dto.getResultManagerId());
@@ -627,6 +636,12 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         result.setCreatedAt(dto.getCreatedAt());
 
         Map<String, Object> detail = new LinkedHashMap<>();
+        detail.put("tissueStatus", dto.getTissueStatus());
+        detail.put("collectionMethod", dto.getCollectionMethod());
+        detail.put("tissueSite", dto.getTissueSite());
+        detail.put("tissueType", dto.getTissueType());
+        detail.put("collectedAt", dto.getCollectedAt());
+        detail.put("reexamYn", dto.getReexamYn());
         detail.put("judgedAt", dto.getJudgedAt());
         detail.put("readerId", dto.getReaderId());
         detail.put("diagnosisName", dto.getDiagnosisName());
@@ -674,6 +689,9 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         result.setCreatedAt(dto.getCreatedAt());
 
         Map<String, Object> detail = new LinkedHashMap<>();
+        detail.put("examEquipmentId", dto.getExamEquipmentId());
+        detail.put("rawData", dto.getRawData());
+        detail.put("reportDocId", dto.getReportDocId());
         detail.put("report", dto.getReport());
         detail.put("measuredItemCode", dto.getMeasuredItemCode());
         result.setDetail(detail);

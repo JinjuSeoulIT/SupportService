@@ -21,6 +21,16 @@ public class TestResultListDTO {
     private Long patientId;
     private String patientName;
     private String departmentName;
+    private String tissueStatus;
+    private String collectionMethod;
+    private String tissueSite;
+    private String tissueType;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime collectedAt;
+    private String reexamYn;
+    private String examEquipmentId;
+    private String rawData;
+    private String reportDocId;
     private String performerId;
     private String performerName;
     private String resultManagerId;

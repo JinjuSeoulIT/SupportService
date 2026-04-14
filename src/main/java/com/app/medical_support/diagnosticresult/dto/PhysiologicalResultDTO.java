@@ -19,6 +19,9 @@ public class PhysiologicalResultDTO {
     private Long patientId;
     private String patientName;
     private String departmentName;
+    private String examEquipmentId;
+    private String rawData;
+    private String reportDocId;
     private String performerId;
     private String performerName;
     private String resultManagerId;
@@ -39,6 +42,9 @@ public class PhysiologicalResultDTO {
             Long patientId,
             String patientName,
             String departmentName,
+            String examEquipmentId,
+            String rawData,
+            String reportDocId,
             String performerId,
             String performerName,
             String resultManagerId,
@@ -57,6 +63,9 @@ public class PhysiologicalResultDTO {
         this.patientId = patientId;
         this.patientName = patientName;
         this.departmentName = departmentName;
+        this.examEquipmentId = examEquipmentId;
+        this.rawData = rawData;
+        this.reportDocId = reportDocId;
         this.performerId = performerId;
         this.performerName = performerName;
         this.resultManagerId = resultManagerId;

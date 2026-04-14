@@ -19,6 +19,12 @@ public class PathologyResultDTO {
     private Long patientId;
     private String patientName;
     private String departmentName;
+    private String tissueStatus;
+    private String collectionMethod;
+    private String tissueSite;
+    private String tissueType;
+    private LocalDateTime collectedAt;
+    private String reexamYn;
     private String performerId;
     private String performerName;
     private String resultManagerId;
@@ -40,6 +46,12 @@ public class PathologyResultDTO {
             Long patientId,
             String patientName,
             String departmentName,
+            String tissueStatus,
+            String collectionMethod,
+            String tissueSite,
+            String tissueType,
+            LocalDateTime collectedAt,
+            String reexamYn,
             String performerId,
             String performerName,
             String resultManagerId,
@@ -59,6 +71,12 @@ public class PathologyResultDTO {
         this.patientId = patientId;
         this.patientName = patientName;
         this.departmentName = departmentName;
+        this.tissueStatus = tissueStatus;
+        this.collectionMethod = collectionMethod;
+        this.tissueSite = tissueSite;
+        this.tissueType = tissueType;
+        this.collectedAt = collectedAt;
+        this.reexamYn = reexamYn;
         this.performerId = performerId;
         this.performerName = performerName;
         this.resultManagerId = resultManagerId;
