@@ -1,6 +1,7 @@
 package com.app.medical_support.nursingtreatment.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +20,10 @@ public class RecordCreateReqDTO {
     private Double temperature;
     private Integer spo2;
     private Integer painScore;
+    @Schema(description = "간호사 사용자/직원 ID")
     private String nursingId;
+
+    @Schema(description = "간호사 표시명. 프론트에서 전달 시 NURSE_NAME 컬럼에 저장")
     private String nurseName;
     private String departmentName;
     private String consciousnessLevel;

@@ -73,6 +73,9 @@ public class RecordDTO {
     @Schema(description = "Nursing ID")
     private String nursingId;
 
+    @Schema(description = "Nurse display name")
+    private String nurseName;
+
     @Schema(description = "Height (cm)")
     private String heightCm;
 

@@ -2,6 +2,7 @@ package com.app.medical_support.diagnosticresult.service;
 
 import com.app.medical_support.common.sequence.SequenceIdService;
 import com.app.medical_support.common.sequence.SequenceIdType;
+import com.app.medical_support.common.exception.InvalidRequestException;
 import com.app.medical_support.diagnosticresult.dto.*;
 import com.app.medical_support.diagnosticresult.entity.EndoscopyResultEntity;
 import com.app.medical_support.diagnosticresult.entity.ImagingResultEntity;
@@ -39,6 +40,8 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     private static final String TYPE_ENDOSCOPY = "ENDOSCOPY";
     private static final String TYPE_PHYSIOLOGICAL = "PHYSIOLOGICAL";
     private static final String STATUS_INACTIVE = "INACTIVE";
+    private static final String PROGRESS_IN_PROGRESS = "IN_PROGRESS";
+    private static final String PROGRESS_COMPLETED = "COMPLETED";
 
     // 검사별 CRUD
 
@@ -65,6 +68,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setResultManagerId(dto.getResultManagerId());
         entity.setResultManagerName(dto.getResultManagerName());
         entity.setStatus(normalizeStatus(dto.getStatus()));
+        entity.setProgressStatus(PROGRESS_IN_PROGRESS);
         entity.setCreatedAt(LocalDateTime.now());
 
         ImagingResultEntity savedEntity = imagingResultRepository.save(entity);
@@ -133,6 +137,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setResultManagerName(dto.getResultManagerName());
         entity.setReaderId(dto.getReaderId());
         entity.setStatus(normalizeStatus(dto.getStatus()));
+        entity.setProgressStatus(PROGRESS_IN_PROGRESS);
         entity.setCreatedAt(LocalDateTime.now());
         EndoscopyResultEntity savedEntity = endoscopyResultRepository.save(entity);
         return getEndoscopyResultResponse(savedEntity.getEndoscopyResultId());
@@ -201,6 +206,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setReaderId(dto.getReaderId());
         entity.setDiagnosisName(dto.getDiagnosisName());
         entity.setStatus(normalizeStatus(dto.getStatus()));
+        entity.setProgressStatus(PROGRESS_IN_PROGRESS);
         entity.setCreatedAt(LocalDateTime.now());
         PathologyResultEntity savedEntity = pathologyResultRepository.save(entity);
         return getPathologyResultResponse(savedEntity.getPathologyExamResultId());
@@ -271,6 +277,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setResultManagerId(dto.getResultManagerId());
         entity.setResultManagerName(dto.getResultManagerName());
         entity.setStatus(normalizeStatus(dto.getStatus()));
+        entity.setProgressStatus(PROGRESS_IN_PROGRESS);
         entity.setCreatedAt(LocalDateTime.now());
         PhysiologicalResultEntity savedEntity = physiologicalResultRepository.save(entity);
         return getPhysiologicalResultResponse(savedEntity.getPhysiologicalExamResultId());
@@ -340,6 +347,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         entity.setResultManagerId(dto.getResultManagerId());
         entity.setResultManagerName(dto.getResultManagerName());
         entity.setStatus(normalizeStatus(dto.getStatus()));
+        entity.setProgressStatus(PROGRESS_IN_PROGRESS);
         entity.setCreatedAt(LocalDateTime.now());
         SpecimenTestResultEntity savedEntity = specimenTestResultRepository.save(entity);
         return getSpecimenResultResponse(savedEntity.getSpecimenExamResultId());
@@ -462,6 +470,61 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         };
     }
 
+    @Override
+    @Transactional
+    public TestResultDetailDTO updateTestResultProgressStatus(String resultId, TestResultProgressStatusUpdateReqDTO dto) {
+        if (dto == null) {
+            throw new InvalidRequestException("Request body is required.");
+        }
+
+        String normalizedType = resolveResultTypeFromResultId(resultId);
+        String targetProgressStatus = normalizeProgressStatus(dto.getProgressStatus());
+
+        return switch (normalizedType) {
+            case TYPE_IMAGING -> {
+                ImagingResultEntity entity = imagingResultRepository.findById(resultId)
+                        .orElseThrow(() -> new DiagnosticResultNotFoundException("Imaging result not found. id=" + resultId));
+                assertProgressStatusUpdatable(entity.getProgressStatus(), targetProgressStatus);
+                entity.setProgressStatus(targetProgressStatus);
+                imagingResultRepository.save(entity);
+                yield mapImagingDetail(getImagingResultResponse(resultId));
+            }
+            case TYPE_SPECIMEN -> {
+                SpecimenTestResultEntity entity = specimenTestResultRepository.findById(resultId)
+                        .orElseThrow(() -> new DiagnosticResultNotFoundException("Specimen result not found. id=" + resultId));
+                assertProgressStatusUpdatable(entity.getProgressStatus(), targetProgressStatus);
+                entity.setProgressStatus(targetProgressStatus);
+                specimenTestResultRepository.save(entity);
+                yield mapSpecimenDetail(getSpecimenResultResponse(resultId));
+            }
+            case TYPE_PATHOLOGY -> {
+                PathologyResultEntity entity = pathologyResultRepository.findById(resultId)
+                        .orElseThrow(() -> new DiagnosticResultNotFoundException("Pathology result not found. id=" + resultId));
+                assertProgressStatusUpdatable(entity.getProgressStatus(), targetProgressStatus);
+                entity.setProgressStatus(targetProgressStatus);
+                pathologyResultRepository.save(entity);
+                yield mapPathologyDetail(getPathologyResultResponse(resultId));
+            }
+            case TYPE_ENDOSCOPY -> {
+                EndoscopyResultEntity entity = endoscopyResultRepository.findById(resultId)
+                        .orElseThrow(() -> new DiagnosticResultNotFoundException("Endoscopy result not found. id=" + resultId));
+                assertProgressStatusUpdatable(entity.getProgressStatus(), targetProgressStatus);
+                entity.setProgressStatus(targetProgressStatus);
+                endoscopyResultRepository.save(entity);
+                yield mapEndoscopyDetail(getEndoscopyResultResponse(resultId));
+            }
+            case TYPE_PHYSIOLOGICAL -> {
+                PhysiologicalResultEntity entity = physiologicalResultRepository.findById(resultId)
+                        .orElseThrow(() -> new DiagnosticResultNotFoundException("Physiological result not found. id=" + resultId));
+                assertProgressStatusUpdatable(entity.getProgressStatus(), targetProgressStatus);
+                entity.setProgressStatus(targetProgressStatus);
+                physiologicalResultRepository.save(entity);
+                yield mapPhysiologicalDetail(getPhysiologicalResultResponse(resultId));
+            }
+            default -> throw new InvalidRequestException("Unsupported resultId: " + resultId);
+        };
+    }
+
     // 매핑
 
     private List<TestResultListDTO> mapImagingResults(List<ImagingResultDTO> source) {
@@ -479,6 +542,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
             result.setSummary(dto.getResultSummary());
             result.setConfirmedAt(dto.getConfirmedAt());
             result.setStatus(dto.getStatus());
+            result.setProgressStatus(dto.getProgressStatus());
             result.setCreatedAt(dto.getCreatedAt());
             return result;
         }).toList();
@@ -499,6 +563,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
             result.setSummary(dto.getResultSummary());
             result.setConfirmedAt(dto.getConfirmedAt());
             result.setStatus(dto.getStatus());
+            result.setProgressStatus(dto.getProgressStatus());
             result.setCreatedAt(dto.getCreatedAt());
             return result;
         }).toList();
@@ -525,6 +590,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
             result.setSummary(dto.getResultSummary());
             result.setConfirmedAt(dto.getConfirmedAt());
             result.setStatus(dto.getStatus());
+            result.setProgressStatus(dto.getProgressStatus());
             result.setCreatedAt(dto.getCreatedAt());
             return result;
         }).toList();
@@ -545,6 +611,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
             result.setSummary(dto.getResultSummary());
             result.setConfirmedAt(dto.getConfirmedAt());
             result.setStatus(dto.getStatus());
+            result.setProgressStatus(dto.getProgressStatus());
             result.setCreatedAt(dto.getCreatedAt());
             return result;
         }).toList();
@@ -568,6 +635,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
             result.setSummary(dto.getResultSummary());
             result.setConfirmedAt(dto.getConfirmedAt());
             result.setStatus(dto.getStatus());
+            result.setProgressStatus(dto.getProgressStatus());
             result.setCreatedAt(dto.getCreatedAt());
             return result;
         }).toList();
@@ -587,6 +655,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         result.setSummary(dto.getResultSummary());
         result.setConfirmedAt(dto.getConfirmedAt());
         result.setStatus(dto.getStatus());
+        result.setProgressStatus(dto.getProgressStatus());
         result.setCreatedAt(dto.getCreatedAt());
 
         Map<String, Object> detail = new LinkedHashMap<>();
@@ -609,6 +678,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         result.setSummary(dto.getResultSummary());
         result.setConfirmedAt(dto.getConfirmedAt());
         result.setStatus(dto.getStatus());
+        result.setProgressStatus(dto.getProgressStatus());
         result.setCreatedAt(dto.getCreatedAt());
 
         Map<String, Object> detail = new LinkedHashMap<>();
@@ -634,6 +704,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         result.setSummary(dto.getResultSummary());
         result.setConfirmedAt(dto.getConfirmedAt());
         result.setStatus(dto.getStatus());
+        result.setProgressStatus(dto.getProgressStatus());
         result.setCreatedAt(dto.getCreatedAt());
 
         Map<String, Object> detail = new LinkedHashMap<>();
@@ -664,6 +735,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         result.setSummary(dto.getResultSummary());
         result.setConfirmedAt(dto.getConfirmedAt());
         result.setStatus(dto.getStatus());
+        result.setProgressStatus(dto.getProgressStatus());
         result.setCreatedAt(dto.getCreatedAt());
 
         Map<String, Object> detail = new LinkedHashMap<>();
@@ -687,6 +759,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         result.setSummary(dto.getResultSummary());
         result.setConfirmedAt(dto.getConfirmedAt());
         result.setStatus(dto.getStatus());
+        result.setProgressStatus(dto.getProgressStatus());
         result.setCreatedAt(dto.getCreatedAt());
 
         Map<String, Object> detail = new LinkedHashMap<>();
@@ -833,6 +906,76 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         }
 
         return "N";
+    }
+
+    private String normalizeProgressStatus(String progressStatus) {
+        if (!hasText(progressStatus)) {
+            throw new InvalidRequestException("progressStatus is required.");
+        }
+
+        String normalized = progressStatus.trim().toUpperCase();
+        if (!PROGRESS_IN_PROGRESS.equals(normalized) && !PROGRESS_COMPLETED.equals(normalized)) {
+            throw new InvalidRequestException("Invalid progressStatus. Allowed values: IN_PROGRESS, COMPLETED");
+        }
+        return normalized;
+    }
+
+    private void assertProgressStatusUpdatable(String currentProgressStatus, String nextProgressStatus) {
+        String current = hasText(currentProgressStatus) ? currentProgressStatus.trim().toUpperCase() : PROGRESS_IN_PROGRESS;
+        if (PROGRESS_COMPLETED.equals(current)) {
+            throw new InvalidRequestException("COMPLETED status cannot be changed.");
+        }
+        if (current.equals(nextProgressStatus)) {
+            throw new InvalidRequestException("progressStatus is already " + nextProgressStatus + ".");
+        }
+    }
+
+    private String resolveResultTypeFromResultId(String resultId) {
+        if (!hasText(resultId)) {
+            throw new InvalidRequestException("resultId is required.");
+        }
+
+        String normalizedId = resultId.trim().toUpperCase();
+        if (normalizedId.startsWith("IMG_R")) {
+            return TYPE_IMAGING;
+        }
+        if (normalizedId.startsWith("SPC_R")) {
+            return TYPE_SPECIMEN;
+        }
+        if (normalizedId.startsWith("PTH_R")) {
+            return TYPE_PATHOLOGY;
+        }
+        if (normalizedId.startsWith("END_R")) {
+            return TYPE_ENDOSCOPY;
+        }
+        if (normalizedId.startsWith("PHY_R")) {
+            return TYPE_PHYSIOLOGICAL;
+        }
+
+        List<String> matchedTypes = new ArrayList<>();
+        if (imagingResultRepository.existsById(resultId)) {
+            matchedTypes.add(TYPE_IMAGING);
+        }
+        if (specimenTestResultRepository.existsById(resultId)) {
+            matchedTypes.add(TYPE_SPECIMEN);
+        }
+        if (pathologyResultRepository.existsById(resultId)) {
+            matchedTypes.add(TYPE_PATHOLOGY);
+        }
+        if (endoscopyResultRepository.existsById(resultId)) {
+            matchedTypes.add(TYPE_ENDOSCOPY);
+        }
+        if (physiologicalResultRepository.existsById(resultId)) {
+            matchedTypes.add(TYPE_PHYSIOLOGICAL);
+        }
+
+        if (matchedTypes.isEmpty()) {
+            throw new DiagnosticResultNotFoundException("Result not found. resultId=" + resultId);
+        }
+        if (matchedTypes.size() > 1) {
+            throw new InvalidRequestException("Ambiguous resultId. Matched types=" + String.join(", ", matchedTypes));
+        }
+        return matchedTypes.get(0);
     }
 
     private boolean matchesIncludeInactive(TestResultListDTO result, TestResultSearchCondition condition) {

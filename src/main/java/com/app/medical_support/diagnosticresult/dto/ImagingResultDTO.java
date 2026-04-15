@@ -28,6 +28,7 @@ public class ImagingResultDTO {
     private String readingDetail;
     private LocalDateTime confirmedAt;
     private String status;
+    private String progressStatus;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
@@ -47,6 +48,7 @@ public class ImagingResultDTO {
             String readingDetail,
             LocalDateTime confirmedAt,
             String status,
+            String progressStatus,
             LocalDateTime createdAt
     ) {
         this.imagingResultId = imagingResultId;
@@ -64,6 +66,7 @@ public class ImagingResultDTO {
         this.readingDetail = readingDetail;
         this.confirmedAt = confirmedAt;
         this.status = status;
+        this.progressStatus = progressStatus;
         this.createdAt = createdAt;
     }
 }

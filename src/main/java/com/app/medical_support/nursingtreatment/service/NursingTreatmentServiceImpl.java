@@ -109,6 +109,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         saved.setStatus(normalizeStatus(recordDTO.getStatus()));
         saved.setReceptionId(recordDTO.getReceptionId());
         saved.setNursingId(recordDTO.getNursingId());
+        saved.setNurseName(recordDTO.getNurseName());
         saved.setHeightCm(recordDTO.getHeightCm());
         saved.setWeightKg(recordDTO.getWeightKg());
         saved.setUpdatedAt(LocalDateTime.now());

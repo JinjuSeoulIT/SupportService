@@ -30,6 +30,7 @@ public class SpecimenTestResultDTO {
     private String judgement;
     private LocalDateTime confirmedAt;
     private String status;
+    private String progressStatus;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
@@ -52,6 +53,7 @@ public class SpecimenTestResultDTO {
             String judgement,
             LocalDateTime confirmedAt,
             String status,
+            String progressStatus,
             LocalDateTime createdAt
     ) {
         this.specimenExamResultId = specimenExamResultId;
@@ -72,6 +74,7 @@ public class SpecimenTestResultDTO {
         this.judgement = judgement;
         this.confirmedAt = confirmedAt;
         this.status = status;
+        this.progressStatus = progressStatus;
         this.createdAt = createdAt;
     }
 }

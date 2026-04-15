@@ -28,6 +28,7 @@ public class EndoscopyResultDTO {
     private LocalDateTime confirmedAt;
     private String readerId;
     private String status;
+    private String progressStatus;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
@@ -48,6 +49,7 @@ public class EndoscopyResultDTO {
             LocalDateTime confirmedAt,
             String readerId,
             String status,
+            String progressStatus,
             LocalDateTime createdAt
     ) {
         this.endoscopyResultId = endoscopyResultId;
@@ -66,6 +68,7 @@ public class EndoscopyResultDTO {
         this.confirmedAt = confirmedAt;
         this.readerId = readerId;
         this.status = status;
+        this.progressStatus = progressStatus;
         this.createdAt = createdAt;
     }
 }

@@ -68,6 +68,9 @@ public class RecordEntity {
     @Column(name = "NURSING_ID")
     private String nursingId;
 
+    @Column(name = "NURSE_NAME")
+    private String nurseName;
+
     @Column(name = "HEIGHT_CM")
     private String heightCm;
 

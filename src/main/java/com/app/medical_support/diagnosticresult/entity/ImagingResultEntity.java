@@ -48,6 +48,9 @@ public class ImagingResultEntity {
     @Column(name = "STATUS")
     private String status;
 
+    @Column(name = "PROGRESS_STATUS")
+    private String progressStatus;
+
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;
 }

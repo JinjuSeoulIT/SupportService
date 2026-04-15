@@ -35,6 +35,7 @@ public class PathologyResultDTO {
     private String readerId;
     private String diagnosisName;
     private String status;
+    private String progressStatus;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
@@ -62,6 +63,7 @@ public class PathologyResultDTO {
             String readerId,
             String diagnosisName,
             String status,
+            String progressStatus,
             LocalDateTime createdAt
     ) {
         this.pathologyExamResultId = pathologyExamResultId;
@@ -87,6 +89,7 @@ public class PathologyResultDTO {
         this.readerId = readerId;
         this.diagnosisName = diagnosisName;
         this.status = status;
+        this.progressStatus = progressStatus;
         this.createdAt = createdAt;
     }
 }

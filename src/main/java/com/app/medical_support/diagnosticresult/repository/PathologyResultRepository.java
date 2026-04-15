@@ -37,6 +37,7 @@ public interface PathologyResultRepository extends JpaRepository<PathologyResult
                 r.readerId,
                 r.diagnosisName,
                 r.status,
+                r.progressStatus,
                 r.createdAt
             )
             from PathologyResultEntity r
@@ -70,6 +71,7 @@ public interface PathologyResultRepository extends JpaRepository<PathologyResult
                 r.readerId,
                 r.diagnosisName,
                 r.status,
+                r.progressStatus,
                 r.createdAt
             )
             from PathologyResultEntity r

@@ -21,7 +21,7 @@
             nr.nursing_id,
             nr.initial_assessment,
             nr.past_medical_history,
-            nr.nursing_id AS nurse_name,
+            nr.nurse_name,
             receipt_dept.department_name AS department_name,
             p.name AS patient_name,
             nr.height_cm,
@@ -40,7 +40,8 @@
                     nr.record_id = #{searchValue}
                 </when>
                 <when test="searchType != null and searchType.equals('nurseName') and searchValue != null and searchValue != ''">
-                    nr.nursing_id LIKE '%' || #{searchValue} || '%'
+                    (nr.nurse_name LIKE '%' || #{searchValue} || '%'
+                    OR nr.nursing_id LIKE '%' || #{searchValue} || '%')
                 </when>
                 <when test="searchType != null and searchType.equals('patientName') and searchValue != null and searchValue != ''">
                     p.name LIKE '%' || #{searchValue} || '%'
@@ -79,7 +80,7 @@
             nr.nursing_id,
             nr.initial_assessment,
             nr.past_medical_history,
-            nr.nursing_id AS nurse_name,
+            nr.nurse_name,
             receipt_dept.department_name AS department_name,
             p.name AS patient_name,
             nr.height_cm,
@@ -114,7 +115,7 @@
             TO_CHAR(nr.updated_at, 'YYYY-MM-DD HH24:MI:SS') AS updated_at,
             nr.height_cm,
             nr.weight_kg,
-            nr.nursing_id AS nurse_name,
+            nr.nurse_name,
             receipt_dept.department_name AS department_name,
             rc.patient_id AS patient_id,
             p.name AS patient_name,

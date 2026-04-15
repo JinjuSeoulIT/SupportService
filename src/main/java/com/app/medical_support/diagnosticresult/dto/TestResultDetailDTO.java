@@ -30,6 +30,7 @@ public class TestResultDetailDTO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime confirmedAt;
     private String status;
+    private String progressStatus;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
     private Map<String, Object> detail;

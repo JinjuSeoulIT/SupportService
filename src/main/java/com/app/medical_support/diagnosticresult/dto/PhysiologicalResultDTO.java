@@ -31,6 +31,7 @@ public class PhysiologicalResultDTO {
     private String measuredItemCode;
     private LocalDateTime confirmedAt;
     private String status;
+    private String progressStatus;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
@@ -54,6 +55,7 @@ public class PhysiologicalResultDTO {
             String measuredItemCode,
             LocalDateTime confirmedAt,
             String status,
+            String progressStatus,
             LocalDateTime createdAt
     ) {
         this.physiologicalExamResultId = physiologicalExamResultId;
@@ -75,6 +77,7 @@ public class PhysiologicalResultDTO {
         this.measuredItemCode = measuredItemCode;
         this.confirmedAt = confirmedAt;
         this.status = status;
+        this.progressStatus = progressStatus;
         this.createdAt = createdAt;
     }
 }

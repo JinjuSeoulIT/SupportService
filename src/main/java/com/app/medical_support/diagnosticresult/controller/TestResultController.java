@@ -3,6 +3,7 @@ package com.app.medical_support.diagnosticresult.controller;
 import com.app.medical_support.common.ApiResponse;
 import com.app.medical_support.diagnosticresult.dto.TestResultDetailDTO;
 import com.app.medical_support.diagnosticresult.dto.TestResultListDTO;
+import com.app.medical_support.diagnosticresult.dto.TestResultProgressStatusUpdateReqDTO;
 import com.app.medical_support.diagnosticresult.dto.TestResultSearchCondition;
 import com.app.medical_support.diagnosticresult.dto.TestResultUpdateReqDTO;
 import com.app.medical_support.diagnosticresult.service.DiagnosticResultService;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -113,6 +115,24 @@ public class TestResultController {
                 true,
                 "Integrated test result updated.",
                 diagnosticResultService.modifyTestResult(resultType, resultId, dto)
+        ));
+    }
+
+    @Operation(
+            summary = "통합 검사 결과 진행상태 변경",
+            description = "경로의 resultId로 결과 타입을 자동 판별해 progressStatus를 변경합니다. "
+                    + "허용값은 IN_PROGRESS, COMPLETED이며 COMPLETED 이후 재변경은 불가합니다."
+    )
+    @PatchMapping("/{resultId}/status")
+    public ResponseEntity<ApiResponse<TestResultDetailDTO>> updateProgressStatus(
+            @Parameter(description = "결과 PK")
+            @PathVariable String resultId,
+            @RequestBody TestResultProgressStatusUpdateReqDTO dto
+    ) {
+        return ResponseEntity.ok(new ApiResponse<>(
+                true,
+                "Integrated test result progress status updated.",
+                diagnosticResultService.updateTestResultProgressStatus(resultId, dto)
         ));
     }
 }

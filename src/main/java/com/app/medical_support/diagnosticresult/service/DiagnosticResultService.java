@@ -41,4 +41,6 @@ public interface DiagnosticResultService {
     TestResultDetailDTO findTestResultDetail(String resultType, String resultId);
 
     TestResultDetailDTO modifyTestResult(String resultType, String resultId, TestResultUpdateReqDTO dto);
+
+    TestResultDetailDTO updateTestResultProgressStatus(String resultId, TestResultProgressStatusUpdateReqDTO dto);
 }

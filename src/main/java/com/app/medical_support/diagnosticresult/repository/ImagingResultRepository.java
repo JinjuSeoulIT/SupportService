@@ -29,6 +29,7 @@ public interface ImagingResultRepository extends JpaRepository<ImagingResultEnti
                 r.readingDetail,
                 r.confirmedAt,
                 r.status,
+                r.progressStatus,
                 r.createdAt
             )
             from ImagingResultEntity r
@@ -54,6 +55,7 @@ public interface ImagingResultRepository extends JpaRepository<ImagingResultEnti
                 r.readingDetail,
                 r.confirmedAt,
                 r.status,
+                r.progressStatus,
                 r.createdAt
             )
             from ImagingResultEntity r
