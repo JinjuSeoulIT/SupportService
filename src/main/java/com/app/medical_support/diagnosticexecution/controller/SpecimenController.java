@@ -3,6 +3,7 @@ package com.app.medical_support.diagnosticexecution.controller;
 import com.app.medical_support.common.ApiResponse;
 import com.app.medical_support.diagnosticexecution.dto.SpecimenCreateReqDTO;
 import com.app.medical_support.diagnosticexecution.dto.SpecimenDTO;
+import com.app.medical_support.diagnosticexecution.dto.SpecimenExamSearchCondition;
 import com.app.medical_support.diagnosticexecution.service.DiagnosticExecutionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,32 +22,65 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/specimen")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "Specimen", description = "Specimen exam API")
+@Tag(
+        name = "검체 검사",
+        description = "검체 검사 CRUD. 조회는 (1) 복합 조건 목록 GET /api/specimen (2) 단일 필드 검색 GET /api/specimen/search 두 가지입니다."
+)
 public class SpecimenController {
 
     private final DiagnosticExecutionService specimenService;
 
-    @Operation(summary = "검체 검사 검색", description = "searchType과 searchValue로 검체 검사를 검색합니다.")
+    @Operation(
+            summary = "검체 검사 목록 조회·검색 (복합 조건)",
+            description = "한 번에 여러 조건(환자명·검체종류·상태·진행상태·날짜 범위 등)으로 목록을 필터합니다. "
+                    + "날짜 구간: 채취일시(collectedAt) 우선, 없으면 생성일시(createdAt). "
+                    + "단일 필드 검색은 별도 API GET /api/specimen/search 를 사용합니다."
+    )
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<SpecimenDTO>>> findList(
+            @Parameter(description = "환자명, 부분 일치")
+            @RequestParam(value = "patientName", required = false) String patientName,
+            @Parameter(description = "검체 종류, 부분 일치")
+            @RequestParam(value = "specimenType", required = false) String specimenType,
+            @Parameter(description = "검체 상태 코드, 대소문자 무시 완전 일치")
+            @RequestParam(value = "specimenStatus", required = false) String specimenStatus,
+            @Parameter(description = "진행상태 (WAITING / IN_PROGRESS / COMPLETED 등, 대소문자 무시 완전 일치)")
+            @RequestParam(value = "progressStatus", required = false) String progressStatus,
+            @Parameter(description = "기간 시작일(포함) yyyy-MM-dd. collectedAt 우선, 없으면 createdAt")
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @Parameter(description = "기간 종료일(포함) yyyy-MM-dd. collectedAt 우선, 없으면 createdAt")
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        SpecimenExamSearchCondition condition = new SpecimenExamSearchCondition();
+        condition.setPatientName(patientName);
+        condition.setSpecimenType(specimenType);
+        condition.setSpecimenStatus(specimenStatus);
+        condition.setProgressStatus(progressStatus);
+        condition.setStartDate(startDate);
+        condition.setEndDate(endDate);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Specimen list loaded.", specimenService.findSpecimenList(condition)));
+    }
+
+    @Operation(
+            summary = "검체 검사 단일 필드 검색",
+            description = "searchType 하나와 searchValue 하나만으로 Repository 검색합니다. "
+                    + "복합 조건(날짜 범위·여러 필드 동시)은 위의 GET /api/specimen 목록 API를 사용하세요."
+    )
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<List<SpecimenDTO>>> searchSpecimens(
-            @Parameter(description = "testExecutionId, specimenType, specimenStatus")
+            @Parameter(description = "검색 구분: testExecutionId | specimenType | specimenStatus")
             @RequestParam("searchType") String searchType,
-            @Parameter(description = "Search value")
+            @Parameter(description = "검색어 (searchType에 맞는 값)")
             @RequestParam("searchValue") String searchValue
     ) {
         return ResponseEntity.ok(new ApiResponse<>(true, "Specimen search completed.", specimenService.searchSpecimen(searchType, searchValue)));
-    }
-
-    @Operation(summary = "검체 검사 목록 조회", description = "전체 검체 검사 목록을 조회합니다.")
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<SpecimenDTO>>> findList() {
-        return ResponseEntity.ok(new ApiResponse<>(true, "Specimen list loaded.", specimenService.findSpecimenList()));
     }
 
     @Operation(summary = "검체 검사 단건 조회", description = "검체 검사 1건을 조회합니다.")

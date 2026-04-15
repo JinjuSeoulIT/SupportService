@@ -13,6 +13,8 @@ import java.time.LocalDate;
 public class TestResultSearchCondition {
 
     private String resultType;
+    /** 결과 PK (예: imagingResultId) */
+    private String resultId;
     private String patientName;
     private String detailCode;
     private String departmentName;

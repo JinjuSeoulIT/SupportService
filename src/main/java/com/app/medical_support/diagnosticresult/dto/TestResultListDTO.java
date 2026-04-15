@@ -36,7 +36,8 @@ public class TestResultListDTO {
     private String resultManagerId;
     private String resultManagerName;
     private String summary;
-    private LocalDateTime resultAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime confirmedAt;
     private String status;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;

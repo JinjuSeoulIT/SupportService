@@ -5,14 +5,19 @@ import com.app.medical_support.common.sequence.SequenceIdService;
 import com.app.medical_support.common.sequence.SequenceIdType;
 import com.app.medical_support.diagnosticexecution.dto.EndoscopyCreateReqDTO;
 import com.app.medical_support.diagnosticexecution.dto.EndoscopyDTO;
+import com.app.medical_support.diagnosticexecution.dto.EndoscopyExamSearchCondition;
 import com.app.medical_support.diagnosticexecution.dto.ImagingCreateReqDTO;
 import com.app.medical_support.diagnosticexecution.dto.ImagingDTO;
+import com.app.medical_support.diagnosticexecution.dto.ImagingExamSearchCondition;
 import com.app.medical_support.diagnosticexecution.dto.PathologyCreateReqDTO;
 import com.app.medical_support.diagnosticexecution.dto.PathologyDTO;
+import com.app.medical_support.diagnosticexecution.dto.PathologyExamSearchCondition;
 import com.app.medical_support.diagnosticexecution.dto.PhysiologicalCreateReqDTO;
 import com.app.medical_support.diagnosticexecution.dto.PhysiologicalDTO;
+import com.app.medical_support.diagnosticexecution.dto.PhysiologicalExamSearchCondition;
 import com.app.medical_support.diagnosticexecution.dto.SpecimenCreateReqDTO;
 import com.app.medical_support.diagnosticexecution.dto.SpecimenDTO;
+import com.app.medical_support.diagnosticexecution.dto.SpecimenExamSearchCondition;
 import com.app.medical_support.diagnosticexecution.dto.TestExecutionDTO;
 import com.app.medical_support.diagnosticexecution.dto.TestExecutionReqDTO;
 import com.app.medical_support.diagnosticexecution.dto.TestExecutionUpdateDTO;
@@ -61,7 +66,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Slf4j
@@ -95,8 +102,9 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     private final ImagingResMapstruct imagingResMapstruct;
 
     @Override
-    public List<ImagingDTO> findImagingList() {
-        return imagingResMapstruct.toDTOList(imagingRepository.findAll());
+    public List<ImagingDTO> findImagingList(ImagingExamSearchCondition condition) {
+        List<ImagingDTO> list = imagingResMapstruct.toDTOList(imagingRepository.findAll());
+        return filterImagingList(list, condition);
     }
 
     @Override
@@ -171,8 +179,9 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     }
 
     @Override
-    public List<EndoscopyDTO> findEndoscopyList() {
-        return endoscopyResMapStruct.toDTOList(endoscopyRepository.findAll());
+    public List<EndoscopyDTO> findEndoscopyList(EndoscopyExamSearchCondition condition) {
+        List<EndoscopyDTO> list = endoscopyResMapStruct.toDTOList(endoscopyRepository.findAll());
+        return filterEndoscopyList(list, condition);
     }
 
     @Override
@@ -237,8 +246,9 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     }
 
     @Override
-    public List<PathologyDTO> findPathologyList() {
-        return pathologyResMapStruct.toDTOList(pathologyRepository.findAll());
+    public List<PathologyDTO> findPathologyList(PathologyExamSearchCondition condition) {
+        List<PathologyDTO> list = pathologyResMapStruct.toDTOList(pathologyRepository.findAll());
+        return filterPathologyList(list, condition);
     }
 
     @Override
@@ -303,8 +313,9 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     }
 
     @Override
-    public List<PhysiologicalDTO> findPhysiologicalList() {
-        return physiologicalResMapStruct.toDTOList(physiologicalRepository.findAll());
+    public List<PhysiologicalDTO> findPhysiologicalList(PhysiologicalExamSearchCondition condition) {
+        List<PhysiologicalDTO> list = physiologicalResMapStruct.toDTOList(physiologicalRepository.findAll());
+        return filterPhysiologicalList(list, condition);
     }
 
     @Override
@@ -387,8 +398,9 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     }
 
     @Override
-    public List<SpecimenDTO> findSpecimenList() {
-        return specimenResMapStruct.toDTOList(specimenRepository.findAll());
+    public List<SpecimenDTO> findSpecimenList(SpecimenExamSearchCondition condition) {
+        List<SpecimenDTO> list = specimenResMapStruct.toDTOList(specimenRepository.findAll());
+        return filterSpecimenList(list, condition);
     }
 
     @Override
@@ -750,6 +762,127 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         resultEntity.setCreatedAt(now);
         resultEntity.setConfirmedAt(now);
         specimenTestResultRepository.save(resultEntity);
+    }
+
+    private List<ImagingDTO> filterImagingList(List<ImagingDTO> list, ImagingExamSearchCondition raw) {
+        ImagingExamSearchCondition c = raw != null ? raw : new ImagingExamSearchCondition();
+        return list.stream()
+                .filter(dto -> execMatchesContains(dto.getPatientName(), c.getPatientName()))
+                .filter(dto -> execMatchesContains(dto.getDepartmentName(), c.getDepartmentName()))
+                .filter(dto -> execMatchesEquals(dto.getProgressStatus(), c.getProgressStatus()))
+                .filter(dto -> execDateRange(dto.getCreatedAt(), c.getStartDate(), c.getEndDate()))
+                .filter(dto -> matchesImagingExamName(dto, c.getExamName()))
+                .toList();
+    }
+
+    private boolean matchesImagingExamName(ImagingDTO dto, String examNameKeyword) {
+        if (!hasText(examNameKeyword)) {
+            return true;
+        }
+        String key = examNameKeyword.trim().toLowerCase();
+        String detail = dto.getDetailCode() != null ? dto.getDetailCode().trim().toLowerCase() : "";
+        String type = dto.getImagingType() != null ? dto.getImagingType().trim().toLowerCase() : "";
+        return detail.contains(key) || type.contains(key);
+    }
+
+    private List<SpecimenDTO> filterSpecimenList(List<SpecimenDTO> list, SpecimenExamSearchCondition raw) {
+        SpecimenExamSearchCondition c = raw != null ? raw : new SpecimenExamSearchCondition();
+        return list.stream()
+                .filter(dto -> execMatchesContains(dto.getPatientName(), c.getPatientName()))
+                .filter(dto -> execMatchesContains(dto.getSpecimenType(), c.getSpecimenType()))
+                .filter(dto -> execMatchesEquals(dto.getSpecimenStatus(), c.getSpecimenStatus()))
+                .filter(dto -> execMatchesEquals(dto.getProgressStatus(), c.getProgressStatus()))
+                .filter(dto -> execDateRangeWithFallback(dto.getCollectedAt(), dto.getCreatedAt(), c.getStartDate(), c.getEndDate()))
+                .toList();
+    }
+
+    private List<PathologyDTO> filterPathologyList(List<PathologyDTO> list, PathologyExamSearchCondition raw) {
+        PathologyExamSearchCondition c = raw != null ? raw : new PathologyExamSearchCondition();
+        return list.stream()
+                .filter(dto -> execMatchesContains(dto.getPatientName(), c.getPatientName()))
+                .filter(dto -> execMatchesContains(dto.getDepartmentName(), c.getDepartmentName()))
+                .filter(dto -> execMatchesContains(dto.getTissueStatus(), c.getTissueStatus()))
+                .filter(dto -> execMatchesEquals(dto.getProgressStatus(), c.getProgressStatus()))
+                .filter(dto -> execDateRangeWithFallback(dto.getCollectedAt(), dto.getCreatedAt(), c.getStartDate(), c.getEndDate()))
+                .toList();
+    }
+
+    private List<EndoscopyDTO> filterEndoscopyList(List<EndoscopyDTO> list, EndoscopyExamSearchCondition raw) {
+        EndoscopyExamSearchCondition c = raw != null ? raw : new EndoscopyExamSearchCondition();
+        return list.stream()
+                .filter(dto -> execMatchesContains(dto.getPatientName(), c.getPatientName()))
+                .filter(dto -> execMatchesContains(dto.getDepartmentName(), c.getDepartmentName()))
+                .filter(dto -> matchesSedationFilter(dto.getSedationYn(), c.getSedationYn()))
+                .filter(dto -> execMatchesEquals(dto.getProgressStatus(), c.getProgressStatus()))
+                .filter(dto -> execDateRangeWithFallback(dto.getProcedureAt(), dto.getCreatedAt(), c.getStartDate(), c.getEndDate()))
+                .toList();
+    }
+
+    private boolean matchesSedationFilter(String dtoValue, String conditionValue) {
+        if (!hasText(conditionValue)) {
+            return true;
+        }
+        return normalizeYnFlag(dtoValue).equals(normalizeYnFlag(conditionValue));
+    }
+
+    private List<PhysiologicalDTO> filterPhysiologicalList(List<PhysiologicalDTO> list, PhysiologicalExamSearchCondition raw) {
+        PhysiologicalExamSearchCondition c = raw != null ? raw : new PhysiologicalExamSearchCondition();
+        return list.stream()
+                .filter(dto -> execMatchesEquals(dto.getPhysiologicalExamId(), c.getPhysiologicalExamId()))
+                .filter(dto -> execMatchesContains(dto.getPatientName(), c.getPatientName()))
+                .filter(dto -> execMatchesContains(dto.getDepartmentName(), c.getDepartmentName()))
+                .filter(dto -> execMatchesEquals(dto.getProgressStatus(), c.getProgressStatus()))
+                .filter(dto -> execDateRange(dto.getCreatedAt(), c.getStartDate(), c.getEndDate()))
+                .toList();
+    }
+
+    private boolean execMatchesEquals(String source, String keyword) {
+        if (!hasText(keyword)) {
+            return true;
+        }
+        if (source == null) {
+            return false;
+        }
+        return source.trim().equalsIgnoreCase(keyword.trim());
+    }
+
+    private boolean execMatchesContains(String source, String keyword) {
+        if (!hasText(keyword)) {
+            return true;
+        }
+        if (source == null) {
+            return false;
+        }
+        return source.trim().toLowerCase().contains(keyword.trim().toLowerCase());
+    }
+
+    private boolean execDateRange(LocalDateTime at, LocalDate startDate, LocalDate endDate) {
+        if (startDate == null && endDate == null) {
+            return true;
+        }
+        if (at == null) {
+            return false;
+        }
+        LocalDateTime start = startDate != null ? startDate.atStartOfDay() : null;
+        LocalDateTime end = endDate != null ? endDate.atTime(LocalTime.MAX) : null;
+        if (start != null && at.isBefore(start)) {
+            return false;
+        }
+        if (end != null && at.isAfter(end)) {
+            return false;
+        }
+        return true;
+    }
+
+    /** 날짜 구간 필터: primary(예: 채취일시·시술일시)가 있으면 그걸 쓰고, 없으면 fallback(보통 createdAt)으로 비교 */
+    private boolean execDateRangeWithFallback(
+            LocalDateTime primary,
+            LocalDateTime fallback,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        LocalDateTime at = primary != null ? primary : fallback;
+        return execDateRange(at, startDate, endDate);
     }
 
     private boolean hasText(String value) {

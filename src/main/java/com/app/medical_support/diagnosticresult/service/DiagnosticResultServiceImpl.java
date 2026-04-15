@@ -406,13 +406,14 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         return mergedResults.stream()
                 .filter(result -> matchesIncludeInactive(result, searchCondition))
                 .filter(result -> matchesEquals(result.getResultType(), searchCondition.getResultType()))
+                .filter(result -> matchesEquals(result.getResultId(), searchCondition.getResultId()))
                 .filter(result -> matchesContains(result.getPatientName(), searchCondition.getPatientName()))
                 .filter(result -> matchesContains(result.getDetailCode(), searchCondition.getDetailCode()))
                 .filter(result -> matchesContains(result.getDepartmentName(), searchCondition.getDepartmentName()))
                 .filter(result -> matchesEquals(result.getStatus(), searchCondition.getStatus()))
-                .filter(result -> matchesDateRange(result.getResultAt(), searchCondition))
+                .filter(result -> matchesDateRange(result.getConfirmedAt(), searchCondition))
                 .sorted(Comparator
-                        .comparing(TestResultListDTO::getResultAt, Comparator.nullsLast(Comparator.reverseOrder()))
+                        .comparing(TestResultListDTO::getConfirmedAt, Comparator.nullsLast(Comparator.reverseOrder()))
                         .thenComparing(TestResultListDTO::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder()))
                         .thenComparing(TestResultListDTO::getResultId, Comparator.nullsLast(Comparator.reverseOrder())))
                 .toList();
@@ -476,7 +477,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
             result.setResultManagerId(dto.getResultManagerId());
             result.setResultManagerName(dto.getResultManagerName());
             result.setSummary(dto.getResultSummary());
-            result.setResultAt(dto.getConfirmedAt());
+            result.setConfirmedAt(dto.getConfirmedAt());
             result.setStatus(dto.getStatus());
             result.setCreatedAt(dto.getCreatedAt());
             return result;
@@ -496,7 +497,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
             result.setResultManagerId(dto.getResultManagerId());
             result.setResultManagerName(dto.getResultManagerName());
             result.setSummary(dto.getResultSummary());
-            result.setResultAt(dto.getConfirmedAt());
+            result.setConfirmedAt(dto.getConfirmedAt());
             result.setStatus(dto.getStatus());
             result.setCreatedAt(dto.getCreatedAt());
             return result;
@@ -522,7 +523,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
             result.setResultManagerId(dto.getResultManagerId());
             result.setResultManagerName(dto.getResultManagerName());
             result.setSummary(dto.getResultSummary());
-            result.setResultAt(dto.getConfirmedAt());
+            result.setConfirmedAt(dto.getConfirmedAt());
             result.setStatus(dto.getStatus());
             result.setCreatedAt(dto.getCreatedAt());
             return result;
@@ -542,7 +543,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
             result.setResultManagerId(dto.getResultManagerId());
             result.setResultManagerName(dto.getResultManagerName());
             result.setSummary(dto.getResultSummary());
-            result.setResultAt(dto.getConfirmedAt());
+            result.setConfirmedAt(dto.getConfirmedAt());
             result.setStatus(dto.getStatus());
             result.setCreatedAt(dto.getCreatedAt());
             return result;
@@ -565,7 +566,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
             result.setResultManagerId(dto.getResultManagerId());
             result.setResultManagerName(dto.getResultManagerName());
             result.setSummary(dto.getResultSummary());
-            result.setResultAt(dto.getConfirmedAt());
+            result.setConfirmedAt(dto.getConfirmedAt());
             result.setStatus(dto.getStatus());
             result.setCreatedAt(dto.getCreatedAt());
             return result;
@@ -584,7 +585,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         result.setResultManagerId(dto.getResultManagerId());
         result.setResultManagerName(dto.getResultManagerName());
         result.setSummary(dto.getResultSummary());
-        result.setResultAt(dto.getConfirmedAt());
+        result.setConfirmedAt(dto.getConfirmedAt());
         result.setStatus(dto.getStatus());
         result.setCreatedAt(dto.getCreatedAt());
 
@@ -606,7 +607,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         result.setResultManagerId(dto.getResultManagerId());
         result.setResultManagerName(dto.getResultManagerName());
         result.setSummary(dto.getResultSummary());
-        result.setResultAt(dto.getConfirmedAt());
+        result.setConfirmedAt(dto.getConfirmedAt());
         result.setStatus(dto.getStatus());
         result.setCreatedAt(dto.getCreatedAt());
 
@@ -631,7 +632,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         result.setResultManagerId(dto.getResultManagerId());
         result.setResultManagerName(dto.getResultManagerName());
         result.setSummary(dto.getResultSummary());
-        result.setResultAt(dto.getConfirmedAt());
+        result.setConfirmedAt(dto.getConfirmedAt());
         result.setStatus(dto.getStatus());
         result.setCreatedAt(dto.getCreatedAt());
 
@@ -661,7 +662,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         result.setResultManagerId(dto.getResultManagerId());
         result.setResultManagerName(dto.getResultManagerName());
         result.setSummary(dto.getResultSummary());
-        result.setResultAt(dto.getConfirmedAt());
+        result.setConfirmedAt(dto.getConfirmedAt());
         result.setStatus(dto.getStatus());
         result.setCreatedAt(dto.getCreatedAt());
 
@@ -684,7 +685,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         result.setResultManagerId(dto.getResultManagerId());
         result.setResultManagerName(dto.getResultManagerName());
         result.setSummary(dto.getResultSummary());
-        result.setResultAt(dto.getConfirmedAt());
+        result.setConfirmedAt(dto.getConfirmedAt());
         result.setStatus(dto.getStatus());
         result.setCreatedAt(dto.getCreatedAt());
 
@@ -853,21 +854,21 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         return trimToEmpty(source).toLowerCase().contains(keyword.trim().toLowerCase());
     }
 
-    private boolean matchesDateRange(LocalDateTime resultAt, TestResultSearchCondition condition) {
+    private boolean matchesDateRange(LocalDateTime confirmedAt, TestResultSearchCondition condition) {
         if (condition.getStartDate() == null && condition.getEndDate() == null) {
             return true;
         }
-        if (resultAt == null) {
+        if (confirmedAt == null) {
             return false;
         }
 
         LocalDateTime startDateTime = condition.getStartDate() != null ? condition.getStartDate().atStartOfDay() : null;
         LocalDateTime endDateTime = condition.getEndDate() != null ? condition.getEndDate().atTime(LocalTime.MAX) : null;
 
-        if (startDateTime != null && resultAt.isBefore(startDateTime)) {
+        if (startDateTime != null && confirmedAt.isBefore(startDateTime)) {
             return false;
         }
-        if (endDateTime != null && resultAt.isAfter(endDateTime)) {
+        if (endDateTime != null && confirmedAt.isAfter(endDateTime)) {
             return false;
         }
         return true;
