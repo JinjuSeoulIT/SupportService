@@ -24,6 +24,25 @@ public class ReceptionIntegrationController {
 
     private final ReceptionIntegrationService receptionIntegrationService;
 
+    @Operation(summary = "접수 목록(조건) 조회")
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<OutpatientReceptionDTO>>> findList(
+            @Parameter(description = "진료일(yyyy-MM-dd)", required = true, example = "2026-04-15")
+            @RequestParam String visitDate,
+            @Parameter(description = "진료유형", example = "OUTPATIENT")
+            @RequestParam(required = false, defaultValue = "OUTPATIENT") String visitType,
+            @Parameter(description = "상태 목록(CSV)", example = "WAITING,CALLED,IN_PROGRESS")
+            @RequestParam(required = false, defaultValue = "WAITING,CALLED,IN_PROGRESS") String statuses
+    ) {
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Reception list loaded.",
+                        receptionIntegrationService.findListByConditions(visitDate, visitType, statuses)
+                )
+        );
+    }
+
     @Operation(summary = "접수 상세 조회")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<OutpatientReceptionDTO>> findDetail(

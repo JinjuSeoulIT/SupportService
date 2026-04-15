@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -68,6 +69,39 @@ public class ReceptionApiClient {
         }
     }
 
+    public List<OutpatientReceptionDTO> fetchListByConditions(
+            String visitDate,
+            String visitType,
+            String statuses
+    ) {
+        String uri = UriComponentsBuilder.fromHttpUrl(baseUrl)
+                .path("/api/receptions")
+                .queryParam("visitDate", visitDate)
+                .queryParam("visitType", visitType)
+                .queryParam("statuses", statuses)
+                .toUriString();
+
+        try {
+            ResponseEntity<ApiResponse<List<OutpatientReceptionDTO>>> responseEntity = restTemplate.exchange(
+                    uri,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<ApiResponse<List<OutpatientReceptionDTO>>>() {
+                    }
+            );
+
+            return unwrapListResult(responseEntity.getBody(), "Reception list fetch failed.");
+        } catch (HttpClientErrorException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Reception list request failed.", ex);
+        } catch (HttpServerErrorException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Reception service failed.", ex);
+        } catch (ResourceAccessException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Reception service is unreachable.", ex);
+        } catch (RestClientException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Reception service call failed.", ex);
+        }
+    }
+
     private <T> T unwrapResult(ApiResponse<T> response, String defaultMessage) {
         if (response == null) {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Reception service response is empty.");
@@ -83,6 +117,20 @@ public class ReceptionApiClient {
         }
 
         return result;
+    }
+
+    private List<OutpatientReceptionDTO> unwrapListResult(
+            ApiResponse<List<OutpatientReceptionDTO>> response,
+            String defaultMessage
+    ) {
+        if (response == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Reception service response is empty.");
+        }
+        if (!response.isSuccess()) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, firstNonBlank(response.getMessage(), defaultMessage));
+        }
+        List<OutpatientReceptionDTO> result = response.getResult();
+        return result == null ? Collections.emptyList() : result;
     }
 
     private String normalizeBaseUrl(String value) {
