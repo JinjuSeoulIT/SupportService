@@ -31,4 +31,7 @@ public class TestExecutionReqDTO {
 
     @Schema(description = "Execution type")
     private String executionType;
+
+    @Schema(description = "Retry number")
+    private Integer retryNo;
 }

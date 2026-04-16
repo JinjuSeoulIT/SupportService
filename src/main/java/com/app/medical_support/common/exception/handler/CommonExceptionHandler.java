@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -35,6 +36,15 @@ public class CommonExceptionHandler {
 
         log.warn("HttpMessageNotReadableException: {}", message);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ApiResponse<>(false, message, null));
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ApiResponse<Void>> handleResponseStatusException(ResponseStatusException ex) {
+        HttpStatus status = ex.getStatus();
+        String message = ex.getReason() != null ? ex.getReason() : status.getReasonPhrase();
+        log.warn("ResponseStatusException: status={}, message={}", status.value(), message);
+        return ResponseEntity.status(status)
                 .body(new ApiResponse<>(false, message, null));
     }
 }

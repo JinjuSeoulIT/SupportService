@@ -38,6 +38,31 @@ public class ReceptionIntegrationService {
         return receptionApiClient.fetchDetail(id);
     }
 
+    /**
+     * 간호기록 등에서 사용하는 외래 접수 대기열.
+     * {@code date}가 비어 있으면 서버 기준 오늘 날짜를 사용한다.
+     */
+    public List<OutpatientReceptionDTO> findQueue(String date, Long departmentId, Long doctorId) {
+        LocalDate targetDate = resolveQueueDate(date);
+        return receptionApiClient.fetchQueue(targetDate.toString(), departmentId, doctorId);
+    }
+
+    private LocalDate resolveQueueDate(String date) {
+        String value = trimToNull(date);
+        if (value == null) {
+            return LocalDate.now();
+        }
+        try {
+            return LocalDate.parse(value);
+        } catch (DateTimeParseException ex) {
+            throw new ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST,
+                    "date format is invalid. format=yyyy-MM-dd",
+                    ex
+            );
+        }
+    }
+
     private LocalDate parseVisitDate(String visitDate) {
         String value = trimToNull(visitDate);
         if (value == null) {

@@ -43,6 +43,25 @@ public class ReceptionIntegrationController {
         );
     }
 
+    @Operation(summary = "외래 접수 대기열 조회 (접수 MSA queue 프록시, date 생략 시 오늘)")
+    @GetMapping("/queue")
+    public ResponseEntity<ApiResponse<List<OutpatientReceptionDTO>>> findQueue(
+            @Parameter(description = "조회일 (yyyy-MM-dd), 생략 시 서버 오늘")
+            @RequestParam(required = false) String date,
+            @Parameter(description = "진료과 ID")
+            @RequestParam(required = false) Long departmentId,
+            @Parameter(description = "의사 ID")
+            @RequestParam(required = false) Long doctorId
+    ) {
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Reception queue loaded.",
+                        receptionIntegrationService.findQueue(date, departmentId, doctorId)
+                )
+        );
+    }
+
     @Operation(summary = "접수 상세 조회")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<OutpatientReceptionDTO>> findDetail(

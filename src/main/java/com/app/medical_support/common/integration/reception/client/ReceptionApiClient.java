@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
@@ -59,13 +60,35 @@ public class ReceptionApiClient {
         } catch (HttpClientErrorException.NotFound ex) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Reception not found. id=" + id, ex);
         } catch (HttpClientErrorException ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Reception detail request failed.", ex);
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Reception detail request failed. upstream="
+                            + firstNonBlank(trimToNull(ex.getResponseBodyAsString()), ex.getMessage()),
+                    ex
+            );
         } catch (HttpServerErrorException ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Reception service failed.", ex);
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_GATEWAY,
+                    "Reception service failed. upstream="
+                            + firstNonBlank(trimToNull(ex.getResponseBodyAsString()), ex.getMessage()),
+                    ex
+            );
         } catch (ResourceAccessException ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Reception service is unreachable.", ex);
+            OutpatientReceptionDTO fallback = findDetailFromQueueFallback(id);
+            if (fallback != null) {
+                return fallback;
+            }
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_GATEWAY,
+                    "Reception detail request timed out or service is unreachable.",
+                    ex
+            );
         } catch (RestClientException ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Reception service call failed.", ex);
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_GATEWAY,
+                    "Reception service call failed. reason=" + firstNonBlank(trimToNull(ex.getMessage()), "unknown"),
+                    ex
+            );
         }
     }
 
@@ -93,6 +116,43 @@ public class ReceptionApiClient {
             return unwrapListResult(responseEntity.getBody(), "Reception list fetch failed.");
         } catch (HttpClientErrorException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Reception list request failed.", ex);
+        } catch (HttpServerErrorException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Reception service failed.", ex);
+        } catch (ResourceAccessException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Reception service is unreachable.", ex);
+        } catch (RestClientException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Reception service call failed.", ex);
+        }
+    }
+
+    /**
+     * 접수 MSA 외래 대기열 API 프록시.
+     * {@code GET /api/receptions/queue?date=...&departmentId=...&doctorId=...}
+     */
+    public List<OutpatientReceptionDTO> fetchQueue(String date, Long departmentId, Long doctorId) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl)
+                .path("/api/receptions/queue")
+                .queryParam("date", date);
+        if (departmentId != null) {
+            builder.queryParam("departmentId", departmentId);
+        }
+        if (doctorId != null) {
+            builder.queryParam("doctorId", doctorId);
+        }
+        String uri = builder.toUriString();
+
+        try {
+            ResponseEntity<ApiResponse<List<OutpatientReceptionDTO>>> responseEntity = restTemplate.exchange(
+                    uri,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<ApiResponse<List<OutpatientReceptionDTO>>>() {
+                    }
+            );
+
+            return unwrapListResult(responseEntity.getBody(), "Reception queue fetch failed.");
+        } catch (HttpClientErrorException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Reception queue request failed.", ex);
         } catch (HttpServerErrorException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Reception service failed.", ex);
         } catch (ResourceAccessException ex) {
@@ -160,5 +220,20 @@ public class ReceptionApiClient {
 
         String trimmed = value.trim();
         return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private OutpatientReceptionDTO findDetailFromQueueFallback(Long id) {
+        if (id == null) {
+            return null;
+        }
+        try {
+            List<OutpatientReceptionDTO> queue = fetchQueue(LocalDate.now().toString(), null, null);
+            return queue.stream()
+                    .filter(item -> id.equals(item.getReceptionId()))
+                    .findFirst()
+                    .orElse(null);
+        } catch (Exception ignored) {
+            return null;
+        }
     }
 }

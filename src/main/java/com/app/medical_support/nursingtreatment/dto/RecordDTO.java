@@ -77,6 +77,7 @@ public class RecordDTO {
     private String nurseName;
 
     @Schema(description = "Height (cm)")
+
     private String heightCm;
 
     @Schema(description = "Weight (kg)")
