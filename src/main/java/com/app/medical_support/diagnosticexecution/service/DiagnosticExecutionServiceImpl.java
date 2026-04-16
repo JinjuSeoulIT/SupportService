@@ -514,6 +514,10 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     public TestExecutionDTO registerTestExecution(TestExecutionReqDTO testExecutionDTO) {
         TestExecutionEntity entity = testExecutionReqMapStruct.toEntity(testExecutionDTO);
         entity.setDetailCode(testExecutionDTO.getDetailCode());
+        entity.setStartedAt(testExecutionDTO.getStartedAt());
+        entity.setCompletedAt(testExecutionDTO.getCompletedAt());
+        entity.setPerformerId(normalizeOptionalValue(testExecutionDTO.getPerformerId()));
+        entity.setPerformerName(normalizeOptionalValue(testExecutionDTO.getPerformerName()));
         entity.setTestExecutionId(sequenceIdService.nextId(SequenceIdType.TEST_EXECUTION_ID));
         entity.setStatus(normalizeStatus(null));
         entity.setCreatedAt(LocalDateTime.now());
