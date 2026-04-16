@@ -7,12 +7,16 @@ import com.app.medical_support.diagnosticexecution.service.DiagnosticExecutionSe
 import com.app.medical_support.nursingtreatment.dto.MedicationRecordReqDTO;
 import com.app.medical_support.nursingtreatment.dto.TreatmentResultCreateDTO;
 import com.app.medical_support.nursingtreatment.service.NursingTreatmentService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.function.Consumer;
 
 @Configuration
@@ -21,28 +25,29 @@ public class MessageProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(MessageProcessor.class);
 
     @Bean
-    public Consumer<Message<Event<String, MedicationRecordReqDTO>>> messageProcessorMedicationRecord(
-            NursingTreatmentService nursingTreatmentService
+    public Consumer<Message<byte[]>> messageProcessorMedicationRecord(
+            NursingTreatmentService nursingTreatmentService,
+            ObjectMapper objectMapper
     ) {
         return message -> {
-            Event<String, MedicationRecordReqDTO> event = message.getPayload();
-            LOG.info("Process message created at {}...", event.getEventCreatedAt());
+            EventEnvelope event = parseEnvelope(objectMapper, message);
+            LOG.info("Process message created at {}...", event.eventCreatedAt);
 
-            switch (event.getEventType()) {
+            switch (event.eventType) {
                 case CREATE:
-                    MedicationRecordReqDTO dto = event.getData();
-                    String medicationId = dto != null ? dto.getMedicationId() : event.getKey();
+                    MedicationRecordReqDTO dto = objectMapper.convertValue(event.data, MedicationRecordReqDTO.class);
+                    String medicationId = dto != null ? dto.getMedicationId() : event.keyText;
                     LOG.info("Create medicationRecord with ID: {}", medicationId);
                     nursingTreatmentService.registerMedicationRecord(dto);
                     break;
                 case DELETE:
-                    String medicationIdForDelete = event.getKey();
+                    String medicationIdForDelete = event.keyText;
                     LOG.info("Delete medicationRecord with ID: {}", medicationIdForDelete);
                     nursingTreatmentService.updateMedicationRecordStatus(medicationIdForDelete, "INACTIVE");
                     break;
                 default:
                     String errorMessage =
-                            "Incorrect event type: " + event.getEventType() + ", expected a CREATE or DELETE event";
+                            "Incorrect event type: " + event.eventType + ", expected a CREATE or DELETE event";
                     LOG.warn(errorMessage);
                     throw new EventProcessingException(errorMessage);
             }
@@ -52,28 +57,29 @@ public class MessageProcessor {
     }
 
     @Bean
-    public Consumer<Message<Event<String, TreatmentResultCreateDTO>>> messageProcessorTreatmentResult(
-            NursingTreatmentService nursingTreatmentService
+    public Consumer<Message<byte[]>> messageProcessorTreatmentResult(
+            NursingTreatmentService nursingTreatmentService,
+            ObjectMapper objectMapper
     ) {
         return message -> {
-            Event<String, TreatmentResultCreateDTO> event = message.getPayload();
-            LOG.info("Process message created at {}...", event.getEventCreatedAt());
+            EventEnvelope event = parseEnvelope(objectMapper, message);
+            LOG.info("Process message created at {}...", event.eventCreatedAt);
 
-            switch (event.getEventType()) {
+            switch (event.eventType) {
                 case CREATE:
-                    TreatmentResultCreateDTO dto = event.getData();
-                    String procedureResultId = dto != null ? dto.getProcedureResultId() : event.getKey();
+                    TreatmentResultCreateDTO dto = objectMapper.convertValue(event.data, TreatmentResultCreateDTO.class);
+                    String procedureResultId = dto != null ? dto.getProcedureResultId() : event.keyText;
                     LOG.info("Create treatmentResult with ID: {}", procedureResultId);
                     nursingTreatmentService.registerTreatmentResult(dto);
                     break;
                 case DELETE:
-                    String procedureResultIdForDelete = event.getKey();
+                    String procedureResultIdForDelete = event.keyText;
                     LOG.info("Delete treatmentResult with ID: {}", procedureResultIdForDelete);
                     nursingTreatmentService.updateTreatmentResultStatus(procedureResultIdForDelete, "INACTIVE");
                     break;
                 default:
                     String errorMessage =
-                            "Incorrect event type: " + event.getEventType() + ", expected a CREATE or DELETE event";
+                            "Incorrect event type: " + event.eventType + ", expected a CREATE or DELETE event";
                     LOG.warn(errorMessage);
                     throw new EventProcessingException(errorMessage);
             }
@@ -83,17 +89,18 @@ public class MessageProcessor {
     }
 
     @Bean
-    public Consumer<Message<Event<Long, TestExecutionReqDTO>>> messageProcessorTestExecution(
-            DiagnosticExecutionService diagnosticExecutionService
+    public Consumer<Message<byte[]>> messageProcessorTestExecution(
+            DiagnosticExecutionService diagnosticExecutionService,
+            ObjectMapper objectMapper
     ) {
         return message -> {
-            Event<Long, TestExecutionReqDTO> event = message.getPayload();
-            LOG.info("Process message created at {}...", event.getEventCreatedAt());
+            EventEnvelope event = parseEnvelope(objectMapper, message);
+            LOG.info("Process message created at {}...", event.eventCreatedAt);
 
-            switch (event.getEventType()) {
+            switch (event.eventType) {
                 case CREATE:
-                    TestExecutionReqDTO dto = event.getData();
-                    Long orderItemId = event.getKey();
+                    TestExecutionReqDTO dto = objectMapper.convertValue(event.data, TestExecutionReqDTO.class);
+                    Long orderItemId = event.keyLong;
                     LOG.info("Create testExecution with OrderItemID: {}", orderItemId);
                     if (dto != null && dto.getOrderItemId() == null && orderItemId != null) {
                         dto.setOrderItemId(orderItemId);
@@ -101,19 +108,87 @@ public class MessageProcessor {
                     diagnosticExecutionService.registerTestExecution(dto);
                     break;
                 case DELETE:
-                    Long orderItemIdForDelete = event.getKey();
+                    Long orderItemIdForDelete = event.keyLong;
                     LOG.info("Delete testExecution with OrderItemID: {}", orderItemIdForDelete);
                     // NOTE: 현재 DiagnosticExecutionService에는 testExecution delete가 없어 무시합니다.
                     break;
                 default:
                     String errorMessage =
-                            "Incorrect event type: " + event.getEventType() + ", expected a CREATE or DELETE event";
+                            "Incorrect event type: " + event.eventType + ", expected a CREATE or DELETE event";
                     LOG.warn(errorMessage);
                     throw new EventProcessingException(errorMessage);
             }
 
             LOG.info("Message processing done!");
         };
+    }
+
+    private static EventEnvelope parseEnvelope(ObjectMapper objectMapper, Message<byte[]> message) {
+        try {
+            byte[] payload = message.getPayload();
+            if (payload == null) {
+                throw new IllegalArgumentException("Kafka message payload is null");
+            }
+            String json = new String(payload, StandardCharsets.UTF_8);
+            JsonNode root = objectMapper.readTree(json);
+
+            String eventTypeRaw = text(root.get("eventType"));
+            Event.Type eventType = eventTypeRaw != null ? Event.Type.valueOf(eventTypeRaw) : null;
+
+            JsonNode keyNode = root.get("key");
+            String keyText = keyNode != null && !keyNode.isNull() ? keyNode.asText() : null;
+            Long keyLong = null;
+            if (keyNode != null && keyNode.isNumber()) {
+                keyLong = keyNode.asLong();
+            } else if (keyText != null) {
+                try {
+                    keyLong = Long.parseLong(keyText);
+                } catch (NumberFormatException ignored) {
+                    keyLong = null;
+                }
+            }
+
+            JsonNode data = root.get("data");
+            LocalDateTime eventCreatedAt = null;
+            String createdAtRaw = text(root.get("eventCreatedAt"));
+            if (createdAtRaw != null) {
+                eventCreatedAt = LocalDateTime.parse(createdAtRaw);
+            }
+
+            return new EventEnvelope(eventType, keyText, keyLong, data, eventCreatedAt);
+        } catch (Exception e) {
+            String errorMessage = "Failed to parse inbound kafka event payload. reason=" + e.getMessage();
+            LOG.warn(errorMessage, e);
+            throw new EventProcessingException(errorMessage);
+        }
+    }
+
+    private static String text(JsonNode node) {
+        if (node == null || node.isNull()) {
+            return null;
+        }
+        String v = node.asText();
+        if (v == null) {
+            return null;
+        }
+        String t = v.trim();
+        return t.isEmpty() ? null : t;
+    }
+
+    private static final class EventEnvelope {
+        final Event.Type eventType;
+        final String keyText;
+        final Long keyLong;
+        final JsonNode data;
+        final LocalDateTime eventCreatedAt;
+
+        private EventEnvelope(Event.Type eventType, String keyText, Long keyLong, JsonNode data, LocalDateTime eventCreatedAt) {
+            this.eventType = eventType;
+            this.keyText = keyText;
+            this.keyLong = keyLong;
+            this.data = data;
+            this.eventCreatedAt = eventCreatedAt;
+        }
     }
 }
 
