@@ -1,5 +1,6 @@
 package com.app.medical_support.nursingtreatment.service;
 
+import com.app.medical_support.integration.outbound.kafka.DownstreamOutcomeEventPublisher;
 import com.app.medical_support.common.integration.reception.dto.OutpatientReceptionDTO;
 import com.app.medical_support.common.integration.reception.service.ReceptionIntegrationService;
 import com.app.medical_support.common.sequence.SequenceIdService;
@@ -45,6 +46,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     private final TreatmentResultRepository treatmentResultRepository;
     private final ReceptionIntegrationService receptionIntegrationService;
     private final SequenceIdService sequenceIdService;
+    private final DownstreamOutcomeEventPublisher downstreamOutcomeEventPublisher;
 
     @Override
     public List<RecordResponseDTO> search(String searchType, String searchValue, String startDate, String endDate) {
@@ -160,7 +162,9 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         entity.setPatientId(medicationRecordDTO.getPatientId());
         entity.setPatientName(medicationRecordDTO.getPatientName());
         entity.setDepartmentName(medicationRecordDTO.getDepartmentName());
-        return toMedicationRecordDTO(medicationRecordRepository.save(entity));
+        MedicationRecordDTO saved = toMedicationRecordDTO(medicationRecordRepository.save(entity));
+        downstreamOutcomeEventPublisher.publishMedicationRecordOutcome(saved);
+        return saved;
     }
 
     @Override
@@ -199,7 +203,9 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         if (medicationRecordDTO.getDepartmentName() != null) {
             entity.setDepartmentName(medicationRecordDTO.getDepartmentName());
         }
-        return toMedicationRecordDTO(medicationRecordRepository.save(entity));
+        MedicationRecordDTO saved = toMedicationRecordDTO(medicationRecordRepository.save(entity));
+        downstreamOutcomeEventPublisher.publishMedicationRecordOutcome(saved);
+        return saved;
     }
 
     @Override
@@ -208,7 +214,9 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         MedicationRecordEntity entity = medicationRecordRepository.findById(id)
                 .orElseThrow(() -> new MedicationRecordNotFoundException(id));
         entity.setStatus(normalizeStatus(status));
-        return toMedicationRecordDTO(medicationRecordRepository.save(entity));
+        MedicationRecordDTO saved = toMedicationRecordDTO(medicationRecordRepository.save(entity));
+        downstreamOutcomeEventPublisher.publishMedicationRecordOutcome(saved);
+        return saved;
     }
 
     @Override
@@ -239,7 +247,9 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         entity.setPatientId(treatmentResultDTO.getPatientId());
         entity.setPatientName(treatmentResultDTO.getPatientName());
         entity.setDepartmentName(treatmentResultDTO.getDepartmentName());
-        return toTreatmentResultDTO(treatmentResultRepository.save(entity));
+        TreatmentResultDTO saved = toTreatmentResultDTO(treatmentResultRepository.save(entity));
+        downstreamOutcomeEventPublisher.publishTreatmentResultOutcome(saved);
+        return saved;
     }
 
     @Override
@@ -275,7 +285,9 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         if (treatmentResultDTO.getDepartmentName() != null) {
             entity.setDepartmentName(treatmentResultDTO.getDepartmentName());
         }
-        return toTreatmentResultDTO(treatmentResultRepository.save(entity));
+        TreatmentResultDTO saved = toTreatmentResultDTO(treatmentResultRepository.save(entity));
+        downstreamOutcomeEventPublisher.publishTreatmentResultOutcome(saved);
+        return saved;
     }
 
     @Override
@@ -284,7 +296,9 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         TreatmentResultEntity entity = treatmentResultRepository.findById(id)
                 .orElseThrow(() -> new TreatmentResultNotFoundException(id));
         entity.setStatus(normalizeStatus(status));
-        return toTreatmentResultDTO(treatmentResultRepository.save(entity));
+        TreatmentResultDTO saved = toTreatmentResultDTO(treatmentResultRepository.save(entity));
+        downstreamOutcomeEventPublisher.publishTreatmentResultOutcome(saved);
+        return saved;
     }
 
     private MedicationRecordDTO toMedicationRecordDTO(MedicationRecordEntity entity) {

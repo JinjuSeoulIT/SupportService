@@ -1,6 +1,7 @@
 package com.app.medical_support.diagnosticexecution.service;
 
 import com.app.medical_support.common.exception.InvalidRequestException;
+import com.app.medical_support.integration.outbound.kafka.DownstreamOutcomeEventPublisher;
 import com.app.medical_support.common.sequence.SequenceIdService;
 import com.app.medical_support.common.sequence.SequenceIdType;
 import com.app.medical_support.diagnosticexecution.dto.EndoscopyCreateReqDTO;
@@ -18,6 +19,7 @@ import com.app.medical_support.diagnosticexecution.dto.PhysiologicalExamSearchCo
 import com.app.medical_support.diagnosticexecution.dto.SpecimenCreateReqDTO;
 import com.app.medical_support.diagnosticexecution.dto.SpecimenDTO;
 import com.app.medical_support.diagnosticexecution.dto.SpecimenExamSearchCondition;
+import com.app.medical_support.diagnosticexecution.dto.DiagnosticExamOutcomeDTO;
 import com.app.medical_support.diagnosticexecution.dto.TestExecutionDTO;
 import com.app.medical_support.diagnosticexecution.dto.TestExecutionReqDTO;
 import com.app.medical_support.diagnosticexecution.dto.TestExecutionUpdateDTO;
@@ -100,6 +102,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     private final SequenceIdService sequenceIdService;
     private final ImagingReqMapstruct imagingReqMapstruct;
     private final ImagingResMapstruct imagingResMapstruct;
+    private final DownstreamOutcomeEventPublisher downstreamOutcomeEventPublisher;
 
     @Override
     public List<ImagingDTO> findImagingList(ImagingExamSearchCondition condition) {
@@ -165,7 +168,19 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
             ensureImagingResultExists(savedEntity);
         }
 
-        return imagingResMapstruct.toDTO(savedEntity);
+        ImagingDTO dto = imagingResMapstruct.toDTO(savedEntity);
+        if (!isCompleted(previousProgressStatus) && isCompleted(savedEntity.getProgressStatus())) {
+            downstreamOutcomeEventPublisher.publishDiagnosticExamOutcome(
+                    toDiagnosticExamOutcome(
+                            "IMAGING",
+                            savedEntity.getImagingExamId(),
+                            savedEntity.getTestExecutionId(),
+                            resolveOrderItemId(savedEntity.getTestExecutionId()),
+                            savedEntity.getProgressStatus(),
+                            savedEntity.getPatientId(),
+                            savedEntity.getDetailCode()));
+        }
+        return dto;
     }
 
     @Override
@@ -232,7 +247,19 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
             ensureEndoscopyResultExists(savedEntity);
         }
 
-        return endoscopyResMapStruct.toDTO(savedEntity);
+        EndoscopyDTO dto = endoscopyResMapStruct.toDTO(savedEntity);
+        if (!isCompleted(previousProgressStatus) && isCompleted(savedEntity.getProgressStatus())) {
+            downstreamOutcomeEventPublisher.publishDiagnosticExamOutcome(
+                    toDiagnosticExamOutcome(
+                            "ENDOSCOPY",
+                            savedEntity.getEndoscopyExamId(),
+                            savedEntity.getTestExecutionId(),
+                            resolveOrderItemId(savedEntity.getTestExecutionId()),
+                            savedEntity.getProgressStatus(),
+                            savedEntity.getPatientId(),
+                            savedEntity.getDetailCode()));
+        }
+        return dto;
     }
 
     @Override
@@ -299,7 +326,19 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
             ensurePathologyResultExists(savedEntity);
         }
 
-        return pathologyResMapStruct.toDTO(savedEntity);
+        PathologyDTO dto = pathologyResMapStruct.toDTO(savedEntity);
+        if (!isCompleted(previousProgressStatus) && isCompleted(savedEntity.getProgressStatus())) {
+            downstreamOutcomeEventPublisher.publishDiagnosticExamOutcome(
+                    toDiagnosticExamOutcome(
+                            "PATHOLOGY",
+                            savedEntity.getPathologyExamId(),
+                            savedEntity.getTestExecutionId(),
+                            resolveOrderItemId(savedEntity.getTestExecutionId()),
+                            savedEntity.getProgressStatus(),
+                            savedEntity.getPatientId(),
+                            savedEntity.getDetailCode()));
+        }
+        return dto;
     }
 
     @Override
@@ -362,7 +401,19 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
             ensurePhysiologicalResultExists(savedEntity);
         }
 
-        return physiologicalResMapStruct.toDTO(savedEntity);
+        PhysiologicalDTO dto = physiologicalResMapStruct.toDTO(savedEntity);
+        if (!isCompleted(previousProgressStatus) && isCompleted(savedEntity.getProgressStatus())) {
+            downstreamOutcomeEventPublisher.publishDiagnosticExamOutcome(
+                    toDiagnosticExamOutcome(
+                            "PHYSIOLOGICAL",
+                            savedEntity.getPhysiologicalExamId(),
+                            savedEntity.getTestExecutionId(),
+                            resolveOrderItemId(savedEntity.getTestExecutionId()),
+                            savedEntity.getProgressStatus(),
+                            savedEntity.getPatientId(),
+                            savedEntity.getDetailCode()));
+        }
+        return dto;
     }
 
     @Override
@@ -480,7 +531,19 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
             ensureSpecimenResultExists(savedEntity);
         }
 
-        return specimenResMapStruct.toDTO(savedEntity);
+        SpecimenDTO dto = specimenResMapStruct.toDTO(savedEntity);
+        if (!isCompleted(previousProgressStatus) && isCompleted(savedEntity.getProgressStatus())) {
+            downstreamOutcomeEventPublisher.publishDiagnosticExamOutcome(
+                    toDiagnosticExamOutcome(
+                            "SPECIMEN",
+                            savedEntity.getSpecimenExamId(),
+                            savedEntity.getTestExecutionId(),
+                            resolveOrderItemId(savedEntity.getTestExecutionId()),
+                            savedEntity.getProgressStatus(),
+                            savedEntity.getPatientId(),
+                            savedEntity.getDetailCode()));
+        }
+        return dto;
     }
 
     @Override
@@ -578,7 +641,9 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
             ensureExamRecordExists(entity);
         }
 
-        return testExecutionResMapStruct.toDTO(testExecutionRepository.save(entity));
+        TestExecutionDTO dto = testExecutionResMapStruct.toDTO(testExecutionRepository.save(entity));
+        downstreamOutcomeEventPublisher.publishTestExecutionOutcome(dto);
+        return dto;
     }
     private void ensureExamRecordExists(TestExecutionEntity entity) {
         String executionType = normalizeExecutionType(entity.getExecutionType());
@@ -963,5 +1028,34 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
 
     private String normalizeOptionalValue(String value) {
         return hasText(value) ? value.trim() : null;
+    }
+
+    private Long resolveOrderItemId(String testExecutionId) {
+        if (!hasText(testExecutionId)) {
+            return null;
+        }
+        return testExecutionRepository.findById(testExecutionId.trim())
+                .map(TestExecutionEntity::getOrderItemId)
+                .orElse(null);
+    }
+
+    private static DiagnosticExamOutcomeDTO toDiagnosticExamOutcome(
+            String examKind,
+            String examId,
+            String testExecutionId,
+            Long orderItemId,
+            String progressStatus,
+            Long patientId,
+            String detailCode
+    ) {
+        DiagnosticExamOutcomeDTO dto = new DiagnosticExamOutcomeDTO();
+        dto.setExamKind(examKind);
+        dto.setExamId(examId);
+        dto.setTestExecutionId(testExecutionId);
+        dto.setOrderItemId(orderItemId);
+        dto.setProgressStatus(progressStatus);
+        dto.setPatientId(patientId);
+        dto.setDetailCode(detailCode);
+        return dto;
     }
 }
