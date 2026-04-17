@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.function.Consumer;
 
@@ -129,8 +128,8 @@ public class MessageProcessor {
             if (payload == null) {
                 throw new IllegalArgumentException("Kafka message payload is null");
             }
-            String json = new String(payload, StandardCharsets.UTF_8);
-            JsonNode root = objectMapper.readTree(json);
+            // Avoid byte[] -> String roundtrip to prevent encoding/garbling issues.
+            JsonNode root = objectMapper.readTree(payload);
 
             String eventTypeRaw = text(root.get("eventType"));
             Event.Type eventType = eventTypeRaw != null ? Event.Type.valueOf(eventTypeRaw) : null;
