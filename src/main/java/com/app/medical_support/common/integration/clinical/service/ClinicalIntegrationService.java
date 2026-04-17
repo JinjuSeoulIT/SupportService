@@ -44,6 +44,30 @@ public class ClinicalIntegrationService {
         return clinicalApiClient.fetchVitalAssess(visitId);
     }
 
+    /**
+     * 수납 claims 집계를 위해 환자 기준으로 visitId를 선택한다.
+     * 선택 규칙: IN_PROGRESS 방문 우선, 없으면 startTime 최신 방문.
+     */
+    public Long resolveVisitIdByPatientId(Long patientId) {
+        validatePositive("patientId", patientId);
+        List<ClinicalVisitSummaryResponse> visits = clinicalApiClient.fetchVisitsByPatientId(patientId).stream()
+                .filter(item -> isPositive(item.getVisitId()))
+                .collect(Collectors.toList());
+        if (visits.isEmpty()) {
+            return null;
+        }
+        Comparator<ClinicalVisitSummaryResponse> byStartTimeNewestFirst = Comparator.comparing(
+                ClinicalVisitSummaryResponse::getStartTime,
+                Comparator.nullsFirst(Comparator.naturalOrder())
+        );
+        return visits.stream()
+                .filter(v -> VISIT_STATUS_IN_PROGRESS.equalsIgnoreCase(trimToEmpty(v.getVisitStatus())))
+                .max(byStartTimeNewestFirst)
+                .map(ClinicalVisitSummaryResponse::getVisitId)
+                .orElseGet(() -> visits.stream().max(byStartTimeNewestFirst).map(ClinicalVisitSummaryResponse::getVisitId).orElse(null));
+    }
+
+
     private Long resolveVisitIdFromVisitList(Long receptionId) {
         List<ClinicalVisitSummaryResponse> matches = clinicalApiClient.fetchVisitsByReceptionId(receptionId).stream()
                 .filter(item -> isPositive(item.getVisitId()))

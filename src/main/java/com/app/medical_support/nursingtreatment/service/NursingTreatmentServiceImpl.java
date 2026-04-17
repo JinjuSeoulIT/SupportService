@@ -1,6 +1,7 @@
 package com.app.medical_support.nursingtreatment.service;
 
 import com.app.medical_support.integration.outbound.kafka.DownstreamOutcomeEventPublisher;
+import com.app.medical_support.common.integration.claims.service.ClaimsCompletionStageService;
 import com.app.medical_support.common.integration.reception.dto.OutpatientReceptionDTO;
 import com.app.medical_support.common.integration.reception.service.ReceptionIntegrationService;
 import com.app.medical_support.common.sequence.SequenceIdService;
@@ -47,6 +48,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     private final ReceptionIntegrationService receptionIntegrationService;
     private final SequenceIdService sequenceIdService;
     private final DownstreamOutcomeEventPublisher downstreamOutcomeEventPublisher;
+    private final ClaimsCompletionStageService claimsCompletionStageService;
 
     @Override
     public List<RecordResponseDTO> search(String searchType, String searchValue, String startDate, String endDate) {
@@ -164,6 +166,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         entity.setDepartmentName(medicationRecordDTO.getDepartmentName());
         MedicationRecordDTO saved = toMedicationRecordDTO(medicationRecordRepository.save(entity));
         downstreamOutcomeEventPublisher.publishMedicationRecordOutcome(saved);
+        stageMedicationIfCompleted(null, saved);
         return saved;
     }
 
@@ -172,6 +175,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     public MedicationRecordDTO modifyMedicationRecord(String id, MedicationRecordUpdateDTO medicationRecordDTO) {
         MedicationRecordEntity entity = medicationRecordRepository.findById(id)
                 .orElseThrow(() -> new MedicationRecordNotFoundException(id));
+        String beforeProgressStatus = entity.getProgressStatus();
         if (medicationRecordDTO.getAdministeredAt() != null) {
             entity.setAdministeredAt(medicationRecordDTO.getAdministeredAt());
         }
@@ -205,6 +209,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         }
         MedicationRecordDTO saved = toMedicationRecordDTO(medicationRecordRepository.save(entity));
         downstreamOutcomeEventPublisher.publishMedicationRecordOutcome(saved);
+        stageMedicationIfCompleted(beforeProgressStatus, saved);
         return saved;
     }
 
@@ -249,6 +254,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         entity.setDepartmentName(treatmentResultDTO.getDepartmentName());
         TreatmentResultDTO saved = toTreatmentResultDTO(treatmentResultRepository.save(entity));
         downstreamOutcomeEventPublisher.publishTreatmentResultOutcome(saved);
+        stageTreatmentIfCompleted(null, saved);
         return saved;
     }
 
@@ -257,6 +263,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     public TreatmentResultDTO modifyTreatmentResult(String id, TreatmentResultUpdateDTO treatmentResultDTO) {
         TreatmentResultEntity entity = treatmentResultRepository.findById(id)
                 .orElseThrow(() -> new TreatmentResultNotFoundException(id));
+        String beforeProgressStatus = entity.getProgressStatus();
         if (treatmentResultDTO.getProcedureResultId() != null) {
             entity.setProcedureResultId(treatmentResultDTO.getProcedureResultId());
         }
@@ -287,6 +294,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         }
         TreatmentResultDTO saved = toTreatmentResultDTO(treatmentResultRepository.save(entity));
         downstreamOutcomeEventPublisher.publishTreatmentResultOutcome(saved);
+        stageTreatmentIfCompleted(beforeProgressStatus, saved);
         return saved;
     }
 
@@ -419,6 +427,32 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         if (!mismatchErrors.isEmpty()) {
             throw new RecordReceptionValidationException("접수 정보 검증 실패: " + String.join(", ", mismatchErrors));
         }
+    }
+
+    private void stageMedicationIfCompleted(String beforeProgressStatus, MedicationRecordDTO saved) {
+        if (saved == null || !isCompleted(saved.getProgressStatus()) || isCompleted(beforeProgressStatus)) {
+            return;
+        }
+        claimsCompletionStageService.stageMedicationCompleted(
+                saved.getPatientId(),
+                saved.getMedicationRecordId(),
+                saved.getMedicationId()
+        );
+    }
+
+    private void stageTreatmentIfCompleted(String beforeProgressStatus, TreatmentResultDTO saved) {
+        if (saved == null || !isCompleted(saved.getProgressStatus()) || isCompleted(beforeProgressStatus)) {
+            return;
+        }
+        claimsCompletionStageService.stageTreatmentCompleted(
+                saved.getPatientId(),
+                saved.getTreatmentResultId(),
+                saved.getDetail()
+        );
+    }
+
+    private boolean isCompleted(String progressStatus) {
+        return "COMPLETED".equalsIgnoreCase(trimToNull(progressStatus));
     }
 
     private String trimToNull(String value) {

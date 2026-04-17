@@ -3,6 +3,7 @@ package com.app.medical_support.diagnosticresult.service;
 import com.app.medical_support.common.sequence.SequenceIdService;
 import com.app.medical_support.common.sequence.SequenceIdType;
 import com.app.medical_support.common.exception.InvalidRequestException;
+import com.app.medical_support.common.integration.claims.service.ClaimsCompletionStageService;
 import com.app.medical_support.diagnosticresult.dto.*;
 import com.app.medical_support.diagnosticresult.entity.EndoscopyResultEntity;
 import com.app.medical_support.diagnosticresult.entity.ImagingResultEntity;
@@ -33,6 +34,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     private final PhysiologicalResultRepository physiologicalResultRepository;
     private final SpecimenTestResultRepository specimenTestResultRepository;
     private final SequenceIdService sequenceIdService;
+    private final ClaimsCompletionStageService claimsCompletionStageService;
 
     private static final String TYPE_IMAGING = "IMAGING";
     private static final String TYPE_SPECIMEN = "SPECIMEN";
@@ -487,7 +489,9 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
                 assertProgressStatusUpdatable(entity.getProgressStatus(), targetProgressStatus);
                 entity.setProgressStatus(targetProgressStatus);
                 imagingResultRepository.save(entity);
-                yield mapImagingDetail(getImagingResultResponse(resultId));
+                TestResultDetailDTO detail = mapImagingDetail(getImagingResultResponse(resultId));
+                stageDiagnosticIfCompleted(detail);
+                yield detail;
             }
             case TYPE_SPECIMEN -> {
                 SpecimenTestResultEntity entity = specimenTestResultRepository.findById(resultId)
@@ -495,7 +499,9 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
                 assertProgressStatusUpdatable(entity.getProgressStatus(), targetProgressStatus);
                 entity.setProgressStatus(targetProgressStatus);
                 specimenTestResultRepository.save(entity);
-                yield mapSpecimenDetail(getSpecimenResultResponse(resultId));
+                TestResultDetailDTO detail = mapSpecimenDetail(getSpecimenResultResponse(resultId));
+                stageDiagnosticIfCompleted(detail);
+                yield detail;
             }
             case TYPE_PATHOLOGY -> {
                 PathologyResultEntity entity = pathologyResultRepository.findById(resultId)
@@ -503,7 +509,9 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
                 assertProgressStatusUpdatable(entity.getProgressStatus(), targetProgressStatus);
                 entity.setProgressStatus(targetProgressStatus);
                 pathologyResultRepository.save(entity);
-                yield mapPathologyDetail(getPathologyResultResponse(resultId));
+                TestResultDetailDTO detail = mapPathologyDetail(getPathologyResultResponse(resultId));
+                stageDiagnosticIfCompleted(detail);
+                yield detail;
             }
             case TYPE_ENDOSCOPY -> {
                 EndoscopyResultEntity entity = endoscopyResultRepository.findById(resultId)
@@ -511,7 +519,9 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
                 assertProgressStatusUpdatable(entity.getProgressStatus(), targetProgressStatus);
                 entity.setProgressStatus(targetProgressStatus);
                 endoscopyResultRepository.save(entity);
-                yield mapEndoscopyDetail(getEndoscopyResultResponse(resultId));
+                TestResultDetailDTO detail = mapEndoscopyDetail(getEndoscopyResultResponse(resultId));
+                stageDiagnosticIfCompleted(detail);
+                yield detail;
             }
             case TYPE_PHYSIOLOGICAL -> {
                 PhysiologicalResultEntity entity = physiologicalResultRepository.findById(resultId)
@@ -519,7 +529,9 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
                 assertProgressStatusUpdatable(entity.getProgressStatus(), targetProgressStatus);
                 entity.setProgressStatus(targetProgressStatus);
                 physiologicalResultRepository.save(entity);
-                yield mapPhysiologicalDetail(getPhysiologicalResultResponse(resultId));
+                TestResultDetailDTO detail = mapPhysiologicalDetail(getPhysiologicalResultResponse(resultId));
+                stageDiagnosticIfCompleted(detail);
+                yield detail;
             }
             default -> throw new InvalidRequestException("Unsupported resultId: " + resultId);
         };
@@ -1038,6 +1050,17 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
             case TYPE_PHYSIOLOGICAL -> "생리기능검사";
             default -> resultType;
         };
+    }
+
+    private void stageDiagnosticIfCompleted(TestResultDetailDTO detail) {
+        if (detail == null || !PROGRESS_COMPLETED.equalsIgnoreCase(trimToEmpty(detail.getProgressStatus()))) {
+            return;
+        }
+        claimsCompletionStageService.stageDiagnosticCompleted(
+                detail.getPatientId(),
+                detail.getResultType(),
+                detail.getResultId()
+        );
     }
 
 }

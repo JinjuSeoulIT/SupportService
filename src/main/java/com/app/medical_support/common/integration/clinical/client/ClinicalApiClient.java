@@ -119,6 +119,39 @@ public class ClinicalApiClient {
         }
     }
 
+    /**
+     * 환자 ID로 진료 방문 목록 조회 (clinical: GET /api/clinical?patientId=...).
+     */
+    public List<ClinicalVisitSummaryResponse> fetchVisitsByPatientId(Long patientId) {
+        String uri = UriComponentsBuilder.fromHttpUrl(baseUrl)
+                .path(visitsByReceptionQueryPath)
+                .queryParam("patientId", patientId)
+                .toUriString();
+        try {
+            ResponseEntity<ApiResponse<List<ClinicalVisitSummaryResponse>>> responseEntity = restTemplate.exchange(
+                    uri,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<ApiResponse<List<ClinicalVisitSummaryResponse>>>() {
+                    }
+            );
+            return unwrapList(responseEntity.getBody(), "Clinical visits by patient fetch failed.");
+        } catch (HttpClientErrorException ex) {
+            String detail = clinicalErrorDetail(ex);
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Clinical visits-by-patient request failed (GET " + uri + "). " + detail,
+                    ex);
+        } catch (HttpServerErrorException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Clinical service failed.", ex);
+        } catch (ResourceAccessException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Clinical service is unreachable.", ex);
+        } catch (RestClientException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Clinical service call failed.", ex);
+        }
+    }
+
+
     public List<ClinicalVisitSummaryResponse> fetchVisitList() {
         String uri = UriComponentsBuilder.fromHttpUrl(baseUrl)
                 .path(visitsListPath)
