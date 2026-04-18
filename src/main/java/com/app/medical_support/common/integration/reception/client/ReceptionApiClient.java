@@ -2,6 +2,8 @@ package com.app.medical_support.common.integration.reception.client;
 
 import com.app.medical_support.common.ApiResponse;
 import com.app.medical_support.common.integration.reception.dto.OutpatientReceptionDTO;
+import com.app.medical_support.common.integration.reception.dto.ReceptionDepartmentDTO;
+import com.app.medical_support.common.integration.reception.dto.ReceptionDoctorDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
@@ -39,6 +41,69 @@ public class ReceptionApiClient {
                 .setReadTimeout(Duration.ofSeconds(5))
                 .build();
         this.baseUrl = normalizeBaseUrl(baseUrl);
+    }
+
+    /**
+     * 접수 MSA 진료과 마스터 ({@code GET /api/departments}).
+     */
+    public List<ReceptionDepartmentDTO> fetchDepartments() {
+        String uri = UriComponentsBuilder.fromHttpUrl(baseUrl)
+                .path("/api/departments")
+                .toUriString();
+
+        try {
+            ResponseEntity<ApiResponse<List<ReceptionDepartmentDTO>>> responseEntity = restTemplate.exchange(
+                    uri,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<ApiResponse<List<ReceptionDepartmentDTO>>>() {
+                    }
+            );
+
+            return unwrapListResult(responseEntity.getBody(), "Reception departments fetch failed.");
+        } catch (HttpClientErrorException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Reception departments request failed.", ex);
+        } catch (HttpServerErrorException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Reception service failed.", ex);
+        } catch (ResourceAccessException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Reception service is unreachable.", ex);
+        } catch (RestClientException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Reception service call failed.", ex);
+        }
+    }
+
+    /**
+     * 접수 MSA 의사 목록 ({@code GET /api/doctors}). 진료 지원에서만 호출한다.
+     *
+     * @param departmentId 선택, 있으면 해당 진료과 소속 의사만
+     */
+    public List<ReceptionDoctorDTO> fetchDoctors(String departmentId) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl)
+                .path("/api/doctors");
+        if (trimToNull(departmentId) != null) {
+            builder.queryParam("departmentId", departmentId.trim());
+        }
+        String uri = builder.toUriString();
+
+        try {
+            ResponseEntity<ApiResponse<List<ReceptionDoctorDTO>>> responseEntity = restTemplate.exchange(
+                    uri,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<ApiResponse<List<ReceptionDoctorDTO>>>() {
+                    }
+            );
+
+            return unwrapListResult(responseEntity.getBody(), "Reception doctors fetch failed.");
+        } catch (HttpClientErrorException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Reception doctors request failed.", ex);
+        } catch (HttpServerErrorException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Reception service failed.", ex);
+        } catch (ResourceAccessException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Reception service is unreachable.", ex);
+        } catch (RestClientException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Reception service call failed.", ex);
+        }
     }
 
     public OutpatientReceptionDTO fetchDetail(Long id) {
@@ -92,17 +157,27 @@ public class ReceptionApiClient {
         }
     }
 
-    public List<OutpatientReceptionDTO> fetchListByConditions(
-            String visitDate,
-            String visitType,
-            String statuses
+    /**
+     * 접수 MSA 외래 접수 목록 ({@code GET /api/receptions}).
+     * 진료 MSA {@code ReceptionClient#getReceptionQueue}와 동일하게 {@code dateFrom}/{@code dateTo}로 조회한다.
+     */
+    public List<OutpatientReceptionDTO> fetchReceptionsByDateRange(
+            String dateFrom,
+            String dateTo,
+            String departmentId,
+            String doctorId
     ) {
-        String uri = UriComponentsBuilder.fromHttpUrl(baseUrl)
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl)
                 .path("/api/receptions")
-                .queryParam("visitDate", visitDate)
-                .queryParam("visitType", visitType)
-                .queryParam("statuses", statuses)
-                .toUriString();
+                .queryParam("dateFrom", dateFrom)
+                .queryParam("dateTo", dateTo);
+        if (trimToNull(departmentId) != null) {
+            builder.queryParam("departmentId", departmentId.trim());
+        }
+        if (trimToNull(doctorId) != null) {
+            builder.queryParam("doctorId", doctorId.trim());
+        }
+        String uri = builder.toUriString();
 
         try {
             ResponseEntity<ApiResponse<List<OutpatientReceptionDTO>>> responseEntity = restTemplate.exchange(
@@ -129,15 +204,15 @@ public class ReceptionApiClient {
      * 접수 MSA 외래 대기열 API 프록시.
      * {@code GET /api/receptions/queue?date=...&departmentId=...&doctorId=...}
      */
-    public List<OutpatientReceptionDTO> fetchQueue(String date, Long departmentId, Long doctorId) {
+    public List<OutpatientReceptionDTO> fetchQueue(String date, String departmentId, String doctorId) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl)
                 .path("/api/receptions/queue")
                 .queryParam("date", date);
-        if (departmentId != null) {
-            builder.queryParam("departmentId", departmentId);
+        if (trimToNull(departmentId) != null) {
+            builder.queryParam("departmentId", departmentId.trim());
         }
-        if (doctorId != null) {
-            builder.queryParam("doctorId", doctorId);
+        if (trimToNull(doctorId) != null) {
+            builder.queryParam("doctorId", doctorId.trim());
         }
         String uri = builder.toUriString();
 
@@ -179,17 +254,14 @@ public class ReceptionApiClient {
         return result;
     }
 
-    private List<OutpatientReceptionDTO> unwrapListResult(
-            ApiResponse<List<OutpatientReceptionDTO>> response,
-            String defaultMessage
-    ) {
+    private <T> List<T> unwrapListResult(ApiResponse<List<T>> response, String defaultMessage) {
         if (response == null) {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Reception service response is empty.");
         }
         if (!response.isSuccess()) {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, firstNonBlank(response.getMessage(), defaultMessage));
         }
-        List<OutpatientReceptionDTO> result = response.getResult();
+        List<T> result = response.getResult();
         return result == null ? Collections.emptyList() : result;
     }
 

@@ -31,7 +31,7 @@
         LEFT JOIN HOSPITAL.RECEPTION rc
             ON nr.reception_id = rc.reception_id
         LEFT JOIN HOSPITAL.DEPARTMENT receipt_dept
-            ON rc.department_id = receipt_dept.department_id
+            ON TRIM(CAST(rc.department_id AS VARCHAR2(256))) = TRIM(CAST(receipt_dept.department_id AS VARCHAR2(256)))
         LEFT JOIN HOSPITAL.PATIENT p
             ON rc.patient_id = p.patient_id
         <where>
@@ -89,7 +89,7 @@
         LEFT JOIN HOSPITAL.RECEPTION rc
             ON nr.reception_id = rc.reception_id
         LEFT JOIN HOSPITAL.DEPARTMENT receipt_dept
-            ON rc.department_id = receipt_dept.department_id
+            ON TRIM(CAST(rc.department_id AS VARCHAR2(256))) = TRIM(CAST(receipt_dept.department_id AS VARCHAR2(256)))
         LEFT JOIN HOSPITAL.PATIENT p
             ON rc.patient_id = p.patient_id
         ORDER BY nr.created_at DESC NULLS LAST, nr.record_id DESC
@@ -124,7 +124,7 @@
         LEFT JOIN HOSPITAL.RECEPTION rc
             ON nr.reception_id = rc.reception_id
         LEFT JOIN HOSPITAL.DEPARTMENT receipt_dept
-            ON rc.department_id = receipt_dept.department_id
+            ON TRIM(CAST(rc.department_id AS VARCHAR2(256))) = TRIM(CAST(receipt_dept.department_id AS VARCHAR2(256)))
         LEFT JOIN HOSPITAL.PATIENT p
             ON rc.patient_id = p.patient_id
         WHERE nr.record_id = #{recordId}

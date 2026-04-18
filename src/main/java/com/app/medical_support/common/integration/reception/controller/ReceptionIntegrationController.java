@@ -32,13 +32,23 @@ public class ReceptionIntegrationController {
             @Parameter(description = "진료유형", example = "OUTPATIENT")
             @RequestParam(required = false, defaultValue = "OUTPATIENT") String visitType,
             @Parameter(description = "상태 목록(CSV)", example = "WAITING,CALLED,IN_PROGRESS")
-            @RequestParam(required = false, defaultValue = "WAITING,CALLED,IN_PROGRESS") String statuses
+            @RequestParam(required = false, defaultValue = "WAITING,CALLED,IN_PROGRESS") String statuses,
+            @Parameter(description = "진료과 ID (접수 MSA와 동일, 예: DEPT-003)")
+            @RequestParam(required = false) String departmentId,
+            @Parameter(description = "의사 ID (접수 MSA와 동일)")
+            @RequestParam(required = false) String doctorId
     ) {
         return ResponseEntity.ok(
                 new ApiResponse<>(
                         true,
                         "Reception list loaded.",
-                        receptionIntegrationService.findListByConditions(visitDate, visitType, statuses)
+                        receptionIntegrationService.findListByConditions(
+                                visitDate,
+                                visitType,
+                                statuses,
+                                departmentId,
+                                doctorId
+                        )
                 )
         );
     }
@@ -48,10 +58,10 @@ public class ReceptionIntegrationController {
     public ResponseEntity<ApiResponse<List<OutpatientReceptionDTO>>> findQueue(
             @Parameter(description = "조회일 (yyyy-MM-dd), 생략 시 서버 오늘")
             @RequestParam(required = false) String date,
-            @Parameter(description = "진료과 ID")
-            @RequestParam(required = false) Long departmentId,
+            @Parameter(description = "진료과 ID (예: DEPT-003)")
+            @RequestParam(required = false) String departmentId,
             @Parameter(description = "의사 ID")
-            @RequestParam(required = false) Long doctorId
+            @RequestParam(required = false) String doctorId
     ) {
         return ResponseEntity.ok(
                 new ApiResponse<>(
