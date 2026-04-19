@@ -30,8 +30,8 @@
         FROM CHJ.NURSING_RECORD nr
         LEFT JOIN HOSPITAL.RECEPTION rc
             ON nr.reception_id = rc.reception_id
-        LEFT JOIN HOSPITAL.DEPARTMENT receipt_dept
-            ON TRIM(CAST(rc.department_id AS VARCHAR2(256))) = TRIM(CAST(receipt_dept.department_id AS VARCHAR2(256)))
+        LEFT JOIN CMH.STAFF_DEPARTMENT receipt_dept
+            ON receipt_dept.department_id = TO_CHAR(rc.department_id)
         LEFT JOIN HOSPITAL.PATIENT p
             ON rc.patient_id = p.patient_id
         <where>
@@ -88,8 +88,8 @@
         FROM CHJ.NURSING_RECORD nr
         LEFT JOIN HOSPITAL.RECEPTION rc
             ON nr.reception_id = rc.reception_id
-        LEFT JOIN HOSPITAL.DEPARTMENT receipt_dept
-            ON TRIM(CAST(rc.department_id AS VARCHAR2(256))) = TRIM(CAST(receipt_dept.department_id AS VARCHAR2(256)))
+        LEFT JOIN CMH.STAFF_DEPARTMENT receipt_dept
+            ON receipt_dept.department_id = TO_CHAR(rc.department_id)
         LEFT JOIN HOSPITAL.PATIENT p
             ON rc.patient_id = p.patient_id
         ORDER BY nr.created_at DESC NULLS LAST, nr.record_id DESC
@@ -123,8 +123,8 @@
         FROM CHJ.NURSING_RECORD nr
         LEFT JOIN HOSPITAL.RECEPTION rc
             ON nr.reception_id = rc.reception_id
-        LEFT JOIN HOSPITAL.DEPARTMENT receipt_dept
-            ON TRIM(CAST(rc.department_id AS VARCHAR2(256))) = TRIM(CAST(receipt_dept.department_id AS VARCHAR2(256)))
+        LEFT JOIN CMH.STAFF_DEPARTMENT receipt_dept
+            ON receipt_dept.department_id = TO_CHAR(rc.department_id)
         LEFT JOIN HOSPITAL.PATIENT p
             ON rc.patient_id = p.patient_id
         WHERE nr.record_id = #{recordId}
