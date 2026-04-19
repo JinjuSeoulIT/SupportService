@@ -35,7 +35,8 @@ public interface PhysiologicalResultRepository extends JpaRepository<Physiologic
                 r.status,
                 r.progressStatus,
                 r.createdAt,
-                r.updatedAt
+                r.updatedAt,
+                r.completedAt
             )
             from PhysiologicalResultEntity r
             join com.app.medical_support.diagnosticexecution.entity.PhysiologicalEntity e
@@ -66,7 +67,8 @@ public interface PhysiologicalResultRepository extends JpaRepository<Physiologic
                 r.status,
                 r.progressStatus,
                 r.createdAt,
-                r.updatedAt
+                r.updatedAt,
+                r.completedAt
             )
             from PhysiologicalResultEntity r
             join com.app.medical_support.diagnosticexecution.entity.PhysiologicalEntity e

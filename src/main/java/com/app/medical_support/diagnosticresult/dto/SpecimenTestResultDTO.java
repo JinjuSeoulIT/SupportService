@@ -36,6 +36,7 @@ public class SpecimenTestResultDTO {
     private LocalDateTime createdAt;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
+    private LocalDateTime completedAt;
     @JsonProperty("isRevised")
     private boolean isRevised;
 
@@ -60,7 +61,8 @@ public class SpecimenTestResultDTO {
             String status,
             String progressStatus,
             LocalDateTime createdAt,
-            LocalDateTime updatedAt
+            LocalDateTime updatedAt,
+            LocalDateTime completedAt
     ) {
         this.specimenExamResultId = specimenExamResultId;
         this.specimenExamId = specimenExamId;
@@ -83,5 +85,6 @@ public class SpecimenTestResultDTO {
         this.progressStatus = progressStatus;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.completedAt = completedAt;
     }
 }

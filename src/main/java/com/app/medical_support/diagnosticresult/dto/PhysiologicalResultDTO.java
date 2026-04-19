@@ -37,6 +37,7 @@ public class PhysiologicalResultDTO {
     private LocalDateTime createdAt;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
+    private LocalDateTime completedAt;
     @JsonProperty("isRevised")
     private boolean isRevised;
 
@@ -62,7 +63,8 @@ public class PhysiologicalResultDTO {
             String status,
             String progressStatus,
             LocalDateTime createdAt,
-            LocalDateTime updatedAt
+            LocalDateTime updatedAt,
+            LocalDateTime completedAt
     ) {
         this.physiologicalExamResultId = physiologicalExamResultId;
         this.physiologicalExamId = physiologicalExamId;
@@ -86,5 +88,6 @@ public class PhysiologicalResultDTO {
         this.progressStatus = progressStatus;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.completedAt = completedAt;
     }
 }

@@ -34,6 +34,7 @@ public class ImagingResultDTO {
     private LocalDateTime createdAt;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
+    private LocalDateTime completedAt;
     @JsonProperty("isRevised")
     private boolean isRevised;
 
@@ -55,7 +56,8 @@ public class ImagingResultDTO {
             String status,
             String progressStatus,
             LocalDateTime createdAt,
-            LocalDateTime updatedAt
+            LocalDateTime updatedAt,
+            LocalDateTime completedAt
     ) {
         this.imagingResultId = imagingResultId;
         this.imagingExamId = imagingExamId;
@@ -75,5 +77,6 @@ public class ImagingResultDTO {
         this.progressStatus = progressStatus;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.completedAt = completedAt;
     }
 }

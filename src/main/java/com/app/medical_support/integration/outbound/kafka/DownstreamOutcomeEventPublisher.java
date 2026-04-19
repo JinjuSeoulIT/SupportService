@@ -21,10 +21,11 @@ import static com.app.medical_support.common.event.Event.Type.CREATE;
 @Slf4j
 public class DownstreamOutcomeEventPublisher {
 
-    public static final String BINDING_OUT_MEDICATION_RECORD_OUTCOME = "output-medicationRecordOutcome-out-0";
-    public static final String BINDING_OUT_TREATMENT_RESULT_OUTCOME = "output-treatmentResultOutcome-out-0";
-    public static final String BINDING_OUT_TEST_EXECUTION_OUTCOME = "output-testExecutionOutcome-out-0";
-    public static final String BINDING_OUT_DIAGNOSTIC_EXAM_OUTCOME = "output-diagnosticExamOutcome-out-0";
+    /** StreamBridge 논리 바인딩명(output-bindings와 동일). 실제 채널은 *-out-0 (application.properties bindings.* 참고) */
+    public static final String BINDING_OUT_MEDICATION_RECORD_OUTCOME = "output-medicationRecordOutcome";
+    public static final String BINDING_OUT_TREATMENT_RESULT_OUTCOME = "output-treatmentResultOutcome";
+    public static final String BINDING_OUT_TEST_EXECUTION_OUTCOME = "output-testExecutionOutcome";
+    public static final String BINDING_OUT_DIAGNOSTIC_EXAM_OUTCOME = "output-diagnosticExamOutcome";
 
     private final StreamBridge streamBridge;
     private final DownstreamKafkaProperties downstreamKafkaProperties;

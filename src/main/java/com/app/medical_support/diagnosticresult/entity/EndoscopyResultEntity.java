@@ -53,4 +53,7 @@ public class EndoscopyResultEntity {
 
     @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
+
+    @Column(name = "COMPLETED_AT")
+    private LocalDateTime completedAt;
 }

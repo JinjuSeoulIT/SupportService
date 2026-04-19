@@ -39,7 +39,8 @@ public interface PathologyResultRepository extends JpaRepository<PathologyResult
                 r.status,
                 r.progressStatus,
                 r.createdAt,
-                r.updatedAt
+                r.updatedAt,
+                r.completedAt
             )
             from PathologyResultEntity r
             join com.app.medical_support.diagnosticexecution.entity.PathologyEntity e
@@ -74,7 +75,8 @@ public interface PathologyResultRepository extends JpaRepository<PathologyResult
                 r.status,
                 r.progressStatus,
                 r.createdAt,
-                r.updatedAt
+                r.updatedAt,
+                r.completedAt
             )
             from PathologyResultEntity r
             join com.app.medical_support.diagnosticexecution.entity.PathologyEntity e

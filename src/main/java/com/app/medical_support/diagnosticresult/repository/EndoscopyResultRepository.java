@@ -32,7 +32,8 @@ public interface EndoscopyResultRepository extends JpaRepository<EndoscopyResult
                 r.status,
                 r.progressStatus,
                 r.createdAt,
-                r.updatedAt
+                r.updatedAt,
+                r.completedAt
             )
             from EndoscopyResultEntity r
             join com.app.medical_support.diagnosticexecution.entity.EndoscopyEntity e
@@ -60,7 +61,8 @@ public interface EndoscopyResultRepository extends JpaRepository<EndoscopyResult
                 r.status,
                 r.progressStatus,
                 r.createdAt,
-                r.updatedAt
+                r.updatedAt,
+                r.completedAt
             )
             from EndoscopyResultEntity r
             join com.app.medical_support.diagnosticexecution.entity.EndoscopyEntity e
