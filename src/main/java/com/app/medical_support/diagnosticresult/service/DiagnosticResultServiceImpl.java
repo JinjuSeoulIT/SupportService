@@ -103,6 +103,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         if (hasText(dto.getStatus())) {
             entity.setStatus(normalizeStatus(dto.getStatus()));
         }
+        entity.setUpdatedAt(LocalDateTime.now());
         ImagingResultEntity savedEntity = imagingResultRepository.save(entity);
         return getImagingResultResponse(savedEntity.getImagingResultId());
     }
@@ -171,6 +172,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         if (hasText(dto.getStatus())) {
             entity.setStatus(normalizeStatus(dto.getStatus()));
         }
+        entity.setUpdatedAt(LocalDateTime.now());
         EndoscopyResultEntity savedEntity = endoscopyResultRepository.save(entity);
         return getEndoscopyResultResponse(savedEntity.getEndoscopyResultId());
     }
@@ -243,6 +245,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         if (hasText(dto.getStatus())) {
             entity.setStatus(normalizeStatus(dto.getStatus()));
         }
+        entity.setUpdatedAt(LocalDateTime.now());
         PathologyResultEntity savedEntity = pathologyResultRepository.save(entity);
         return getPathologyResultResponse(savedEntity.getPathologyExamResultId());
     }
@@ -311,6 +314,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         if (hasText(dto.getStatus())) {
             entity.setStatus(normalizeStatus(dto.getStatus()));
         }
+        entity.setUpdatedAt(LocalDateTime.now());
         PhysiologicalResultEntity savedEntity = physiologicalResultRepository.save(entity);
         return getPhysiologicalResultResponse(savedEntity.getPhysiologicalExamResultId());
     }
@@ -387,6 +391,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         if (hasText(dto.getStatus())) {
             entity.setStatus(normalizeStatus(dto.getStatus()));
         }
+        entity.setUpdatedAt(LocalDateTime.now());
         SpecimenTestResultEntity savedEntity = specimenTestResultRepository.save(entity);
         return getSpecimenResultResponse(savedEntity.getSpecimenExamResultId());
     }
@@ -556,6 +561,8 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
             result.setStatus(dto.getStatus());
             result.setProgressStatus(dto.getProgressStatus());
             result.setCreatedAt(dto.getCreatedAt());
+            result.setUpdatedAt(dto.getUpdatedAt());
+            result.setRevised(isRevised(dto.getProgressStatus(), dto.getUpdatedAt()));
             return result;
         }).toList();
     }
@@ -577,6 +584,8 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
             result.setStatus(dto.getStatus());
             result.setProgressStatus(dto.getProgressStatus());
             result.setCreatedAt(dto.getCreatedAt());
+            result.setUpdatedAt(dto.getUpdatedAt());
+            result.setRevised(isRevised(dto.getProgressStatus(), dto.getUpdatedAt()));
             return result;
         }).toList();
     }
@@ -604,6 +613,8 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
             result.setStatus(dto.getStatus());
             result.setProgressStatus(dto.getProgressStatus());
             result.setCreatedAt(dto.getCreatedAt());
+            result.setUpdatedAt(dto.getUpdatedAt());
+            result.setRevised(isRevised(dto.getProgressStatus(), dto.getUpdatedAt()));
             return result;
         }).toList();
     }
@@ -625,6 +636,8 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
             result.setStatus(dto.getStatus());
             result.setProgressStatus(dto.getProgressStatus());
             result.setCreatedAt(dto.getCreatedAt());
+            result.setUpdatedAt(dto.getUpdatedAt());
+            result.setRevised(isRevised(dto.getProgressStatus(), dto.getUpdatedAt()));
             return result;
         }).toList();
     }
@@ -649,6 +662,8 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
             result.setStatus(dto.getStatus());
             result.setProgressStatus(dto.getProgressStatus());
             result.setCreatedAt(dto.getCreatedAt());
+            result.setUpdatedAt(dto.getUpdatedAt());
+            result.setRevised(isRevised(dto.getProgressStatus(), dto.getUpdatedAt()));
             return result;
         }).toList();
     }
@@ -669,6 +684,8 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         result.setStatus(dto.getStatus());
         result.setProgressStatus(dto.getProgressStatus());
         result.setCreatedAt(dto.getCreatedAt());
+        result.setUpdatedAt(dto.getUpdatedAt());
+        result.setRevised(isRevised(dto.getProgressStatus(), dto.getUpdatedAt()));
 
         Map<String, Object> detail = new LinkedHashMap<>();
         detail.put("readingDetail", dto.getReadingDetail());
@@ -692,6 +709,8 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         result.setStatus(dto.getStatus());
         result.setProgressStatus(dto.getProgressStatus());
         result.setCreatedAt(dto.getCreatedAt());
+        result.setUpdatedAt(dto.getUpdatedAt());
+        result.setRevised(isRevised(dto.getProgressStatus(), dto.getUpdatedAt()));
 
         Map<String, Object> detail = new LinkedHashMap<>();
         detail.put("resultItemCode", dto.getResultItemCode());
@@ -718,6 +737,8 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         result.setStatus(dto.getStatus());
         result.setProgressStatus(dto.getProgressStatus());
         result.setCreatedAt(dto.getCreatedAt());
+        result.setUpdatedAt(dto.getUpdatedAt());
+        result.setRevised(isRevised(dto.getProgressStatus(), dto.getUpdatedAt()));
 
         Map<String, Object> detail = new LinkedHashMap<>();
         detail.put("tissueStatus", dto.getTissueStatus());
@@ -749,6 +770,8 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         result.setStatus(dto.getStatus());
         result.setProgressStatus(dto.getProgressStatus());
         result.setCreatedAt(dto.getCreatedAt());
+        result.setUpdatedAt(dto.getUpdatedAt());
+        result.setRevised(isRevised(dto.getProgressStatus(), dto.getUpdatedAt()));
 
         Map<String, Object> detail = new LinkedHashMap<>();
         detail.put("biopsyYn", dto.getBiopsyYn());
@@ -773,6 +796,8 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
         result.setStatus(dto.getStatus());
         result.setProgressStatus(dto.getProgressStatus());
         result.setCreatedAt(dto.getCreatedAt());
+        result.setUpdatedAt(dto.getUpdatedAt());
+        result.setRevised(isRevised(dto.getProgressStatus(), dto.getUpdatedAt()));
 
         Map<String, Object> detail = new LinkedHashMap<>();
         detail.put("examEquipmentId", dto.getExamEquipmentId());
@@ -1031,6 +1056,10 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
 
     private boolean hasText(String value) {
         return value != null && !value.trim().isEmpty();
+    }
+
+    private boolean isRevised(String progressStatus, LocalDateTime updatedAt) {
+        return PROGRESS_COMPLETED.equalsIgnoreCase(trimToEmpty(progressStatus)) && updatedAt != null;
     }
 
     private String trimToEmpty(String value) {

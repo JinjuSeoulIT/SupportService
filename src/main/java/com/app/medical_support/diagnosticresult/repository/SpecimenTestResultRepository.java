@@ -33,7 +33,8 @@ public interface SpecimenTestResultRepository extends JpaRepository<SpecimenTest
                 r.confirmedAt,
                 r.status,
                 r.progressStatus,
-                r.createdAt
+                r.createdAt,
+                r.updatedAt
             )
             from SpecimenTestResultEntity r
             join com.app.medical_support.diagnosticexecution.entity.SpecimenEntity e
@@ -62,7 +63,8 @@ public interface SpecimenTestResultRepository extends JpaRepository<SpecimenTest
                 r.confirmedAt,
                 r.status,
                 r.progressStatus,
-                r.createdAt
+                r.createdAt,
+                r.updatedAt
             )
             from SpecimenTestResultEntity r
             join com.app.medical_support.diagnosticexecution.entity.SpecimenEntity e

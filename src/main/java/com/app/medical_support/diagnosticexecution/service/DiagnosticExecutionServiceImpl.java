@@ -966,6 +966,14 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         return "COMPLETED".equalsIgnoreCase(progressStatus != null ? progressStatus.trim() : null);
     }
 
+    private boolean isCancelled(String progressStatus) {
+        return "CANCELLED".equalsIgnoreCase(progressStatus != null ? progressStatus.trim() : null);
+    }
+
+    private boolean isTerminalProgress(String progressStatus) {
+        return isCompleted(progressStatus) || isCancelled(progressStatus);
+    }
+
     private String normalizeExecutionType(String executionType) {
         return hasText(executionType) ? executionType.trim().toUpperCase() : "";
     }
@@ -1011,19 +1019,60 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         }
 
         String trimmed = value.trim().toUpperCase();
-        if ("WAITING".equals(trimmed) || "IN_PROGRESS".equals(trimmed) || "COMPLETED".equals(trimmed)) {
+        if ("WAITING".equals(trimmed)
+                || "IN_PROGRESS".equals(trimmed)
+                || "COMPLETED".equals(trimmed)
+                || "CANCELLED".equals(trimmed)) {
             return trimmed;
         }
 
         return "WAITING";
     }
 
-    private String resolveProgressStatus(String newValue, String currentValue) {
-        if (!hasText(newValue)) {
-            return hasText(currentValue) ? normalizeProgressStatus(currentValue) : "WAITING";
+    /**
+     * 허용: WAITING → IN_PROGRESS / COMPLETED / CANCELLED; IN_PROGRESS → COMPLETED / CANCELLED; 동일 값(멱등).
+     * 금지: IN_PROGRESS → WAITING; COMPLETED/CANCELLED → 다른 값.
+     */
+    private void assertProgressTransition(String currentNormalized, String nextNormalized) {
+        if (currentNormalized.equals(nextNormalized)) {
+            return;
         }
+        if (isTerminalProgress(currentNormalized)) {
+            throw new InvalidRequestException(
+                    "Invalid progressStatus transition: cannot change from "
+                            + currentNormalized + " to " + nextNormalized + ".");
+        }
+        if (isInProgress(currentNormalized) && "WAITING".equals(nextNormalized)) {
+            throw new InvalidRequestException(
+                    "Invalid progressStatus transition: cannot change from IN_PROGRESS to WAITING.");
+        }
+        if ("WAITING".equals(currentNormalized)) {
+            if ("IN_PROGRESS".equals(nextNormalized)
+                    || "COMPLETED".equals(nextNormalized)
+                    || "CANCELLED".equals(nextNormalized)) {
+                return;
+            }
+            throw new InvalidRequestException(
+                    "Invalid progressStatus transition from WAITING to " + nextNormalized + ".");
+        }
+        if (isInProgress(currentNormalized)) {
+            if ("COMPLETED".equals(nextNormalized) || "CANCELLED".equals(nextNormalized)) {
+                return;
+            }
+            throw new InvalidRequestException(
+                    "Invalid progressStatus transition from IN_PROGRESS to " + nextNormalized + ".");
+        }
+        throw new InvalidRequestException("Unsupported progressStatus: " + currentNormalized);
+    }
 
-        return normalizeProgressStatus(newValue);
+    private String resolveProgressStatus(String newValue, String currentValue) {
+        String currentNorm = hasText(currentValue) ? normalizeProgressStatus(currentValue) : "WAITING";
+        if (!hasText(newValue)) {
+            return currentNorm;
+        }
+        String nextNorm = normalizeProgressStatus(newValue);
+        assertProgressTransition(currentNorm, nextNorm);
+        return nextNorm;
     }
 
     private String normalizeOptionalValue(String value) {

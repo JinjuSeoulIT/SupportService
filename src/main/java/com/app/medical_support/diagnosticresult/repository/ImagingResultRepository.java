@@ -30,7 +30,8 @@ public interface ImagingResultRepository extends JpaRepository<ImagingResultEnti
                 r.confirmedAt,
                 r.status,
                 r.progressStatus,
-                r.createdAt
+                r.createdAt,
+                r.updatedAt
             )
             from ImagingResultEntity r
             join com.app.medical_support.diagnosticexecution.entity.ImagingEntity e
@@ -56,7 +57,8 @@ public interface ImagingResultRepository extends JpaRepository<ImagingResultEnti
                 r.confirmedAt,
                 r.status,
                 r.progressStatus,
-                r.createdAt
+                r.createdAt,
+                r.updatedAt
             )
             from ImagingResultEntity r
             join com.app.medical_support.diagnosticexecution.entity.ImagingEntity e
