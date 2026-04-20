@@ -21,6 +21,7 @@ public class TestResultDetailDTO {
     private String testExecutionId;
     private String detailCode;
     private Long patientId;
+    private Long visitId;
     private String patientName;
     private String departmentName;
     private String performerId;
