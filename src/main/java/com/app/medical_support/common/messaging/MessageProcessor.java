@@ -90,7 +90,8 @@ public class MessageProcessor {
     @Bean
     public Consumer<Message<byte[]>> messageProcessorTestExecution(
             DiagnosticExecutionService diagnosticExecutionService,
-            ObjectMapper objectMapper
+            ObjectMapper objectMapper,
+            TestExecutionPerformerInboundNormalizer testExecutionPerformerInboundNormalizer
     ) {
         return message -> {
             EventEnvelope event = parseEnvelope(objectMapper, message);
@@ -103,6 +104,9 @@ public class MessageProcessor {
                     LOG.info("Create testExecution with OrderItemID: {}", orderItemId);
                     if (dto != null && dto.getOrderItemId() == null && orderItemId != null) {
                         dto.setOrderItemId(orderItemId);
+                    }
+                    if (dto != null) {
+                        testExecutionPerformerInboundNormalizer.applyForClinicalKafka(dto);
                     }
                     diagnosticExecutionService.registerTestExecution(dto);
                     break;
