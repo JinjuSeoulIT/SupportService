@@ -53,6 +53,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
     @Override
     public List<RecordResponseDTO> search(String searchType, String searchValue, String startDate, String endDate) {
         if (!"recordId".equals(searchType)
+                && !"receptionId".equals(searchType)
                 && !"nurseName".equals(searchType)
                 && !"patientName".equals(searchType)
                 && !"departmentName".equals(searchType)

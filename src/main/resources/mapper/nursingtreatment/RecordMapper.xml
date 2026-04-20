@@ -39,6 +39,9 @@
                 <when test="searchType != null and searchType.equals('recordId')">
                     nr.record_id = #{searchValue}
                 </when>
+                <when test="searchType != null and searchType.equals('receptionId') and searchValue != null and searchValue != ''">
+                    nr.reception_id = #{searchValue}
+                </when>
                 <when test="searchType != null and searchType.equals('nurseName') and searchValue != null and searchValue != ''">
                     (nr.nurse_name LIKE '%' || #{searchValue} || '%'
                     OR nr.nursing_id LIKE '%' || #{searchValue} || '%')

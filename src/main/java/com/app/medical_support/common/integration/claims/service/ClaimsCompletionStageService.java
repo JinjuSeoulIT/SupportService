@@ -3,10 +3,12 @@ package com.app.medical_support.common.integration.claims.service;
 import com.app.medical_support.common.integration.claims.dto.ClaimsItemRequest;
 import com.app.medical_support.common.integration.clinical.service.ClinicalIntegrationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ClaimsCompletionStageService {
 
     private static final String SOURCE_TYPE = "CLINICAL_ORDER_ITEM";
@@ -35,21 +37,31 @@ public class ClaimsCompletionStageService {
         if (patientId == null || patientId <= 0) {
             return;
         }
-        Long visitId = clinicalIntegrationService.resolveVisitIdByPatientId(patientId);
-        if (visitId == null) {
-            return;
+        try {
+            Long visitId = clinicalIntegrationService.resolveVisitIdByPatientId(patientId);
+            if (visitId == null) {
+                return;
+            }
+            claimsStagingService.stageItem(
+                    visitId,
+                    patientId,
+                    ClaimsItemRequest.builder()
+                            .itemName(itemName)
+                            .itemCode(null)
+                            .orderType(orderType)
+                            .sourceId(toNumericSourceId(sourceRawId))
+                            .sourceType(SOURCE_TYPE)
+                            .build()
+            );
+        } catch (RuntimeException ex) {
+            log.warn(
+                    "Claims staging skipped (clinical visit resolve failed). patientId={} orderType={} itemName={} : {}",
+                    patientId,
+                    orderType,
+                    itemName,
+                    ex.getMessage()
+            );
         }
-        claimsStagingService.stageItem(
-                visitId,
-                patientId,
-                ClaimsItemRequest.builder()
-                        .itemName(itemName)
-                        .itemCode(null)
-                        .orderType(orderType)
-                        .sourceId(toNumericSourceId(sourceRawId))
-                        .sourceType(SOURCE_TYPE)
-                        .build()
-        );
     }
 
     private Long toNumericSourceId(String sourceRawId) {
