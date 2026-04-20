@@ -38,17 +38,14 @@ import static com.app.medical_support.common.event.Event.Type.CREATE;
 
 public class DownstreamOutcomeEventPublisher {
 
-
-
-    /** StreamBridge 채널명은 {@code spring.cloud.stream.bindings.<name>-out-0} 와 일치해야 합니다. */
-
-    public static final String BINDING_OUT_MEDICATION_RECORD_OUTCOME = "output-medicationRecordOutcome-out-0";
-
-    public static final String BINDING_OUT_TREATMENT_RESULT_OUTCOME = "output-treatmentResultOutcome-out-0";
-
-    public static final String BINDING_OUT_DIAGNOSTIC_EXAM_OUTCOME = "output-diagnosticExamOutcome-out-0";
-
-    public static final String BINDING_OUT_DIAGNOSTIC_TEST_RESULT_OUTCOME = "output-diagnosticTestResultOutcome-out-0";
+    /**
+     * StreamBridge 바인딩명은 {@code spring.cloud.stream.output-bindings} 에 등록된 논리 이름을 사용합니다.
+     * 실제 destination은 {@code spring.cloud.stream.bindings.<name>-out-0.destination} 으로 매핑됩니다.
+     */
+    public static final String BINDING_OUT_MEDICATION_RECORD_OUTCOME = "output-medicationRecordOutcome";
+    public static final String BINDING_OUT_TREATMENT_RESULT_OUTCOME = "output-treatmentResultOutcome";
+    public static final String BINDING_OUT_DIAGNOSTIC_EXAM_OUTCOME = "output-diagnosticExamOutcome";
+    public static final String BINDING_OUT_DIAGNOSTIC_TEST_RESULT_OUTCOME = "output-diagnosticTestResultOutcome";
 
 
 
