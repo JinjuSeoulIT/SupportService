@@ -4,6 +4,8 @@ import com.app.medical_support.common.sequence.SequenceIdService;
 import com.app.medical_support.common.sequence.SequenceIdType;
 import com.app.medical_support.common.exception.InvalidRequestException;
 import com.app.medical_support.common.integration.claims.service.ClaimsCompletionStageService;
+import com.app.medical_support.diagnosticexecution.entity.TestExecutionEntity;
+import com.app.medical_support.diagnosticexecution.repository.TestExecutionRepository;
 import com.app.medical_support.integration.outbound.kafka.DownstreamOutcomeEventPublisher;
 import com.app.medical_support.diagnosticresult.dto.*;
 import com.app.medical_support.diagnosticresult.entity.EndoscopyResultEntity;
@@ -18,6 +20,7 @@ import com.app.medical_support.diagnosticresult.repository.PathologyResultReposi
 import com.app.medical_support.diagnosticresult.repository.PhysiologicalResultRepository;
 import com.app.medical_support.diagnosticresult.repository.SpecimenTestResultRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +28,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DiagnosticResultServiceImpl implements DiagnosticResultService {
@@ -34,6 +38,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     private final PathologyResultRepository pathologyResultRepository;
     private final PhysiologicalResultRepository physiologicalResultRepository;
     private final SpecimenTestResultRepository specimenTestResultRepository;
+    private final TestExecutionRepository testExecutionRepository;
     private final SequenceIdService sequenceIdService;
     private final ClaimsCompletionStageService claimsCompletionStageService;
     private final DownstreamOutcomeEventPublisher downstreamOutcomeEventPublisher;
@@ -495,11 +500,14 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
                         .orElseThrow(() -> new DiagnosticResultNotFoundException("Imaging result not found. id=" + resultId));
                 assertProgressStatusUpdatable(entity.getProgressStatus(), targetProgressStatus);
                 entity.setProgressStatus(targetProgressStatus);
+                LocalDateTime completedAt = null;
                 if (PROGRESS_COMPLETED.equals(targetProgressStatus)) {
-                    entity.setCompletedAt(LocalDateTime.now());
+                    completedAt = LocalDateTime.now();
+                    entity.setCompletedAt(completedAt);
                 }
                 imagingResultRepository.save(entity);
                 TestResultDetailDTO detail = mapImagingDetail(getImagingResultResponse(resultId));
+                syncTestExecutionWhenResultCompleted(detail, normalizedType, completedAt);
                 stageDiagnosticIfCompleted(detail);
                 yield detail;
             }
@@ -508,11 +516,14 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
                         .orElseThrow(() -> new DiagnosticResultNotFoundException("Specimen result not found. id=" + resultId));
                 assertProgressStatusUpdatable(entity.getProgressStatus(), targetProgressStatus);
                 entity.setProgressStatus(targetProgressStatus);
+                LocalDateTime completedAt = null;
                 if (PROGRESS_COMPLETED.equals(targetProgressStatus)) {
-                    entity.setCompletedAt(LocalDateTime.now());
+                    completedAt = LocalDateTime.now();
+                    entity.setCompletedAt(completedAt);
                 }
                 specimenTestResultRepository.save(entity);
                 TestResultDetailDTO detail = mapSpecimenDetail(getSpecimenResultResponse(resultId));
+                syncTestExecutionWhenResultCompleted(detail, normalizedType, completedAt);
                 stageDiagnosticIfCompleted(detail);
                 yield detail;
             }
@@ -521,11 +532,14 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
                         .orElseThrow(() -> new DiagnosticResultNotFoundException("Pathology result not found. id=" + resultId));
                 assertProgressStatusUpdatable(entity.getProgressStatus(), targetProgressStatus);
                 entity.setProgressStatus(targetProgressStatus);
+                LocalDateTime completedAt = null;
                 if (PROGRESS_COMPLETED.equals(targetProgressStatus)) {
-                    entity.setCompletedAt(LocalDateTime.now());
+                    completedAt = LocalDateTime.now();
+                    entity.setCompletedAt(completedAt);
                 }
                 pathologyResultRepository.save(entity);
                 TestResultDetailDTO detail = mapPathologyDetail(getPathologyResultResponse(resultId));
+                syncTestExecutionWhenResultCompleted(detail, normalizedType, completedAt);
                 stageDiagnosticIfCompleted(detail);
                 yield detail;
             }
@@ -534,11 +548,14 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
                         .orElseThrow(() -> new DiagnosticResultNotFoundException("Endoscopy result not found. id=" + resultId));
                 assertProgressStatusUpdatable(entity.getProgressStatus(), targetProgressStatus);
                 entity.setProgressStatus(targetProgressStatus);
+                LocalDateTime completedAt = null;
                 if (PROGRESS_COMPLETED.equals(targetProgressStatus)) {
-                    entity.setCompletedAt(LocalDateTime.now());
+                    completedAt = LocalDateTime.now();
+                    entity.setCompletedAt(completedAt);
                 }
                 endoscopyResultRepository.save(entity);
                 TestResultDetailDTO detail = mapEndoscopyDetail(getEndoscopyResultResponse(resultId));
+                syncTestExecutionWhenResultCompleted(detail, normalizedType, completedAt);
                 stageDiagnosticIfCompleted(detail);
                 yield detail;
             }
@@ -547,11 +564,14 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
                         .orElseThrow(() -> new DiagnosticResultNotFoundException("Physiological result not found. id=" + resultId));
                 assertProgressStatusUpdatable(entity.getProgressStatus(), targetProgressStatus);
                 entity.setProgressStatus(targetProgressStatus);
+                LocalDateTime completedAt = null;
                 if (PROGRESS_COMPLETED.equals(targetProgressStatus)) {
-                    entity.setCompletedAt(LocalDateTime.now());
+                    completedAt = LocalDateTime.now();
+                    entity.setCompletedAt(completedAt);
                 }
                 physiologicalResultRepository.save(entity);
                 TestResultDetailDTO detail = mapPhysiologicalDetail(getPhysiologicalResultResponse(resultId));
+                syncTestExecutionWhenResultCompleted(detail, normalizedType, completedAt);
                 stageDiagnosticIfCompleted(detail);
                 yield detail;
             }
@@ -1099,6 +1119,34 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
             case TYPE_PHYSIOLOGICAL -> "생리기능검사";
             default -> resultType;
         };
+    }
+
+    private void syncTestExecutionWhenResultCompleted(TestResultDetailDTO detail, String resultType, LocalDateTime resultCompletedAt) {
+        if (detail == null || !PROGRESS_COMPLETED.equalsIgnoreCase(trimToEmpty(detail.getProgressStatus()))) {
+            return;
+        }
+
+        String testExecutionId = trimToEmpty(detail.getTestExecutionId());
+        if (testExecutionId.isEmpty()) {
+            log.warn("Skip testExecution completion sync: missing testExecutionId. resultId={}, resultType={}",
+                    detail.getResultId(), resultType);
+            return;
+        }
+
+        Optional<TestExecutionEntity> executionOptional = testExecutionRepository.findById(testExecutionId);
+        if (executionOptional.isEmpty()) {
+            log.warn("Skip testExecution completion sync: execution not found. resultId={}, resultType={}, testExecutionId={}",
+                    detail.getResultId(), resultType, testExecutionId);
+            return;
+        }
+
+        TestExecutionEntity executionEntity = executionOptional.get();
+        executionEntity.setProgressStatus(PROGRESS_COMPLETED);
+        if (executionEntity.getCompletedAt() == null) {
+            executionEntity.setCompletedAt(resultCompletedAt != null ? resultCompletedAt : LocalDateTime.now());
+        }
+        executionEntity.setUpdatedAt(LocalDateTime.now());
+        testExecutionRepository.save(executionEntity);
     }
 
     private void stageDiagnosticIfCompleted(TestResultDetailDTO detail) {
