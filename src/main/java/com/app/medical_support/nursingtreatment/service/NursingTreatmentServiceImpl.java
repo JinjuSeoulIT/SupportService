@@ -166,7 +166,6 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         entity.setPatientName(medicationRecordDTO.getPatientName());
         entity.setDepartmentName(medicationRecordDTO.getDepartmentName());
         MedicationRecordDTO saved = toMedicationRecordDTO(medicationRecordRepository.save(entity));
-        downstreamOutcomeEventPublisher.publishMedicationRecordOutcome(saved);
         stageMedicationIfCompleted(null, saved);
         return saved;
     }
@@ -209,7 +208,6 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
             entity.setDepartmentName(medicationRecordDTO.getDepartmentName());
         }
         MedicationRecordDTO saved = toMedicationRecordDTO(medicationRecordRepository.save(entity));
-        downstreamOutcomeEventPublisher.publishMedicationRecordOutcome(saved);
         stageMedicationIfCompleted(beforeProgressStatus, saved);
         return saved;
     }
@@ -221,7 +219,6 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
                 .orElseThrow(() -> new MedicationRecordNotFoundException(id));
         entity.setStatus(normalizeStatus(status));
         MedicationRecordDTO saved = toMedicationRecordDTO(medicationRecordRepository.save(entity));
-        downstreamOutcomeEventPublisher.publishMedicationRecordOutcome(saved);
         return saved;
     }
 
@@ -254,7 +251,6 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
         entity.setPatientName(treatmentResultDTO.getPatientName());
         entity.setDepartmentName(treatmentResultDTO.getDepartmentName());
         TreatmentResultDTO saved = toTreatmentResultDTO(treatmentResultRepository.save(entity));
-        downstreamOutcomeEventPublisher.publishTreatmentResultOutcome(saved);
         stageTreatmentIfCompleted(null, saved);
         return saved;
     }
@@ -294,7 +290,6 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
             entity.setDepartmentName(treatmentResultDTO.getDepartmentName());
         }
         TreatmentResultDTO saved = toTreatmentResultDTO(treatmentResultRepository.save(entity));
-        downstreamOutcomeEventPublisher.publishTreatmentResultOutcome(saved);
         stageTreatmentIfCompleted(beforeProgressStatus, saved);
         return saved;
     }
@@ -306,7 +301,6 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
                 .orElseThrow(() -> new TreatmentResultNotFoundException(id));
         entity.setStatus(normalizeStatus(status));
         TreatmentResultDTO saved = toTreatmentResultDTO(treatmentResultRepository.save(entity));
-        downstreamOutcomeEventPublisher.publishTreatmentResultOutcome(saved);
         return saved;
     }
 
@@ -439,6 +433,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
                 saved.getMedicationRecordId(),
                 saved.getMedicationId()
         );
+        downstreamOutcomeEventPublisher.publishMedicationRecordOutcome(saved);
     }
 
     private void stageTreatmentIfCompleted(String beforeProgressStatus, TreatmentResultDTO saved) {
@@ -450,6 +445,7 @@ public class NursingTreatmentServiceImpl implements NursingTreatmentService {
                 saved.getTreatmentResultId(),
                 saved.getDetail()
         );
+        downstreamOutcomeEventPublisher.publishTreatmentResultOutcome(saved);
     }
 
     private boolean isCompleted(String progressStatus) {

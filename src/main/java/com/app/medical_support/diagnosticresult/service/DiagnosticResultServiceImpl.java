@@ -4,6 +4,7 @@ import com.app.medical_support.common.sequence.SequenceIdService;
 import com.app.medical_support.common.sequence.SequenceIdType;
 import com.app.medical_support.common.exception.InvalidRequestException;
 import com.app.medical_support.common.integration.claims.service.ClaimsCompletionStageService;
+import com.app.medical_support.integration.outbound.kafka.DownstreamOutcomeEventPublisher;
 import com.app.medical_support.diagnosticresult.dto.*;
 import com.app.medical_support.diagnosticresult.entity.EndoscopyResultEntity;
 import com.app.medical_support.diagnosticresult.entity.ImagingResultEntity;
@@ -35,6 +36,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
     private final SpecimenTestResultRepository specimenTestResultRepository;
     private final SequenceIdService sequenceIdService;
     private final ClaimsCompletionStageService claimsCompletionStageService;
+    private final DownstreamOutcomeEventPublisher downstreamOutcomeEventPublisher;
 
     private static final String TYPE_IMAGING = "IMAGING";
     private static final String TYPE_SPECIMEN = "SPECIMEN";
@@ -1108,6 +1110,7 @@ public class DiagnosticResultServiceImpl implements DiagnosticResultService {
                 detail.getResultType(),
                 detail.getResultId()
         );
+        downstreamOutcomeEventPublisher.publishDiagnosticTestResultOutcome(detail);
     }
 
 }
