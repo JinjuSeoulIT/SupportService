@@ -11,6 +11,7 @@ import java.util.Optional;
 
 public interface EndoscopyResultRepository extends JpaRepository<EndoscopyResultEntity, String> {
     boolean existsByEndoscopyExamId(String endoscopyExamId);
+    Optional<EndoscopyResultEntity> findByEndoscopyExamId(String endoscopyExamId);
 
     @Query("""
             select new com.app.medical_support.diagnosticresult.dto.EndoscopyResultDTO(

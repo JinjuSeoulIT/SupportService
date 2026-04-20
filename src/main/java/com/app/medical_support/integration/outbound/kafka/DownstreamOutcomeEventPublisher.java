@@ -56,54 +56,60 @@ public class DownstreamOutcomeEventPublisher {
 
 
     public void publishMedicationRecordOutcome(MedicationRecordDTO body) {
-
-        if (!downstreamKafkaProperties.isEnabled() || body == null) {
-
+        if (!canPublish("medicationRecord", body)) {
             return;
-
         }
 
         Object key = body.getMedicationRecordId() != null ? body.getMedicationRecordId() : body.getMedicationId();
-
-        streamBridge.send(
-
+        sendWithTrace(
+                "medicationRecord",
                 BINDING_OUT_MEDICATION_RECORD_OUTCOME,
-
-                MessageBuilder.withPayload(new Event<>(CREATE, key, body)).build());
-
+                key,
+                body,
+                "medicationRecordId=" + body.getMedicationRecordId()
+                        + ", medicationId=" + body.getMedicationId()
+                        + ", patientId=" + body.getPatientId()
+        );
     }
 
 
 
     public void publishTreatmentResultOutcome(TreatmentResultDTO body) {
-
-        if (!downstreamKafkaProperties.isEnabled() || body == null) {
-
+        if (!canPublish("treatmentResult", body)) {
             return;
-
         }
 
         Object key = body.getTreatmentResultId() != null ? body.getTreatmentResultId() : body.getProcedureResultId();
-
-        streamBridge.send(
-
+        sendWithTrace(
+                "treatmentResult",
                 BINDING_OUT_TREATMENT_RESULT_OUTCOME,
-
-                MessageBuilder.withPayload(new Event<>(CREATE, key, body)).build());
-
+                key,
+                body,
+                "treatmentResultId=" + body.getTreatmentResultId()
+                        + ", procedureResultId=" + body.getProcedureResultId()
+                        + ", patientId=" + body.getPatientId()
+        );
     }
 
     /**
      * 검사(실행) 진행상태가 {@code COMPLETED}로 전환되는 시점에 발행합니다.
      */
     public void publishDiagnosticExamOutcome(DiagnosticExamOutcomeDTO body) {
-        if (!downstreamKafkaProperties.isEnabled() || body == null) {
+        if (!canPublish("diagnosticExam", body)) {
             return;
         }
         Object key = body.getExamId() != null ? body.getExamId() : body.getTestExecutionId();
-        streamBridge.send(
+        sendWithTrace(
+                "diagnosticExam",
                 BINDING_OUT_DIAGNOSTIC_EXAM_OUTCOME,
-                MessageBuilder.withPayload(new Event<>(CREATE, key, body)).build());
+                key,
+                body,
+                "examKind=" + body.getExamKind()
+                        + ", examId=" + body.getExamId()
+                        + ", testExecutionId=" + body.getTestExecutionId()
+                        + ", patientId=" + body.getPatientId()
+                        + ", progressStatus=" + body.getProgressStatus()
+        );
     }
 
 
@@ -115,21 +121,72 @@ public class DownstreamOutcomeEventPublisher {
      */
 
     public void publishDiagnosticTestResultOutcome(TestResultDetailDTO body) {
-
-        if (!downstreamKafkaProperties.isEnabled() || body == null) {
-
+        if (!canPublish("diagnosticTestResult", body)) {
             return;
-
         }
 
         Object key = body.getResultId() != null ? body.getResultId() : body.getTestExecutionId();
-
-        streamBridge.send(
-
+        sendWithTrace(
+                "diagnosticTestResult",
                 BINDING_OUT_DIAGNOSTIC_TEST_RESULT_OUTCOME,
+                key,
+                body,
+                "resultType=" + body.getResultType()
+                        + ", resultId=" + body.getResultId()
+                        + ", testExecutionId=" + body.getTestExecutionId()
+                        + ", patientId=" + body.getPatientId()
+                        + ", progressStatus=" + body.getProgressStatus()
+        );
+    }
 
-                MessageBuilder.withPayload(new Event<>(CREATE, key, body)).build());
+    private boolean canPublish(String eventType, Object body) {
+        if (!downstreamKafkaProperties.isEnabled()) {
+            log.info("Kafka publish skipped: eventType={}, reason=kafkaDisabled", eventType);
+            return false;
+        }
+        if (body == null) {
+            log.warn("Kafka publish skipped: eventType={}, reason=nullBody", eventType);
+            return false;
+        }
+        return true;
+    }
 
+    private void sendWithTrace(String eventType, String bindingName, Object key, Object body, String identifiers) {
+        try {
+            boolean sent = streamBridge.send(
+                    bindingName,
+                    MessageBuilder.withPayload(new Event<>(CREATE, key, body)).build()
+            );
+            if (sent) {
+                log.info(
+                        "Kafka publish success: eventType={}, binding={}, key={}, sent={}, {}",
+                        eventType,
+                        bindingName,
+                        key,
+                        true,
+                        identifiers
+                );
+            } else {
+                log.warn(
+                        "Kafka publish failed: eventType={}, binding={}, key={}, sent={}, {}",
+                        eventType,
+                        bindingName,
+                        key,
+                        false,
+                        identifiers
+                );
+            }
+        } catch (RuntimeException ex) {
+            log.error(
+                    "Kafka publish error: eventType={}, binding={}, key={}, {}, message={}",
+                    eventType,
+                    bindingName,
+                    key,
+                    identifiers,
+                    ex.getMessage(),
+                    ex
+            );
+        }
     }
 
 }

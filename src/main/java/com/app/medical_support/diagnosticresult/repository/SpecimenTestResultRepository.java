@@ -11,6 +11,7 @@ import java.util.Optional;
 
 public interface SpecimenTestResultRepository extends JpaRepository<SpecimenTestResultEntity, String> {
     boolean existsBySpecimenExamId(String specimenExamId);
+    Optional<SpecimenTestResultEntity> findBySpecimenExamId(String specimenExamId);
 
     @Query("""
             select new com.app.medical_support.diagnosticresult.dto.SpecimenTestResultDTO(

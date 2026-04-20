@@ -11,6 +11,7 @@ import java.util.Optional;
 
 public interface PathologyResultRepository extends JpaRepository<PathologyResultEntity, String> {
     boolean existsByPathologyExamId(String pathologyExamId);
+    Optional<PathologyResultEntity> findByPathologyExamId(String pathologyExamId);
 
     @Query("""
             select new com.app.medical_support.diagnosticresult.dto.PathologyResultDTO(

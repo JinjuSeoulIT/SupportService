@@ -11,6 +11,7 @@ import java.util.Optional;
 
 public interface ImagingResultRepository extends JpaRepository<ImagingResultEntity, String> {
     boolean existsByImagingExamId(String imagingExamId);
+    Optional<ImagingResultEntity> findByImagingExamId(String imagingExamId);
 
     @Query("""
             select new com.app.medical_support.diagnosticresult.dto.ImagingResultDTO(

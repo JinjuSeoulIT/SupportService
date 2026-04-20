@@ -11,6 +11,7 @@ import java.util.Optional;
 
 public interface PhysiologicalResultRepository extends JpaRepository<PhysiologicalResultEntity, String> {
     boolean existsByPhysiologicalExamId(String physiologicalExamId);
+    Optional<PhysiologicalResultEntity> findByPhysiologicalExamId(String physiologicalExamId);
 
     @Query("""
             select new com.app.medical_support.diagnosticresult.dto.PhysiologicalResultDTO(

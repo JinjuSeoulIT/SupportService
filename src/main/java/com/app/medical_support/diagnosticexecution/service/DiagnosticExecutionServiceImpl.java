@@ -1,6 +1,7 @@
 package com.app.medical_support.diagnosticexecution.service;
 
 import com.app.medical_support.common.exception.InvalidRequestException;
+import com.app.medical_support.common.integration.claims.service.ClaimsCompletionStageService;
 import com.app.medical_support.integration.outbound.kafka.DownstreamOutcomeEventPublisher;
 import com.app.medical_support.common.sequence.SequenceIdService;
 import com.app.medical_support.common.sequence.SequenceIdType;
@@ -72,6 +73,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -103,6 +105,7 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
     private final ImagingReqMapstruct imagingReqMapstruct;
     private final ImagingResMapstruct imagingResMapstruct;
     private final DownstreamOutcomeEventPublisher downstreamOutcomeEventPublisher;
+    private final ClaimsCompletionStageService claimsCompletionStageService;
 
     @Override
     public List<ImagingDTO> findImagingList(ImagingExamSearchCondition condition) {
@@ -166,6 +169,9 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
 
         if (!isCompleted(previousProgressStatus) && isCompleted(savedEntity.getProgressStatus())) {
             ensureImagingResultExists(savedEntity);
+            stageDiagnosticCompletionFromExam("IMAGING", savedEntity.getPatientId(),
+                    imagingResultRepository.findByImagingExamId(savedEntity.getImagingExamId())
+                            .map(ImagingResultEntity::getImagingResultId));
             downstreamOutcomeEventPublisher.publishDiagnosticExamOutcome(
                     toDiagnosticExamOutcome(
                             "IMAGING",
@@ -244,6 +250,9 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
 
         if (!isCompleted(previousProgressStatus) && isCompleted(savedEntity.getProgressStatus())) {
             ensureEndoscopyResultExists(savedEntity);
+            stageDiagnosticCompletionFromExam("ENDOSCOPY", savedEntity.getPatientId(),
+                    endoscopyResultRepository.findByEndoscopyExamId(savedEntity.getEndoscopyExamId())
+                            .map(EndoscopyResultEntity::getEndoscopyResultId));
             downstreamOutcomeEventPublisher.publishDiagnosticExamOutcome(
                     toDiagnosticExamOutcome(
                             "ENDOSCOPY",
@@ -322,6 +331,9 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
 
         if (!isCompleted(previousProgressStatus) && isCompleted(savedEntity.getProgressStatus())) {
             ensurePathologyResultExists(savedEntity);
+            stageDiagnosticCompletionFromExam("PATHOLOGY", savedEntity.getPatientId(),
+                    pathologyResultRepository.findByPathologyExamId(savedEntity.getPathologyExamId())
+                            .map(PathologyResultEntity::getPathologyExamResultId));
             downstreamOutcomeEventPublisher.publishDiagnosticExamOutcome(
                     toDiagnosticExamOutcome(
                             "PATHOLOGY",
@@ -396,6 +408,9 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
 
         if (!isCompleted(previousProgressStatus) && isCompleted(savedEntity.getProgressStatus())) {
             ensurePhysiologicalResultExists(savedEntity);
+            stageDiagnosticCompletionFromExam("PHYSIOLOGICAL", savedEntity.getPatientId(),
+                    physiologicalResultRepository.findByPhysiologicalExamId(savedEntity.getPhysiologicalExamId())
+                            .map(PhysiologicalResultEntity::getPhysiologicalExamResultId));
             downstreamOutcomeEventPublisher.publishDiagnosticExamOutcome(
                     toDiagnosticExamOutcome(
                             "PHYSIOLOGICAL",
@@ -525,6 +540,9 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
 
         if (!isCompleted(previousProgressStatus) && isCompleted(savedEntity.getProgressStatus())) {
             ensureSpecimenResultExists(savedEntity);
+            stageDiagnosticCompletionFromExam("SPECIMEN", savedEntity.getPatientId(),
+                    specimenTestResultRepository.findBySpecimenExamId(savedEntity.getSpecimenExamId())
+                            .map(SpecimenTestResultEntity::getSpecimenExamResultId));
             downstreamOutcomeEventPublisher.publishDiagnosticExamOutcome(
                     toDiagnosticExamOutcome(
                             "SPECIMEN",
@@ -853,6 +871,12 @@ public class DiagnosticExecutionServiceImpl implements DiagnosticExecutionServic
         resultEntity.setCreatedAt(now);
         resultEntity.setConfirmedAt(now);
         specimenTestResultRepository.save(resultEntity);
+    }
+
+    private void stageDiagnosticCompletionFromExam(String resultType, Long patientId, Optional<String> resultIdOptional) {
+        resultIdOptional.ifPresent(resultId ->
+                claimsCompletionStageService.stageDiagnosticCompleted(patientId, resultType, resultId)
+        );
     }
 
     private List<ImagingDTO> filterImagingList(List<ImagingDTO> list, ImagingExamSearchCondition raw) {
