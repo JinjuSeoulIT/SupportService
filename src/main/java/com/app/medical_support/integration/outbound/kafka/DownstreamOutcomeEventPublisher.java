@@ -3,6 +3,7 @@ package com.app.medical_support.integration.outbound.kafka;
 
 
 import com.app.medical_support.common.event.Event;
+import com.app.medical_support.common.integration.clinical.service.ClinicalIntegrationService;
 import com.app.medical_support.diagnosticexecution.dto.DiagnosticExamOutcomeDTO;
 import com.app.medical_support.diagnosticresult.dto.TestResultDetailDTO;
 import com.app.medical_support.nursingtreatment.dto.MedicationRecordDTO;
@@ -52,6 +53,7 @@ public class DownstreamOutcomeEventPublisher {
     private final StreamBridge streamBridge;
 
     private final DownstreamKafkaProperties downstreamKafkaProperties;
+    private final ClinicalIntegrationService clinicalIntegrationService;
 
 
 
@@ -62,6 +64,7 @@ public class DownstreamOutcomeEventPublisher {
             return;
 
         }
+        ensureVisitId(body);
 
         Object key = body.getMedicationRecordId() != null ? body.getMedicationRecordId() : body.getMedicationId();
 
@@ -82,6 +85,7 @@ public class DownstreamOutcomeEventPublisher {
             return;
 
         }
+        ensureVisitId(body);
 
         Object key = body.getTreatmentResultId() != null ? body.getTreatmentResultId() : body.getProcedureResultId();
 
@@ -100,6 +104,7 @@ public class DownstreamOutcomeEventPublisher {
         if (!downstreamKafkaProperties.isEnabled() || body == null) {
             return;
         }
+        ensureVisitId(body);
         Object key = body.getExamId() != null ? body.getExamId() : body.getTestExecutionId();
         streamBridge.send(
                 BINDING_OUT_DIAGNOSTIC_EXAM_OUTCOME,
@@ -121,6 +126,7 @@ public class DownstreamOutcomeEventPublisher {
             return;
 
         }
+        ensureVisitId(body);
 
         Object key = body.getResultId() != null ? body.getResultId() : body.getTestExecutionId();
 
@@ -130,6 +136,38 @@ public class DownstreamOutcomeEventPublisher {
 
                 MessageBuilder.withPayload(new Event<>(CREATE, key, body)).build());
 
+    }
+
+    private void ensureVisitId(MedicationRecordDTO body) {
+        if (body == null || body.getVisitId() != null || body.getPatientId() == null) {
+            return;
+        }
+        Long visitId = clinicalIntegrationService.resolveVisitIdByPatientId(body.getPatientId());
+        body.setVisitId(visitId);
+    }
+
+    private void ensureVisitId(TreatmentResultDTO body) {
+        if (body == null || body.getVisitId() != null || body.getPatientId() == null) {
+            return;
+        }
+        Long visitId = clinicalIntegrationService.resolveVisitIdByPatientId(body.getPatientId());
+        body.setVisitId(visitId);
+    }
+
+    private void ensureVisitId(DiagnosticExamOutcomeDTO body) {
+        if (body == null || body.getVisitId() != null || body.getPatientId() == null) {
+            return;
+        }
+        Long visitId = clinicalIntegrationService.resolveVisitIdByPatientId(body.getPatientId());
+        body.setVisitId(visitId);
+    }
+
+    private void ensureVisitId(TestResultDetailDTO body) {
+        if (body == null || body.getVisitId() != null || body.getPatientId() == null) {
+            return;
+        }
+        Long visitId = clinicalIntegrationService.resolveVisitIdByPatientId(body.getPatientId());
+        body.setVisitId(visitId);
     }
 
 }

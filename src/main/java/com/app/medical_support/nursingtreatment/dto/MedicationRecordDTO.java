@@ -26,6 +26,7 @@ public class MedicationRecordDTO {
     private String progressStatus;
     private String createdAt;
     private Long patientId;
+    private Long visitId;
     private String patientName;
     private String departmentName;
 }

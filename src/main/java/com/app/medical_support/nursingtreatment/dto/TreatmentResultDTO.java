@@ -26,6 +26,7 @@ public class TreatmentResultDTO {
     private String nurseName;
     private String detail;
     private Long patientId;
+    private Long visitId;
     private String patientName;
     private String departmentName;
 }

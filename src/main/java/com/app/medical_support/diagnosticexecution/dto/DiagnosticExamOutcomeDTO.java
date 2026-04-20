@@ -14,6 +14,7 @@ public class DiagnosticExamOutcomeDTO {
     private Long orderItemId;
     private String progressStatus;
     private Long patientId;
+    private Long visitId;
     private String detailCode;
 }
 
